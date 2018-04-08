@@ -1,5 +1,6 @@
 package fe.game;
 
+import h2d.Bitmap;
 import h2d.Graphics;
 import h2d.Interactive;
 import h2d.Layers;
@@ -32,6 +33,7 @@ class Board
 	var mask:Mask;
 	var container:Layers;
 	var background:Graphics;
+	var selectedElemBackground:Bitmap;
 	var effectHandler:EffectHandler;
 
 	var isDragging:Bool = false;
@@ -63,13 +65,18 @@ class Board
 					background.drawTile(i * Elem.SIZE - Elem.SIZE / 2 + 2.5, j * Elem.SIZE - Elem.SIZE / 2 + 2.5, Res.image.game.elem_background.toTile());
 		background.endFill();
 
+		selectedElemBackground = new Bitmap(Res.image.game.elem_selected.toTile(), container);
+		selectedElemBackground.tile.dx = cast -selectedElemBackground.tile.width / 2;
+		selectedElemBackground.tile.dy = cast -selectedElemBackground.tile.height / 2;
+		selectedElemBackground.visible = false;
+
 		addElemsToBoard();
 		checkMap();
 		removeAllMatch();
 
 		mask.width = Std.int(container.getSize().width + Elem.SIZE / 2);
 		mask.height = Std.int(container.getSize().height + Elem.SIZE / 2);
-		mask.setPos(50, 50);
+		mask.setPos(25, 25);
 
 		createInteractive();
 	}
@@ -128,6 +135,8 @@ class Board
 			}
 			else if (!isAnimationInProgress)
 			{
+				selectedElemBackground.visible = false;
+
 				if (focusElement != null)
 				{
 					focusElement.hasMouseHover = false;
@@ -141,8 +150,12 @@ class Board
 				if (focusElement != null)
 				{
 					focusElement.hasMouseHover = true;
+					selectedElemBackground.x = focusElement.graphic.x;
+					selectedElemBackground.y = focusElement.graphic.y;
+					selectedElemBackground.visible = true;
 				}
 			}
+			else selectedElemBackground.visible = false;
 		};
 	}
 
@@ -198,34 +211,30 @@ class Board
 		tempB.isUnderSwapping = true;
 		isAnimationInProgress = true;
 
-		var tempSavedX = tempA.x;
-		var tempSavedY = tempA.y;
+		var tempSavedX = tempA.graphic.x;
+		var tempSavedY = tempA.graphic.y;
 		var tempSavedindexX = tempA.indexX;
 		var tempSavedindexY = tempA.indexY;
 
 		map[indexY][indexX] = tempA;
-		tempA.x = tempB.x;
-		tempA.y = tempB.y;
 		tempA.indexX = tempB.indexX;
 		tempA.indexY = tempB.indexY;
 
 		map[targetIndexY][targetIndexX] = tempB;
-		tempB.x = tempSavedX;
-		tempB.y = tempSavedY;
 		tempB.indexX = tempSavedindexX;
 		tempB.indexY = tempSavedindexY;
 
 		Actuate.tween(tempA, .3, {
-			animationX: tempA.x,
-			animationY: tempA.y
+			animationX: tempB.graphic.x,
+			animationY: tempB.graphic.y
 		}).onUpdate(function() {
 			tempA.graphic.x = tempA.animationX;
 			tempA.graphic.y = tempA.animationY;
 		}).ease(Quart.easeOut);
 
 		Actuate.tween(tempB, .3, {
-			animationX: tempB.x,
-			animationY: tempB.y
+			animationX: tempSavedX,
+			animationY: tempSavedY
 		}).onUpdate(function() {
 			tempB.graphic.x = tempB.animationX;
 			tempB.graphic.y = tempB.animationY;
@@ -322,8 +331,7 @@ class Board
 
 									prevPossibleElem.indexX = j;
 									prevPossibleElem.indexY = downIndex;
-									prevPossibleElem.x = j * Elem.SIZE;
-									prevPossibleElem.y = downIndex * Elem.SIZE;
+									prevPossibleElem.animationPath = [{ x: j * Elem.SIZE, y: downIndex * Elem.SIZE}];
 
 									map[downIndex - 2][j - 1] = null;
 									map[downIndex][j] = prevPossibleElem;
@@ -339,8 +347,7 @@ class Board
 
 									nextPossibleElem.indexX = j;
 									nextPossibleElem.indexY = downIndex;
-									nextPossibleElem.x = j * Elem.SIZE;
-									nextPossibleElem.y = downIndex * Elem.SIZE;
+									nextPossibleElem.animationPath = [{ x: j * Elem.SIZE, y: downIndex * Elem.SIZE}];
 
 									map[downIndex - 2][j + 1] = null;
 									map[downIndex][j] = nextPossibleElem;
@@ -364,7 +371,7 @@ class Board
 						}
 						else if (upperElem.type != ElemType.Empty)
 						{
-							upperElem.y = downIndex * Elem.SIZE;
+							upperElem.animationPath = [{ x: upperElem.graphic.x, y: downIndex * Elem.SIZE}];
 							upperElem.indexY = downIndex;
 
 							map[i - 1][j] = null;
@@ -378,10 +385,22 @@ class Board
 					}
 					else
 					{
-						map[i][j] = new Elem(i, j);
-						map[i][j].animationY = map[i][j].graphic.y = -Elem.SIZE;
-						container.addChild(map[i][j].graphic);
-						moveElemToPosition(map[i][j]);
+						var addingPosition:Float = -Elem.SIZE;
+						for (k in i + 1...map.length)
+						{
+							if (map[k][j] != null && map[k][j].type != ElemType.Empty)
+							{
+								addingPosition = map[k][j].graphic.y - Elem.SIZE;
+								break;
+							}
+						}
+
+						var lastElem = map[i][j] = new Elem(i, j);
+						lastElem.animationPath = [{ x: lastElem.graphic.x, y: lastElem.graphic.y}];
+						lastElem.animationY = lastElem.graphic.y = addingPosition;
+
+						container.addChild(lastElem.graphic);
+						moveElemToPosition(lastElem);
 
 						fillMap();
 						return;
@@ -417,19 +436,26 @@ class Board
 			e.graphic.rotation = e.rotation;
 		}).ease(Quad.easeOut)
 		.onComplete(function() {
-			Actuate.tween(e, getElemTweenSpeedByDistance(e.y - e.animationY), {
-				animationX: e.x,
-				animationY: e.y,
-				rotation: 0
-			}).onUpdate(function() {
-				e.graphic.x = e.animationX;
-				e.graphic.y = e.animationY;
-				e.graphic.rotation = e.rotation;
-			}).onComplete(function() {
-				e.graphic.moveFinished();
-				if (onComplete != null) onComplete();
-			}).ease(Quad.easeIn);
+			moveElemToNextPosition(e, onComplete);
 		});
+	}
+
+	function moveElemToNextPosition(e:Elem, onComplete:Void->Void = null)
+	{
+		Actuate.tween(e, getElemTweenSpeedByDistance(e.animationPath[0].y - e.graphic.y), {
+			animationX: e.animationPath[0].x,
+			animationY: e.animationPath[0].y,
+			rotation: 0
+		}).onUpdate(function() {
+			e.graphic.x = e.animationX;
+			e.graphic.y = e.animationY;
+			e.graphic.rotation = e.rotation;
+		}).onComplete(function() {
+			e.graphic.moveFinished();
+			e.animationPath.shift();
+			if (e.animationPath.length > 0) moveElemToNextPosition(e, onComplete);
+			else if (onComplete != null) onComplete();
+		}).ease(Quad.easeIn);
 	}
 
 	function getElemTweenSpeedByDistance(d:Float):Float
@@ -446,10 +472,10 @@ class Board
 				var size = e.graphic.getSize();
 
 				if (e != null && e.type != ElemType.Blocker
-					&& p.x > e.x - size.width / 2
-					&& p.x < e.x + size.width / 2
-					&& p.y > e.y - size.height / 2
-					&& p.y < e.y + size.height / 2
+					&& p.x > e.graphic.x - size.width / 2
+					&& p.x < e.graphic.x + size.width / 2
+					&& p.y > e.graphic.y - size.height / 2
+					&& p.y < e.graphic.y + size.height / 2
 				){
 					return e;
 				}
@@ -473,7 +499,7 @@ class Board
 		foundMatch = mapData.matches;
 		foundPossibilities = mapData.movePossibilities;
 
-		for (m in foundMatch) for (e in m) if (e != null) effectHandler.addMonsterMatchEffect(e.x, e.y);
+		for (m in foundMatch) for (e in m) if (e != null) effectHandler.addMonsterMatchEffect(e.graphic.x, e.graphic.y);
 
 		if (showHelpTimer != null)
 		{

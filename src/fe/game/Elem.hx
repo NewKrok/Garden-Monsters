@@ -1,6 +1,7 @@
 package fe.game;
 
 import fe.asset.ElemTile;
+import hpp.util.GeomUtil.SimplePoint;
 
 /**
  * ...
@@ -14,32 +15,31 @@ class Elem
 
 	public var indexX:UInt;
 	public var indexY:UInt;
-	public var x:Float;
-	public var y:Float;
 	public var animationX:Float;
 	public var animationY:Float;
 	public var rotation:Float;
 	public var type(default, set):ElemType;
 	public var isUnderSwapping:Bool;
 	public var graphic:ElemGraphic;
+	public var animationPath:Array<SimplePoint>;
 
 	public function new(row:UInt, col:UInt, type:ElemType = ElemType.Random)
 	{
 		indexX = col;
 		indexY = row;
-		x = col * SIZE;
-		y = row * SIZE;
-		animationX = x;
-		animationY = y;
+		animationX = col * SIZE;
+		animationY = row * SIZE;
 		rotation = 0;
 		isUnderSwapping = false;
+
+		animationPath = [];
 
 		graphic = new ElemGraphic();
 
 		this.type = type == ElemType.Random ? cast(1 + Math.floor(Math.random() * 7)) : type;
 
-		graphic.x = x;
-		graphic.y = y;
+		graphic.x = animationX;
+		graphic.y = animationY;
 
 		if (type == ElemType.Empty) graphic.visible = false;
 	}
