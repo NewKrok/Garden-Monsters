@@ -1,5 +1,6 @@
 package fe.state;
 
+import fe.game.Elem;
 import h2d.Bitmap;
 import h2d.Layers;
 import haxe.Timer;
@@ -37,8 +38,7 @@ class GameState extends Base2dState
 		new Bitmap(Res.image.game.background.toTile(), stage);
 
 		gameContainer = new Layers(stage);
-
-		effectHandler = new EffectHandler(gameContainer);
+		effectHandler = new EffectHandler();
 
 		resizeGameContainer();
 		reset();
@@ -46,6 +46,10 @@ class GameState extends Base2dState
 		//createRandomBoard(function(){ trace("Start Game!"); });
 
 		loadBoard();
+
+		effectHandler.view.x = 50 + Elem.SIZE / 2;
+		effectHandler.view.y = 50 + Elem.SIZE / 2;
+		gameContainer.addChild(effectHandler.view);
 	}
 
 	function createRandomBoard(onComplete:Void->Void)
@@ -57,7 +61,7 @@ class GameState extends Base2dState
 			Timer.delay(function(){ createRandomBoard(onComplete); }, 200);
 		else
 		{
-			board = new Board(gameContainer, map);
+			board = new Board(gameContainer, map, effectHandler);
 
 			trace("Board created, time: " + (Date.now().getTime() - boardCreationStartTime) + "ms, possibilities: " + board.foundPossibilities.length + ", match: " + board.foundMatch.length);
 			onComplete();
@@ -81,7 +85,7 @@ class GameState extends Base2dState
 			[ -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 ],
 			[ -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 ]
 		]);
-		board = new Board(gameContainer, map);
+		board = new Board(gameContainer, map, effectHandler);
 	}
 
 	override public function update(delta:Float)

@@ -1,14 +1,13 @@
 package fe.game;
 
-import fe.asset.ElemTile;
+import fe.AppConfig;
+import fe.asset.ElemTile.MonsterTileInfo;
 import h2d.Bitmap;
 import h2d.Sprite;
 import h2d.Tile;
 import h2d.filter.Glow;
 import motion.Actuate;
 import motion.easing.Quad;
-import fe.AppConfig;
-import fe.asset.ElemTile.MonsterTileInfo;
 
 /**
  * ...

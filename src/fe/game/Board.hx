@@ -1,5 +1,6 @@
 package fe.game;
 
+import h2d.Graphics;
 import h2d.Interactive;
 import h2d.Layers;
 import h2d.Mask;
@@ -8,6 +9,7 @@ import hpp.heaps.HppG;
 import hpp.util.GeomUtil;
 import hpp.util.GeomUtil.SimplePoint;
 import hxd.Event;
+import hxd.Res;
 import motion.Actuate;
 import motion.easing.Quad;
 import motion.easing.Quart;
@@ -27,6 +29,8 @@ class Board
 	var parent:Layers;
 	var mask:Mask;
 	var container:Layers;
+	var background:Graphics;
+	var effectHandler:EffectHandler;
 
 	var isDragging:Bool = false;
 	var isAnimationInProgress:Bool = false;
@@ -36,15 +40,24 @@ class Board
 	var draggedElement:Elem;
 	var focusElement:Elem;
 
-	public function new(parent:Layers, map:Array<Array<Elem>>)
+	public function new(parent:Layers, map:Array<Array<Elem>>, effectHandler:EffectHandler)
 	{
 		this.parent = parent;
 		this.map = map;
+		this.effectHandler = effectHandler;
 
 		mask = new Mask(100, 100, parent);
 
 		container = new Layers(mask);
 		container.setPos(Elem.SIZE / 2, Elem.SIZE / 2);
+
+		background = new Graphics(container);
+		background.beginFill(0xFF0000);
+		for (i in 0...map[0].length)
+			for (j in 0...map.length)
+				if (map[j][i].type != ElemType.Blocker && map[j][i].type != ElemType.Empty )
+					background.drawTile(i * Elem.SIZE - Elem.SIZE / 2 + 2.5, j * Elem.SIZE - Elem.SIZE / 2 + 2.5, Res.image.game.elem_background.toTile());
+		background.endFill();
 
 		addElemsToBoard();
 		checkMap();
@@ -52,7 +65,7 @@ class Board
 
 		mask.width = Std.int(container.getSize().width + Elem.SIZE / 2);
 		mask.height = Std.int(container.getSize().height + Elem.SIZE / 2);
-		mask.setPos(100, 100);
+		mask.setPos(50, 50);
 
 		createInteractive();
 	}
@@ -372,7 +385,7 @@ class Board
 		}
 
 		isAnimationInProgress = true;
-		Actuate.timer(.7).onComplete(function() {
+		Actuate.timer(1).onComplete(function() {
 			isAnimationInProgress = false;
 			checkMap();
 			if (foundMatch.length > 0 || isThereNullInMap())removeAllMatch();
@@ -451,7 +464,7 @@ class Board
 		foundMatch = mapData.matches;
 		foundPossibilities = mapData.movePossibilities;
 
-		for (m in foundMatch) for (e in m) if (e != null) e.graphic.setScale(.8);
+		for (m in foundMatch) for (e in m) if (e != null) effectHandler.addMonsterMatchEffect(e.x, e.y);
 		//for (m in foundPossibilities) if (m != null) m.graphic.filter = new Glow(0xFFFF00, 1, 1, 3, 1);
 
 		debugMapTrace();

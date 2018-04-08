@@ -8,7 +8,7 @@ import fe.asset.ElemTile;
  */
 class Elem
 {
-	public static var SIZE(default, null):UInt = 90;
+	public static var SIZE(default, null):UInt = 105;
 
 	public var hasMouseHover(default, set):Bool = false;
 
@@ -51,7 +51,11 @@ class Elem
 		if (type == ElemType.Empty || type == null) graphic.setTile(ElemTile.emptyElemGraphic);
 		else graphic.setTile(ElemTile.tiles.get(cast type));
 
-		if (type == ElemType.Empty) graphic.visible = false;
+		switch (type)
+		{
+			case ElemType.Empty: graphic.visible = false;
+			case _:
+		}
 
 		return v;
 	}
