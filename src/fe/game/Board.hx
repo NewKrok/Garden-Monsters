@@ -5,12 +5,14 @@ import h2d.Interactive;
 import h2d.Layers;
 import h2d.Mask;
 import h2d.filter.Glow;
+import haxe.Timer;
 import hpp.heaps.HppG;
 import hpp.util.GeomUtil;
 import hpp.util.GeomUtil.SimplePoint;
 import hxd.Event;
 import hxd.Res;
 import motion.Actuate;
+import motion.actuators.GenericActuator;
 import motion.easing.Quad;
 import motion.easing.Quart;
 import fe.game.Elem.ElemType;
@@ -39,6 +41,8 @@ class Board
 	var dragStartPoint:SimplePoint = { x: 0, y: 0 };
 	var draggedElement:Elem;
 	var focusElement:Elem;
+
+	var showHelpTimer:Dynamic;
 
 	public function new(parent:Layers, map:Array<Array<Elem>>, effectHandler:EffectHandler)
 	{
@@ -101,20 +105,22 @@ class Board
 			if (isDragging)
 			{
 				var d:Float = GeomUtil.getDistance({ x: e.relX, y: e.relY }, dragStartPoint);
+
 				if (d > 25)
 				{
 					var a:Float = GeomUtil.getAngle({ x: e.relX, y: e.relY }, dragStartPoint) * (180 / Math.PI);
-					if ((a > 135 && a < 180)
-						|| (a > -180 && a < -135)
+
+					if ((a > 135 && a <= 180)
+						|| (a > -180 && a <= -135)
 					)
 						dragDirection = DragDirection.Right;
-					else if ((a > 0 && a < 45)
-						|| (a > -45 && a < 0)
+					else if ((a > 0 && a <= 45)
+						|| (a > -45 && a <= 0)
 					)
 						dragDirection = DragDirection.Left;
-					else if (a > 45 && a < 135)
+					else if (a > 45 && a <= 135)
 						dragDirection = DragDirection.Up;
-					else if (a > -135 && a < -45)
+					else if (a > -135 && a <= -45)
 						dragDirection = DragDirection.Down;
 
 					swapElemRequest();
@@ -458,14 +464,26 @@ class Board
 		for (row in map)
 			for (elem in row)
 				if (elem != null)
+				{
+					elem.graphic.filter = null;
 					elem.graphic.setScale(1);
+				}
 
 		var mapData = BoardHelper.analyzeMap(map);
 		foundMatch = mapData.matches;
 		foundPossibilities = mapData.movePossibilities;
 
 		for (m in foundMatch) for (e in m) if (e != null) effectHandler.addMonsterMatchEffect(e.x, e.y);
-		//for (m in foundPossibilities) if (m != null) m.graphic.filter = new Glow(0xFFFF00, 1, 1, 3, 1);
+
+		if (showHelpTimer != null)
+		{
+			showHelpTimer = null;
+			Actuate.stop(showHelpTimer);
+		}
+		showHelpTimer = Actuate.timer(5).onComplete(function() {
+			if (foundPossibilities.length == 1) trace("NO MORE MOVES!");
+			else for (m in foundPossibilities) if (m != null) m.graphic.filter = new Glow(0xFFFF00, 1, 1, 3, 1);
+		});
 
 		debugMapTrace();
 	}

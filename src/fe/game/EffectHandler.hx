@@ -1,7 +1,9 @@
 package fe.game;
 
+import h2d.Bitmap;
 import h2d.Layers;
 import h2d.Particles;
+import h2d.Tile;
 import hxd.Res;
 import motion.Actuate;
 
@@ -24,6 +26,12 @@ class EffectHandler
 
 	public function addMonsterMatchEffect(x:Float, y:Float):Void
 	{
+		addExplosionLight(x, y);
+		addStarEffect(x, y);
+	}
+
+	function addStarEffect(x:Float, y:Float):Void
+	{
 		var g = new ParticleGroup(particles);
 
 		g.sizeRand = .3;
@@ -36,7 +44,7 @@ class EffectHandler
 		g.emitLoop = false;
 		g.speedRand = 3;
 		g.fadeIn = 0;
-		g.fadeOut = 0;
+		g.fadeOut = .5;
 		g.rotSpeed = Math.PI / 5;
 		g.rotSpeedRand = Math.PI / 5;
 		g.texture = Res.image.game.effect.star.toTexture();
@@ -48,6 +56,31 @@ class EffectHandler
 		Actuate.timer(MONSTER_MATCH_EFFECT_DURATION).onComplete(function() {
 			removeEffect(g);
 		});
+	}
+
+	function addExplosionLight(x:Float, y:Float)
+	{
+		var image:Bitmap = new Bitmap(Res.image.game.effect.light.toTile(), view);
+		image.x = x;
+		image.y = y;
+		image.setScale(.5);
+
+		var tile:Tile = image.tile;
+		tile.dx = cast -tile.width / 2;
+		tile.dy = cast -tile.height / 2;
+
+		Actuate.tween(image, MONSTER_MATCH_EFFECT_DURATION, {
+			scaleX: 1, scaleY: 1, alpha: 0
+		}).onUpdate(function(){
+			image.setScale(image.scaleX);
+		}).onComplete(function(){
+			removeExplosionLight(image);
+		});
+	}
+
+	function removeExplosionLight(img:Bitmap)
+	{
+		img.remove();
 	}
 
 	function removeEffect(g:ParticleGroup)
