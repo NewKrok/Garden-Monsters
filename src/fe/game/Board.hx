@@ -14,6 +14,7 @@ import hxd.Event;
 import hxd.Res;
 import motion.Actuate;
 import motion.actuators.GenericActuator;
+import motion.easing.Linear;
 import motion.easing.Quad;
 import motion.easing.Quart;
 import fe.game.Elem.ElemType;
@@ -147,7 +148,7 @@ class Board
 					y: e.relY - container.y - mask.y
 				});
 
-				if (focusElement != null)
+				if (focusElement != null && focusElement.type != ElemType.Empty)
 				{
 					focusElement.hasMouseHover = true;
 					selectedElemBackground.x = focusElement.graphic.x;
@@ -317,21 +318,49 @@ class Board
 							if (downIndex - i > 1 || i - upperIndex > 1)
 							{
 								var prevPossibleElem = map[downIndex - 2][j - 1];
+								var isPrevBlocked:Bool = map[downIndex - 1][j - 1] == null || map[downIndex - 1][j - 1].type == ElemType.Blocker;
 								var nextPossibleElem = map[downIndex - 2][j + 1];
+								var isNextBlocked:Bool = map[downIndex - 1][j + 1] == null || map[downIndex - 1][j + 1].type == ElemType.Blocker;
 
 								if (
 									(crossFillFromLeft
 										|| nextPossibleElem == null
 										|| nextPossibleElem.type == ElemType.Empty
-										|| nextPossibleElem.type == ElemType.Blocker)
+										|| nextPossibleElem.type == ElemType.Blocker
+										|| isNextBlocked)
 									&& prevPossibleElem != null
+									&& !isPrevBlocked
 									&& BoardHelper.isMovableElem(prevPossibleElem)
 								){
 									crossFillFromLeft = !crossFillFromLeft;
 
 									prevPossibleElem.indexX = j;
 									prevPossibleElem.indexY = downIndex;
-									prevPossibleElem.animationPath = [{ x: j * Elem.SIZE, y: downIndex * Elem.SIZE}];
+									prevPossibleElem.animationPath = [];
+
+									var offsetBeforeChangeCol:Int = 0;
+									if (map[downIndex - 1][j - 1] == null || map[downIndex - 1][j - 1].graphic.y != map[downIndex - 1][j - 1].indexY * Elem.SIZE)
+										offsetBeforeChangeCol = Math.round(Math.abs(Math.round(map[downIndex - 1][j - 1].graphic.y - map[downIndex - 1][j - 1].indexY * Elem.SIZE)) / Elem.SIZE);
+
+									if (offsetBeforeChangeCol > 0)
+									{
+										var maxYBeforeColChange:Float = prevPossibleElem.graphic.y + offsetBeforeChangeCol * Elem.SIZE;
+
+										prevPossibleElem.animationPath.push(
+											{ x: prevPossibleElem.graphic.x, y: maxYBeforeColChange }
+										);
+										prevPossibleElem.animationPath.push(
+											{ x: prevPossibleElem.graphic.x + Elem.SIZE, y: maxYBeforeColChange + Elem.SIZE }
+										);
+									}
+									else
+										prevPossibleElem.animationPath.push(
+											{ x: prevPossibleElem.graphic.x + Elem.SIZE, y: prevPossibleElem.graphic.y + Elem.SIZE }
+										);
+
+									prevPossibleElem.animationPath.push(
+										{ x: j * Elem.SIZE, y: downIndex * Elem.SIZE}
+									);
 
 									map[downIndex - 2][j - 1] = null;
 									map[downIndex][j] = prevPossibleElem;
@@ -341,13 +370,40 @@ class Board
 									fillMap();
 									return;
 								}
-								else if (nextPossibleElem != null && BoardHelper.isMovableElem(nextPossibleElem))
-								{
+								else if (
+									nextPossibleElem != null
+									&& !isNextBlocked
+									&& BoardHelper.isMovableElem(nextPossibleElem)
+								){
 									crossFillFromLeft = !crossFillFromLeft;
 
 									nextPossibleElem.indexX = j;
 									nextPossibleElem.indexY = downIndex;
-									nextPossibleElem.animationPath = [{ x: j * Elem.SIZE, y: downIndex * Elem.SIZE}];
+									nextPossibleElem.animationPath = [];
+
+									var offsetBeforeChangeCol:Int = 0;
+									if (map[downIndex - 1][j + 1] == null || map[downIndex - 1][j + 1].graphic.y != map[downIndex - 1][j + 1].indexY * Elem.SIZE)
+										offsetBeforeChangeCol = Math.round(Math.abs(Math.round(map[downIndex - 1][j + 1].graphic.y - map[downIndex - 1][j + 1].indexY * Elem.SIZE)) / Elem.SIZE);
+
+									if (offsetBeforeChangeCol > 0)
+									{
+										var maxYBeforeColChange:Float = nextPossibleElem.graphic.y + offsetBeforeChangeCol * Elem.SIZE;
+
+										nextPossibleElem.animationPath.push(
+											{ x: nextPossibleElem.graphic.x, y: maxYBeforeColChange }
+										);
+										nextPossibleElem.animationPath.push(
+											{ x: nextPossibleElem.graphic.x - Elem.SIZE, y: maxYBeforeColChange + Elem.SIZE }
+										);
+									}
+									else
+										nextPossibleElem.animationPath.push(
+											{ x: nextPossibleElem.graphic.x - Elem.SIZE, y: nextPossibleElem.graphic.y + Elem.SIZE }
+										);
+
+									nextPossibleElem.animationPath.push(
+										{ x: j * Elem.SIZE, y: downIndex * Elem.SIZE}
+									);
 
 									map[downIndex - 2][j + 1] = null;
 									map[downIndex][j] = nextPossibleElem;
@@ -386,21 +442,22 @@ class Board
 					else
 					{
 						var addingPosition:Float = -Elem.SIZE;
-						for (k in i + 1...map.length)
+
+						for (k in 1...map.length)
 						{
 							if (map[k][j] != null && map[k][j].type != ElemType.Empty)
 							{
-								addingPosition = map[k][j].graphic.y - Elem.SIZE;
+								addingPosition = map[k][j].graphic.y > 0 ? -Elem.SIZE : map[k][j].graphic.y - Elem.SIZE;
 								break;
 							}
 						}
 
-						var lastElem = map[i][j] = new Elem(i, j);
-						lastElem.animationPath = [{ x: lastElem.graphic.x, y: lastElem.graphic.y}];
-						lastElem.animationY = lastElem.graphic.y = addingPosition;
+						var newElem = map[i][j] = new Elem(i, j);
+						newElem.animationPath = [{ x: newElem.graphic.x, y: newElem.graphic.y}];
+						newElem.animationY = newElem.graphic.y = addingPosition;
 
-						container.addChild(lastElem.graphic);
-						moveElemToPosition(lastElem);
+						container.addChild(newElem.graphic);
+						moveElemToPosition(newElem);
 
 						fillMap();
 						return;
@@ -436,13 +493,13 @@ class Board
 			e.graphic.rotation = e.rotation;
 		}).ease(Quad.easeOut)
 		.onComplete(function() {
-			moveElemToNextPosition(e, onComplete);
+			moveElemToNextPosition(e, onComplete, true);
 		});
 	}
 
-	function moveElemToNextPosition(e:Elem, onComplete:Void->Void = null)
+	function moveElemToNextPosition(e:Elem, onComplete:Void->Void = null, isFirstMove:Bool = false)
 	{
-		Actuate.tween(e, getElemTweenSpeedByDistance(e.animationPath[0].y - e.graphic.y), {
+		Actuate.tween(e, getElemTweenSpeedByDistance(GeomUtil.getDistance(e.animationPath[0], { x: e.graphic.x, y: e.graphic.y } )), {
 			animationX: e.animationPath[0].x,
 			animationY: e.animationPath[0].y,
 			rotation: 0
@@ -451,16 +508,19 @@ class Board
 			e.graphic.y = e.animationY;
 			e.graphic.rotation = e.rotation;
 		}).onComplete(function() {
-			e.graphic.moveFinished();
 			e.animationPath.shift();
 			if (e.animationPath.length > 0) moveElemToNextPosition(e, onComplete);
-			else if (onComplete != null) onComplete();
-		}).ease(Quad.easeIn);
+			else
+			{
+				e.graphic.moveFinished();
+				if (onComplete != null) onComplete();
+			}
+		}).ease(Linear.easeNone);
 	}
 
 	function getElemTweenSpeedByDistance(d:Float):Float
 	{
-		return d / Elem.SIZE * .2;
+		return d / Elem.SIZE * .1;
 	}
 
 	function getElemByPosition(p:SimplePoint):Elem
