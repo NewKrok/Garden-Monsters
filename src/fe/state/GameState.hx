@@ -47,8 +47,8 @@ class GameState extends Base2dState
 
 		loadBoard();
 
-		effectHandler.view.x = 50 + Elem.SIZE / 2;
-		effectHandler.view.y = 50 + Elem.SIZE / 2;
+		effectHandler.view.x = 25 + Elem.SIZE / 2;
+		effectHandler.view.y = 25 + Elem.SIZE / 2;
 		gameContainer.addChild(effectHandler.view);
 	}
 
@@ -71,12 +71,6 @@ class GameState extends Base2dState
 	function loadBoard()
 	{
 		var map = BoardHelper.createMap([
-			/*[7,0,0,3],
-			[2,0,0,3],
-			[1,2,3,7],
-			[2,3,2,2],
-			[6,2,4,2],
-			[3,2,2,1],*/
 			[ -2, -2, -2, -2,  0,  0, -2, -2, -2, -2 ],
 			[ -2, -2, -2, -2,  0,  0, -2, -2, -2, -2 ],
 			[ -2, -2, -2,  0, -2, -2,  0, -2, -2, -2 ],

@@ -20,6 +20,7 @@ class TestBoard
 		testRandomPlayableMap();
 
 		testNullMatch();
+		testRowWithEmptyMatch();
 		testRowMatchWithBlockerWithEmpty();
 		testColMatchWithBlockerWithEmpty();
 		testTripleRow();
@@ -79,6 +80,22 @@ class TestBoard
 		var expected = [
 			[ map[0][0], map[0][1], map[0][2] ],
 			[ map[1][1], map[2][1], map[3][1] ]
+		];
+
+		if (!isEqual(BoardHelper.analyzeMap(map).matches, expected))
+			throw "Failed test!";
+	}
+
+	static function testRowWithEmptyMatch()
+	{
+		var map = BoardHelper.createMap([
+			[ 2, 2, 3, -1, -1, -1, 7, 3 ],
+			[ 1, 5, 5,  5, -1,  1, 1, 2 ],
+			[ 5, 6, 5,  2, -1,  3, 7, 7 ],
+		]);
+
+		var expected = [
+			[ map[1][1], map[1][2], map[1][3] ]
 		];
 
 		if (!isEqual(BoardHelper.analyzeMap(map).matches, expected))

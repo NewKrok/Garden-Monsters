@@ -7,6 +7,7 @@ import h2d.Layers;
 import h2d.Mask;
 import h2d.filter.Glow;
 import haxe.Timer;
+import haxe.ds.Map;
 import hpp.heaps.HppG;
 import hpp.util.GeomUtil;
 import hpp.util.GeomUtil.SimplePoint;
@@ -28,6 +29,9 @@ class Board
 {
 	public var foundMatch:Array<Array<Elem>>;
 	public var foundPossibilities:Array<Elem>;
+
+	public var alreadyAnimatedElems:Array<Elem>;
+	public var underAnimationElems:Array<Elem>;
 
 	var map:Array<Array<Elem>>;
 	var parent:Layers;
@@ -268,25 +272,45 @@ class Board
 
 	function removeAllMatch()
 	{
-		for (i in 0...map.length)
+		underAnimationElems = [];
+		alreadyAnimatedElems = [];
+
+		if (foundMatch.length > 0)
 		{
-			for (j in 0...map[i].length)
+			for (row in map) for (e in row) e.animationPath = [];
+			isAnimationInProgress = true;
+
+			for (i in 0...map.length)
 			{
-				for (m in foundMatch)
+				for (j in 0...map[i].length)
 				{
-					for (e in m)
-						if (e == map[i][j])
-						{
-							map[i][j].graphic.remove();
-							map[i][j] = null;
-							break;
-						}
+					for (m in foundMatch)
+					{
+						for (e in m)
+							if (e == map[i][j])
+							{
+								map[i][j].graphic.remove();
+								map[i][j] = null;
+								break;
+							}
+					}
 				}
 			}
-		}
 
+			checkMap();
+			fillMap();
+
+			for (row in map) for (e in row) if (e != null && e.animationPath.length > 0) moveElemToPosition(e, checkAnimationProgress);
+		}
+	}
+
+	function checkAnimationProgress()
+	{
+		for (row in map) for (e in row) if (e != null && e.animationPath.length > 0) return;
+
+		isAnimationInProgress = false;
 		checkMap();
-		fillMap();
+		removeAllMatch();
 	}
 
 	function fillMap()
@@ -318,9 +342,9 @@ class Board
 							if (downIndex - i > 1 || i - upperIndex > 1)
 							{
 								var prevPossibleElem = map[downIndex - 2][j - 1];
-								var isPrevBlocked:Bool = map[downIndex - 1][j - 1] == null || map[downIndex - 1][j - 1].type == ElemType.Blocker;
+								var isPrevBlocked:Bool = map[downIndex - 1][j - 1] == null || map[downIndex - 1][j - 1].type == ElemType.Blocker;// || map[downIndex - 1][j - 1].isUsedForCrossAnimation;
 								var nextPossibleElem = map[downIndex - 2][j + 1];
-								var isNextBlocked:Bool = map[downIndex - 1][j + 1] == null || map[downIndex - 1][j + 1].type == ElemType.Blocker;
+								var isNextBlocked:Bool = map[downIndex - 1][j + 1] == null || map[downIndex - 1][j + 1].type == ElemType.Blocker;// || map[downIndex - 1][j + 1].isUsedForCrossAnimation;
 
 								if (
 									(crossFillFromLeft
@@ -334,38 +358,15 @@ class Board
 								){
 									crossFillFromLeft = !crossFillFromLeft;
 
-									prevPossibleElem.indexX = j;
-									prevPossibleElem.indexY = downIndex;
-									prevPossibleElem.animationPath = [];
-
-									var offsetBeforeChangeCol:Int = 0;
-									if (map[downIndex - 1][j - 1] == null || map[downIndex - 1][j - 1].graphic.y != map[downIndex - 1][j - 1].indexY * Elem.SIZE)
-										offsetBeforeChangeCol = Math.round(Math.abs(Math.round(map[downIndex - 1][j - 1].graphic.y - map[downIndex - 1][j - 1].indexY * Elem.SIZE)) / Elem.SIZE);
-
-									if (offsetBeforeChangeCol > 0)
-									{
-										var maxYBeforeColChange:Float = prevPossibleElem.graphic.y + offsetBeforeChangeCol * Elem.SIZE;
-
-										prevPossibleElem.animationPath.push(
-											{ x: prevPossibleElem.graphic.x, y: maxYBeforeColChange }
-										);
-										prevPossibleElem.animationPath.push(
-											{ x: prevPossibleElem.graphic.x + Elem.SIZE, y: maxYBeforeColChange + Elem.SIZE }
-										);
-									}
-									else
-										prevPossibleElem.animationPath.push(
-											{ x: prevPossibleElem.graphic.x + Elem.SIZE, y: prevPossibleElem.graphic.y + Elem.SIZE }
-										);
+									prevPossibleElem.indexX++;
+									prevPossibleElem.indexY++;
 
 									prevPossibleElem.animationPath.push(
-										{ x: j * Elem.SIZE, y: downIndex * Elem.SIZE}
+										{ x: prevPossibleElem.indexX * Elem.SIZE, y: prevPossibleElem.indexY * Elem.SIZE }
 									);
 
 									map[downIndex - 2][j - 1] = null;
-									map[downIndex][j] = prevPossibleElem;
-
-									moveElemToPosition(prevPossibleElem);
+									map[prevPossibleElem.indexY][prevPossibleElem.indexX] = prevPossibleElem;
 
 									fillMap();
 									return;
@@ -377,38 +378,15 @@ class Board
 								){
 									crossFillFromLeft = !crossFillFromLeft;
 
-									nextPossibleElem.indexX = j;
-									nextPossibleElem.indexY = downIndex;
-									nextPossibleElem.animationPath = [];
-
-									var offsetBeforeChangeCol:Int = 0;
-									if (map[downIndex - 1][j + 1] == null || map[downIndex - 1][j + 1].graphic.y != map[downIndex - 1][j + 1].indexY * Elem.SIZE)
-										offsetBeforeChangeCol = Math.round(Math.abs(Math.round(map[downIndex - 1][j + 1].graphic.y - map[downIndex - 1][j + 1].indexY * Elem.SIZE)) / Elem.SIZE);
-
-									if (offsetBeforeChangeCol > 0)
-									{
-										var maxYBeforeColChange:Float = nextPossibleElem.graphic.y + offsetBeforeChangeCol * Elem.SIZE;
-
-										nextPossibleElem.animationPath.push(
-											{ x: nextPossibleElem.graphic.x, y: maxYBeforeColChange }
-										);
-										nextPossibleElem.animationPath.push(
-											{ x: nextPossibleElem.graphic.x - Elem.SIZE, y: maxYBeforeColChange + Elem.SIZE }
-										);
-									}
-									else
-										nextPossibleElem.animationPath.push(
-											{ x: nextPossibleElem.graphic.x - Elem.SIZE, y: nextPossibleElem.graphic.y + Elem.SIZE }
-										);
+									nextPossibleElem.indexX--;
+									nextPossibleElem.indexY++;
 
 									nextPossibleElem.animationPath.push(
-										{ x: j * Elem.SIZE, y: downIndex * Elem.SIZE}
+										{ x: nextPossibleElem.indexX * Elem.SIZE, y: nextPossibleElem.indexY * Elem.SIZE }
 									);
 
 									map[downIndex - 2][j + 1] = null;
-									map[downIndex][j] = nextPossibleElem;
-
-									moveElemToPosition(nextPossibleElem);
+									map[nextPossibleElem.indexY][nextPossibleElem.indexX] = nextPossibleElem;
 
 									fillMap();
 									return;
@@ -427,13 +405,11 @@ class Board
 						}
 						else if (upperElem.type != ElemType.Empty)
 						{
-							upperElem.animationPath = [{ x: upperElem.graphic.x, y: downIndex * Elem.SIZE}];
+							upperElem.animationPath.push({ x: upperElem.indexX * Elem.SIZE, y: downIndex * Elem.SIZE});
 							upperElem.indexY = downIndex;
 
 							map[i - 1][j] = null;
 							map[downIndex][j] = upperElem;
-
-							moveElemToPosition(upperElem);
 
 							fillMap();
 							return;
@@ -453,11 +429,9 @@ class Board
 						}
 
 						var newElem = map[i][j] = new Elem(i, j);
-						newElem.animationPath = [{ x: newElem.graphic.x, y: newElem.graphic.y}];
+						newElem.animationPath.push({ x: newElem.graphic.x, y: newElem.graphic.y});
 						newElem.animationY = newElem.graphic.y = addingPosition;
-
 						container.addChild(newElem.graphic);
-						moveElemToPosition(newElem);
 
 						fillMap();
 						return;
@@ -465,13 +439,6 @@ class Board
 				}
 			}
 		}
-
-		isAnimationInProgress = true;
-		Actuate.timer(1).onComplete(function() {
-			isAnimationInProgress = false;
-			checkMap();
-			if (foundMatch.length > 0 || isThereNullInMap())removeAllMatch();
-		});
 	}
 
 	function isThereNullInMap():Bool
@@ -485,16 +452,24 @@ class Board
 
 	function moveElemToPosition(e:Elem, onComplete:Void->Void = null)
 	{
-		Actuate.tween(e, .2, {
-			animationY: e.animationY - Elem.SIZE / 4,
-			rotation: Math.random() * Math.PI / 4 - Math.PI / 8
-		}).onUpdate(function() {
-			e.graphic.y = e.animationY;
-			e.graphic.rotation = e.rotation;
-		}).ease(Quad.easeOut)
-		.onComplete(function() {
-			moveElemToNextPosition(e, onComplete, true);
-		});
+		if (underAnimationElems.indexOf(e) == -1) underAnimationElems.push(e);
+
+		if (alreadyAnimatedElems.indexOf(e) == -1)
+		{
+			alreadyAnimatedElems.push(e);
+
+			Actuate.tween(e, .2, {
+				animationY: e.animationY - Elem.SIZE / 4,
+				rotation: Math.random() * Math.PI / 4 - Math.PI / 8
+			}).onUpdate(function() {
+				e.graphic.y = e.animationY;
+				e.graphic.rotation = e.rotation;
+			}).ease(Quad.easeOut)
+			.onComplete(function() {
+				moveElemToNextPosition(e, onComplete, true);
+			});
+		}
+		else moveElemToNextPosition(e, onComplete, true);
 	}
 
 	function moveElemToNextPosition(e:Elem, onComplete:Void->Void = null, isFirstMove:Bool = false)
@@ -509,10 +484,19 @@ class Board
 			e.graphic.rotation = e.rotation;
 		}).onComplete(function() {
 			e.animationPath.shift();
+
 			if (e.animationPath.length > 0) moveElemToNextPosition(e, onComplete);
 			else
 			{
-				e.graphic.moveFinished();
+				underAnimationElems.remove(e);
+
+				if (
+					map[e.indexY + 1] != null
+					&& map[e.indexY + 1][e.indexX] != null
+					&& map[e.indexY + 1][e.indexX].type != ElemType.Empty
+					&& underAnimationElems.indexOf(e) == -1
+				) e.graphic.moveFinished();
+
 				if (onComplete != null) onComplete();
 			}
 		}).ease(Linear.easeNone);
@@ -520,7 +504,7 @@ class Board
 
 	function getElemTweenSpeedByDistance(d:Float):Float
 	{
-		return d / Elem.SIZE * .1;
+		return d / Elem.SIZE * .15;
 	}
 
 	function getElemByPosition(p:SimplePoint):Elem
@@ -563,8 +547,8 @@ class Board
 
 		if (showHelpTimer != null)
 		{
+			Actuate.stop(showHelpTimer, null, false, false);
 			showHelpTimer = null;
-			Actuate.stop(showHelpTimer);
 		}
 		showHelpTimer = Actuate.timer(5).onComplete(function() {
 			if (foundPossibilities.length == 1) trace("NO MORE MOVES!");

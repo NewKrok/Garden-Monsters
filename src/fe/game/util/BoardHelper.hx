@@ -270,7 +270,11 @@ class BoardHelper
 				}
 				else sameElemsInCol[colIndex] = [];
 
-				if (rowBaseType == ElemType.Empty) rowBaseType = elemType;
+				if (rowBaseType == ElemType.Empty)
+				{
+					rowBaseType = elemType;
+					sameElemsInRow = [];
+				}
 
 				if (isMovableElem(elem) && elem != null && rowBaseType == elemType)
 				{

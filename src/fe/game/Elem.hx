@@ -12,6 +12,7 @@ class Elem
 	public static var SIZE(default, null):UInt = 105;
 
 	public var hasMouseHover(default, set):Bool = false;
+	public var id(default, null):UInt = Math.floor(Math.random() * 99999);
 
 	public var indexX:UInt;
 	public var indexY:UInt;
@@ -22,6 +23,7 @@ class Elem
 	public var isUnderSwapping:Bool;
 	public var graphic:ElemGraphic;
 	public var animationPath:Array<SimplePoint>;
+	public var isUsedForCrossAnimation:Bool;
 
 	public function new(row:UInt, col:UInt, type:ElemType = ElemType.Random)
 	{
@@ -31,6 +33,7 @@ class Elem
 		animationY = row * SIZE;
 		rotation = 0;
 		isUnderSwapping = false;
+		isUsedForCrossAnimation = false;
 
 		animationPath = [];
 
