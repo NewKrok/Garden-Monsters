@@ -1,0 +1,19 @@
+# Fruit-Eaters
+Match3 game made in Haxe with Heaps
+
+## Try it now
+- coming soon
+
+## Dependencies
+- **Heaps forked*** High Performance Game Framework. http://heaps.io/
+- **Actuate 1.8.7** Animating lib for Haxe projects. https://github.com/jgranick/actuate
+- **HPP Package** Some useful classes for haxe projects https://github.com/NewKrok/HPP-Package
+
+## Notice
+- It use a forked version of Heaps because of some particle modification: https://github.com/NewKrok/heaps
+
+Our webpage:
+http://flashplusplus.net
+
+Our Facebook page:
+https://www.facebook.com/flashplusplus/
