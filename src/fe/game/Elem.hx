@@ -44,19 +44,20 @@ class Elem
 		graphic.x = animationX;
 		graphic.y = animationY;
 
-		if (type == ElemType.Empty) graphic.visible = false;
+		if (type == ElemType.Empty || type == ElemType.None) graphic.visible = false;
 	}
 
 	function set_type(v:ElemType):ElemType
 	{
 		type = v;
 
-		if (type == ElemType.Empty || type == null) graphic.setTile(ElemTile.emptyElemGraphic);
+		if (type == ElemType.Empty || type == ElemType.None || type == null) graphic.setTile(ElemTile.emptyElemGraphic);
 		else graphic.setTile(ElemTile.tiles.get(cast type));
 
 		switch (type)
 		{
 			case ElemType.Empty: graphic.visible = false;
+			case ElemType.None: graphic.visible = false;
 			case _:
 		}
 
@@ -73,7 +74,8 @@ class Elem
 
 @:enum abstract ElemType(Int)
 {
-	var Random = -2;
-	var Empty = -1;
 	var Blocker = 0;
+	var Empty = -1;
+	var Random = -2;
+	var None = -3;
 }

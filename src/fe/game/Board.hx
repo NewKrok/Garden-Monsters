@@ -11,6 +11,7 @@ import haxe.ds.Map;
 import hpp.heaps.HppG;
 import hpp.util.GeomUtil;
 import hpp.util.GeomUtil.SimplePoint;
+import hxd.Cursor;
 import hxd.Event;
 import hxd.Res;
 import motion.Actuate;
@@ -66,7 +67,7 @@ class Board
 		background.beginFill(0xFF0000);
 		for (i in 0...map[0].length)
 			for (j in 0...map.length)
-				if (map[j][i].type != ElemType.Blocker && map[j][i].type != ElemType.Empty )
+				if (map[j][i].type != ElemType.Blocker && map[j][i].type != ElemType.None && map[j][i].type != ElemType.Empty )
 					background.drawTile(i * Elem.SIZE - Elem.SIZE / 2 + 2.5, j * Elem.SIZE - Elem.SIZE / 2 + 2.5, Res.image.game.elem_background.toTile());
 		background.endFill();
 
@@ -94,6 +95,7 @@ class Board
 	function createInteractive()
 	{
 		var i:Interactive = new Interactive(HppG.stage2d.width, HppG.stage2d.height, parent);
+		i.cursor = Cursor.Default;
 
 		i.onPush = function(e:Event)
 		{
@@ -152,13 +154,15 @@ class Board
 					y: e.relY - container.y - mask.y
 				});
 
-				if (focusElement != null && focusElement.type != ElemType.Empty)
+				if (focusElement != null && focusElement.type != ElemType.Empty && focusElement.type != ElemType.None)
 				{
 					focusElement.hasMouseHover = true;
 					selectedElemBackground.x = focusElement.graphic.x;
 					selectedElemBackground.y = focusElement.graphic.y;
 					selectedElemBackground.visible = true;
+					i.cursor = Cursor.Button;
 				}
+				else i.cursor = Cursor.Default;
 			}
 			else selectedElemBackground.visible = false;
 		};
@@ -210,6 +214,8 @@ class Board
 			|| tempB.type == ElemType.Blocker
 			|| tempA.type == ElemType.Empty
 			|| tempB.type == ElemType.Empty
+			|| tempA.type == ElemType.None
+			|| tempB.type == ElemType.None
 		) return;
 
 		tempA.isUnderSwapping = true;
@@ -321,19 +327,45 @@ class Board
 			{
 				if (map[i][j] == null)
 				{
-					if (i > 0)
+					var firstElemIndex:UInt = 0;
+					while (
+						firstElemIndex < map.length
+						&& map[firstElemIndex][j] != null
+						&& map[firstElemIndex][j].type == ElemType.None
+					) {
+						firstElemIndex++;
+					}
+
+					if (i > 0 && firstElemIndex == 0)
 					{
 						var upperIndex:UInt = i - 1;
-						while (upperIndex != 0 && (map[upperIndex][j] == null || map[upperIndex][j].type == ElemType.Empty)) upperIndex--;
+						while (
+							upperIndex != 0
+							&& (
+								map[upperIndex][j] == null
+								|| map[upperIndex][j].type == ElemType.Empty
+								|| map[upperIndex][j].type == ElemType.None
+							)
+						) upperIndex--;
+
 						var upperElem = map[upperIndex][j];
 
 						var downIndex:UInt = map.length - 1;
+						var noneIndex:Int = -1;
 						for (l in i + 1...map.length)
 						{
 							if (map[l][j] != null && map[l][j].type != ElemType.Empty)
 							{
-								downIndex = l - 1;
-								break;
+								if (noneIndex == -1 && map[l][j].type == ElemType.None)
+								{
+									noneIndex = l;
+								}
+								else
+								{
+									if (noneIndex == -1) downIndex = l - 1;
+									else downIndex = noneIndex - 1;
+									break;
+								}
 							}
 						}
 
@@ -342,9 +374,9 @@ class Board
 							if (downIndex - i > 1 || i - upperIndex > 1)
 							{
 								var prevPossibleElem = map[downIndex - 2][j - 1];
-								var isPrevBlocked:Bool = map[downIndex - 1][j - 1] == null || map[downIndex - 1][j - 1].type == ElemType.Blocker;// || map[downIndex - 1][j - 1].isUsedForCrossAnimation;
+								var isPrevBlocked:Bool = map[downIndex - 1][j - 1] == null || map[downIndex - 1][j - 1].type == ElemType.Blocker;
 								var nextPossibleElem = map[downIndex - 2][j + 1];
-								var isNextBlocked:Bool = map[downIndex - 1][j + 1] == null || map[downIndex - 1][j + 1].type == ElemType.Blocker;// || map[downIndex - 1][j + 1].isUsedForCrossAnimation;
+								var isNextBlocked:Bool = map[downIndex - 1][j + 1] == null || map[downIndex - 1][j + 1].type == ElemType.Blocker;
 
 								if (
 									(crossFillFromLeft
@@ -408,7 +440,7 @@ class Board
 							upperElem.animationPath.push({ x: upperElem.indexX * Elem.SIZE, y: downIndex * Elem.SIZE});
 							upperElem.indexY = downIndex;
 
-							map[i - 1][j] = null;
+							map[upperIndex][j] = null;
 							map[downIndex][j] = upperElem;
 
 							fillMap();
@@ -427,8 +459,8 @@ class Board
 								break;
 							}
 						}
-
-						var newElem = map[i][j] = new Elem(i, j);
+trace("ADD TO", i, j, firstElemIndex);
+						var newElem = map[firstElemIndex][j] = new Elem(firstElemIndex, j);
 						newElem.animationPath.push({ x: newElem.graphic.x, y: newElem.graphic.y});
 						newElem.animationY = newElem.graphic.y = addingPosition;
 						container.addChild(newElem.graphic);

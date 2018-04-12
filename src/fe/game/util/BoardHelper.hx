@@ -369,6 +369,7 @@ class BoardHelper
 					|| map[cast x + o.x][cast y + o.y] == null
 					|| map[cast x + o.x][cast y + o.y].type == ElemType.Blocker
 					|| map[cast x + o.x][cast y + o.y].type == ElemType.Empty
+					|| map[cast x + o.x][cast y + o.y].type == ElemType.None
 				) match = false;
 
 			if (match) return true;
@@ -379,12 +380,12 @@ class BoardHelper
 
 	static public function isMovableElem(elem:Elem):Bool
 	{
-		return elem != null && elem.type != ElemType.Empty && elem.type != ElemType.Blocker;
+		return elem != null && elem.type != ElemType.Empty && elem.type != ElemType.Blocker && elem.type != ElemType.None;
 	}
 
 	static public function isMovableType(type:ElemType):Bool
 	{
-		return type != ElemType.Empty && type != ElemType.Blocker;
+		return type != ElemType.Empty && type != ElemType.Blocker && type != ElemType.None;
 	}
 }
 
