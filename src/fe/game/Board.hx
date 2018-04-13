@@ -336,7 +336,7 @@ class Board
 						firstElemIndex++;
 					}
 
-					if (i > 0 && firstElemIndex == 0)
+					if (firstElemIndex < i)
 					{
 						var upperIndex:UInt = i - 1;
 						while (
@@ -459,8 +459,8 @@ class Board
 								break;
 							}
 						}
-trace("ADD TO", i, j, firstElemIndex);
-						var newElem = map[firstElemIndex][j] = new Elem(firstElemIndex, j);
+
+						var newElem = map[i][j] = new Elem(i, j);
 						newElem.animationPath.push({ x: newElem.graphic.x, y: newElem.graphic.y});
 						newElem.animationY = newElem.graphic.y = addingPosition;
 						container.addChild(newElem.graphic);
