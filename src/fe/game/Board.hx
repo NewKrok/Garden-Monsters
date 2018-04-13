@@ -9,18 +9,22 @@ import h2d.filter.Glow;
 import haxe.Timer;
 import haxe.ds.Map;
 import hpp.heaps.HppG;
+import hpp.util.ArrayUtil;
 import hpp.util.GeomUtil;
 import hpp.util.GeomUtil.SimplePoint;
 import hxd.Cursor;
 import hxd.Event;
 import hxd.Res;
 import motion.Actuate;
+import motion.MotionPath;
 import motion.actuators.GenericActuator;
 import motion.easing.Linear;
 import motion.easing.Quad;
 import motion.easing.Quart;
 import fe.game.Elem.ElemType;
 import fe.game.util.BoardHelper;
+
+using hpp.util.ArrayUtil;
 
 /**
  * ...
@@ -286,6 +290,8 @@ class Board
 			for (row in map) for (e in row) e.animationPath = [];
 			isAnimationInProgress = true;
 
+			for (m in foundMatch) handleElemSkill(m);
+
 			for (i in 0...map.length)
 			{
 				for (j in 0...map[i].length)
@@ -303,11 +309,176 @@ class Board
 				}
 			}
 
-			checkMap();
-			fillMap();
+			Actuate.timer(1).onComplete(function() {
+				checkMap();
+				fillMap();
 
-			for (row in map) for (e in row) if (e != null && e.animationPath.length > 0) moveElemToPosition(e, checkAnimationProgress);
+				for (row in map) for (e in row) if (e != null && e.animationPath.length > 0) moveElemToPosition(e, checkAnimationProgress);
+			});
 		}
+	}
+
+	function handleElemSkill(m:Array<Elem>)
+	{
+		switch(m[0].type)
+		{
+			case ElemType.Elem1: removeElemByElem(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem1Effect);
+			case ElemType.Elem3: changeElemTypeByElem(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem3Effect);
+			case ElemType.Elem7: removeElemByElem(getRandomNotMatchedPlayableElem(), m.random(), effectHandler.addElem7Effect);
+
+			case _:
+		}
+	}
+
+	function getRandomNearbyNotMatchedPlayableElem(m:Array<Elem>):Elem
+	{
+		var searchDirections:Array<SimplePoint> = [
+			{ x: -1, y: -1 }, { x: -1, y: 0 }, { x: -1, y: 1 },
+			{ x: 0,  y: -1 }, 				   { x: 0,  y: 1 },
+			{ x: 1,  y: -1 }, { x: 1,  y: 0 }, { x: 1,  y: 1 }
+		];
+		var possibleElems:Array<Elem> = [];
+
+		for (e in m)
+		{
+			for (d in searchDirections)
+			{
+				if (map[cast e.indexY + d.y] == null) continue;
+
+				var selectedElem = map[cast e.indexY + d.y][cast e.indexX + d.x];
+
+				if (
+					selectedElem != null
+					&& selectedElem.type != ElemType.Blocker
+					&& selectedElem.type != ElemType.Empty
+					&& selectedElem.type != ElemType.None
+					&& m.indexOf(selectedElem) == -1
+					&& isNotMatchedElem(selectedElem)
+				) possibleElems.push(selectedElem);
+			}
+		}
+
+		return possibleElems.random();
+	}
+
+	function getRandomNotMatchedPlayableElem():Elem
+	{
+		var possibleElems:Array<Elem> = [];
+
+		for (row in map)
+		{
+			for (e in row)
+			{
+				if (
+					e != null
+					&& e.type != ElemType.Blocker
+					&& e.type != ElemType.Empty
+					&& e.type != ElemType.None
+					&& isNotMatchedElem(e)
+				) possibleElems.push(e);
+			}
+		}
+
+		return possibleElems.random();
+	}
+
+	function removeElemByElem(target:Elem, triggerElem:Elem, effect:Float->Float->Void)
+	{
+		if (target != null)
+		{
+			var e = triggerElem.clone();
+
+			var path = new MotionPath().bezier(
+				target.graphic.x,
+				target.graphic.y,
+				target.graphic.x + (triggerElem.graphic.x - target.graphic.x) / 2,
+				target.graphic.y + (triggerElem.graphic.y - target.graphic.y) / 2 - 100
+			);
+
+			container.addChild(e.graphic);
+			Actuate.tween(e.graphic, .2, {
+				scaleY: .8,
+				y: e.graphic.y + 10
+			}).ease(Quad.easeOut).onUpdate(function() {
+				e.graphic.scaleY = e.graphic.scaleY;
+			}).onComplete(function() {
+				Actuate.tween(e.graphic, .1, {
+					scaleY: 1,
+					y: e.graphic.y - 10
+				}).ease(Quad.easeOut).onUpdate(function() {
+					e.graphic.scaleY = e.graphic.scaleY;
+				}).onComplete(function() {
+					Actuate.motionPath(e.graphic, .5, {
+						x: path.x,
+						y: path.y
+					}).ease(Linear.easeNone).onUpdate(function() {
+						e.graphic.scaleY = e.graphic.scaleY;
+					}).onComplete(function(){
+						e.graphic.remove();
+						e = null;
+						effect(target.graphic.x, target.graphic.y);
+						map[target.indexY][target.indexX] = null;
+						target.graphic.remove();
+						target = null;
+					});
+				});
+			});
+		}
+	}
+
+	function changeElemTypeByElem(target:Elem, triggerElem:Elem, effect:Float->Float->Void)
+	{
+		if (target != null)
+		{
+			var e = triggerElem.clone();
+
+			var path = new MotionPath().bezier(
+				target.graphic.x,
+				target.graphic.y,
+				target.graphic.x + (triggerElem.graphic.x - target.graphic.x) / 2,
+				target.graphic.y + (triggerElem.graphic.y - target.graphic.y) / 2 - 100
+			);
+
+			container.addChild(e.graphic);
+			Actuate.tween(e.graphic, .2, {
+				scaleY: .8,
+				y: e.graphic.y + 10
+			}).ease(Quad.easeOut).onUpdate(function() {
+				e.graphic.scaleY = e.graphic.scaleY;
+			}).onComplete(function() {
+				Actuate.tween(e.graphic, .1, {
+					scaleY: 1,
+					y: e.graphic.y - 10
+				}).ease(Quad.easeOut).onUpdate(function() {
+					e.graphic.scaleY = e.graphic.scaleY;
+				}).onComplete(function() {
+					Actuate.motionPath(e.graphic, .5, {
+						x: path.x,
+						y: path.y
+					}).ease(Linear.easeNone).onUpdate(function() {
+						e.graphic.scaleY = e.graphic.scaleY;
+					}).onComplete(function(){
+						e.graphic.remove();
+						e = null;
+						effect(target.graphic.x, target.graphic.y);
+						target.type = ElemType.Random;
+					});
+				});
+			});
+		}
+	}
+
+	function isNotMatchedElem(e:Elem):Bool
+	{
+		var count:UInt = 0;
+
+		for (m in foundMatch)
+		{
+			if (m.indexOf(e) > -1) count++;
+			if (count > 1) return false;
+		}
+
+		return true;
 	}
 
 	function checkAnimationProgress()

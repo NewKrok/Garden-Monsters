@@ -39,16 +39,26 @@ class Elem
 
 		graphic = new ElemGraphic();
 
-		this.type = type == ElemType.Random ? cast(1 + Math.floor(Math.random() * 7)) : type;
+		this.type = type;
 
 		graphic.x = animationX;
 		graphic.y = animationY;
+	}
 
-		if (type == ElemType.Empty || type == ElemType.None) graphic.visible = false;
+	public function clone()
+	{
+		return new Elem(indexY, indexX, type);
 	}
 
 	function set_type(v:ElemType):ElemType
 	{
+		if (type == v) return v;
+
+		if (v == ElemType.Random)
+		{
+			v = cast(1 + Math.floor(Math.random() * 7));
+			while(v == type) v = cast(1 + Math.floor(Math.random() * 7));
+		}
 		type = v;
 
 		if (type == ElemType.Empty || type == ElemType.None || type == null) graphic.setTile(ElemTile.emptyElemGraphic);
@@ -74,8 +84,30 @@ class Elem
 
 @:enum abstract ElemType(Int)
 {
-	var Blocker = 0;
-	var Empty = -1;
-	var Random = -2;
 	var None = -3;
+	var Random = -2;
+	var Empty = -1;
+	var Blocker = 0;
+
+	var Elem1 = 1;
+	var Elem2 = 2;
+	var Elem3 = 3;
+	var Elem4 = 4;
+	var Elem5 = 5;
+	var Elem6 = 6;
+	var Elem7 = 7;
 }
+
+/* TEMPORARY INFO
+-3	DONE Not playable block but it cant block the other elems
+-2	DONE Random block between 1 - 7
+-1	DONE Temporary empty block - Iterable can happen after match
+ 0	DONE Not playable block and it block the other elems
+ 1	DONE After match it removes 1 nearby element too // RECHECK THE PART EFFECT
+ 2	After match it freezes 1 nearby elems for one turn - cant move and cant match
+ 3	DONE After match it changes to random type 1 nearby element // RECHECK THE PART EFFECT
+ 4	After match it shifts to left and to right the elems - the left and the right elems dissapearing
+ 5	After match it removes the elem under it
+ 6	After match it removes the nearby similar type elems too
+ 7	DONE After match it removes 1 random element too // IT SHOULD BE DIFFERENT // RECHECK THE PART EFFECT
+*/
