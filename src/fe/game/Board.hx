@@ -327,7 +327,8 @@ class Board
 			case ElemType.Elem1: removeElemByElem(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem1StartEffect, effectHandler.addElem1ActivateEffect);
 			case ElemType.Elem2: freezeElemByElem(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem2StartEffect, effectHandler.addElem2ActivateEffect);
 			case ElemType.Elem3: changeElemTypeByElem(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem3StartEffect, effectHandler.addElem3ActivateEffect);
-			case ElemType.Elem7: removeElemByElem(getRandomNotMatchedPlayableElem(), m.random(), null, effectHandler.addElem7Effect);
+			case ElemType.Elem4: shiftRow(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem4StartEffect, effectHandler.addElem4ActivateEffect);
+			//case ElemType.Elem7: removeElemByElem(getRandomNotMatchedPlayableElem(), m.random(), null, effectHandler.addElem7Effect);
 
 			case _:
 		}
@@ -521,15 +522,176 @@ class Board
 		}
 	}
 
+	function shiftRow(target:Elem, triggerElem:Elem, startEffect:Float->Float->Void, activateEffect:Float->Float->Void)
+	{
+		if (target != null)
+		{
+			if (startEffect != null) startEffect(triggerElem.graphic.x, triggerElem.graphic.y);
+
+			var e = triggerElem.clone();
+
+			var path = new MotionPath().bezier(
+				target.graphic.x,
+				target.graphic.y,
+				target.graphic.x + (triggerElem.graphic.x - target.graphic.x) / 2,
+				target.graphic.y + (triggerElem.graphic.y - target.graphic.y) / 2 - 100
+			);
+
+			container.addChild(e.graphic);
+			Actuate.tween(e.graphic, .2, {
+				scaleY: .8,
+				y: e.graphic.y + 10
+			}).ease(Quad.easeOut).onUpdate(function() {
+				e.graphic.scaleY = e.graphic.scaleY;
+			}).onComplete(function() {
+				Actuate.tween(e.graphic, .1, {
+					scaleY: 1,
+					y: e.graphic.y - 10
+				}).ease(Quad.easeOut).onUpdate(function() {
+					e.graphic.scaleY = e.graphic.scaleY;
+				}).onComplete(function() {
+					Actuate.motionPath(e.graphic, .5, {
+						x: path.x,
+						y: path.y
+					}).ease(Linear.easeNone).onUpdate(function() {
+						e.graphic.scaleY = e.graphic.scaleY;
+					}).onComplete(function(){
+						e.graphic.remove();
+						e = null;
+						activateEffect(target.graphic.x, target.graphic.y);
+						if (BoardHelper.isMovableElem(map[target.indexY][target.indexX + 1])) activateEffect(target.graphic.x + Elem.SIZE, target.graphic.y);
+						if (BoardHelper.isMovableElem(map[target.indexY][target.indexX - 1])) activateEffect(target.graphic.x - Elem.SIZE, target.graphic.y);
+						map[target.indexY][target.indexX] = null;
+						shiftToLeft(target.indexX, target.indexY);
+						shiftToRight(target.indexX, target.indexY);
+						target.graphic.remove();
+						target = null;
+					});
+				});
+			});
+		}
+	}
+
+	function shiftToLeft(x:UInt, y:UInt)
+	{
+		var firstLeftIndex:UInt = 0;
+		for (i in 0...x)
+			if (map[y][i] == null
+				|| map[y][i].type == ElemType.Blocker
+				|| map[y][i].type == ElemType.Empty
+				|| map[y][i].type == ElemType.None
+			) firstLeftIndex = i + 1;
+
+		if (firstLeftIndex == x) return;
+
+		var e = map[y][firstLeftIndex].clone();
+		container.addChild(e.graphic);
+		map[y][firstLeftIndex].graphic.remove();
+		map[y][firstLeftIndex] = null;
+
+		for (i in firstLeftIndex...x - 1)
+		{
+			map[y][i] = map[y][i + 1];
+			map[y][i].indexX--;
+			map[y][i].animationPath = [{ x: map[y][i].indexX * Elem.SIZE, y: map[y][i].graphic.y}];
+			moveElemToPosition(map[y][i]);
+		}
+
+		map[y][x - 1] = null;
+
+		var path = new MotionPath().bezier(
+			e.graphic.x - Elem.SIZE,
+			e.graphic.y + Elem.SIZE,
+			e.graphic.x - Elem.SIZE / 2,
+			e.graphic.y - Elem.SIZE
+		);
+
+		var speed:Float = getElemTweenSpeedByDistance(Math.abs(GeomUtil.getDistance(
+			{ x: e.graphic.x - Elem.SIZE, y: e.graphic.y + Elem.SIZE },
+			{ x: e.graphic.x, y: e.graphic.y }
+		))) * 2;
+
+		Actuate.tween(e.graphic, speed, {
+			rotation: e.graphic.rotation + Math.random() * Math.PI - Math.PI / 2,
+			alpha: 0
+		});
+
+		Actuate.motionPath(e.graphic, speed, {
+			x: path.x,
+			y: path.y
+		}).ease(Quad.easeOut).onUpdate(function(){
+			e.graphic.x = e.graphic.x;
+		}).onComplete(function(){
+			e.graphic.remove();
+			e = null;
+		});
+	}
+
+	function shiftToRight(x:UInt, y:UInt)
+	{
+		var lastRightIndex:UInt = map[0].length - 1;
+		for (i in x + 1...map[0].length)
+			if (map[y][i] == null
+				|| map[y][i].type == ElemType.Blocker
+				|| map[y][i].type == ElemType.Empty
+				|| map[y][i].type == ElemType.None
+			){
+				lastRightIndex = i - 1;
+				break;
+			}
+
+		if (lastRightIndex == x) return;
+
+		var e = map[y][lastRightIndex].clone();
+		container.addChild(e.graphic);
+		map[y][lastRightIndex].graphic.remove();
+
+		var reverseIndex:UInt = lastRightIndex;
+		for (i in x + 1...lastRightIndex)
+		{
+			map[y][reverseIndex] = map[y][reverseIndex - 1];
+			map[y][reverseIndex].indexX++;
+			map[y][reverseIndex].animationPath = [{ x: map[y][reverseIndex].indexX * Elem.SIZE, y: map[y][reverseIndex].graphic.y}];
+			moveElemToPosition(map[y][reverseIndex]);
+			reverseIndex--;
+		}
+
+		map[y][x + 1] = null;
+
+		var path = new MotionPath().bezier(
+			e.graphic.x + Elem.SIZE,
+			e.graphic.y + Elem.SIZE,
+			e.graphic.x + Elem.SIZE / 2,
+			e.graphic.y - Elem.SIZE
+		);
+
+		var speed:Float = getElemTweenSpeedByDistance(Math.abs(GeomUtil.getDistance(
+			{ x: e.graphic.x + Elem.SIZE, y: e.graphic.y + Elem.SIZE },
+			{ x: e.graphic.x, y: e.graphic.y }
+		))) * 2;
+
+		Actuate.tween(e.graphic, speed, {
+			rotation: e.graphic.rotation + Math.random() * Math.PI - Math.PI / 2,
+			alpha: 0
+		});
+
+		Actuate.motionPath(e.graphic, speed, {
+			x: path.x,
+			y: path.y
+		}).ease(Quad.easeOut).onUpdate(function(){
+			e.graphic.x = e.graphic.x;
+		}).onComplete(function(){
+			e.graphic.remove();
+			e = null;
+		});
+	}
+
 	function isNotMatchedElem(e:Elem):Bool
 	{
 		var count:UInt = 0;
 
 		for (m in foundMatch)
-		{
-			if (m.indexOf(e) > -1) count++;
-			if (count > 1) return false;
-		}
+			if (m.indexOf(e) > -1) return false;
 
 		return true;
 	}
@@ -547,6 +709,9 @@ class Board
 
 	function turnEnd()
 	{
+		checkMap();
+		if (foundMatch.length > 0) return;
+
 		for (row in map)
 			for (e in row)
 				if (e.isFrozen && e.frozenTurnCount > 0)

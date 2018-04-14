@@ -119,8 +119,8 @@ class Elem
  1	DONE After match it removes 1 nearby element too
  2	DONE After match it freezes 1 nearby elems for one turn - cant move but can match
  3	DONE After match it changes to random type 1 nearby element
- 4	After match it shifts to left and to right the elems - the left and the right elems dissapearing
- 5	After match it removes the elem under it
- 6	After match it removes the nearby similar type elems too
- 7	After match it removes 1 random element too // IT SHOULD BE DIFFERENT
+ 4	DONE After match it shifts to left and to right the elems - the left and the right elems dissapearing
+ 5	After match it ???
+ 6	After match it ???
+ 7	After match it swaps 2 nearby elem
 */

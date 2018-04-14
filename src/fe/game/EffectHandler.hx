@@ -71,6 +71,17 @@ class EffectHandler
 		addSplashEffect(x, y, Res.image.game.effect.elem_3_splash.toTile());
 	}
 
+	public function addElem4StartEffect(x:Float, y:Float):Void
+	{
+		addFocusLightEffect(x, y, Res.image.game.effect.elem_4_light.toTile());
+	}
+
+	public function addElem4ActivateEffect(x:Float, y:Float):Void
+	{
+		addExplosionLight(x, y, Res.image.game.effect.elem_4_light.toTile());
+		addExplosionEffect(x, y, Res.image.game.effect.elem_4.toTexture(), 60);
+	}
+
 	public function addElem7Effect(x:Float, y:Float):Void
 	{
 		addExplosionLight(x, y, Res.image.game.effect.light.toTile());
