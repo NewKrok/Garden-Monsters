@@ -1,5 +1,6 @@
 package fe.game;
 
+import fe.TweenConfig;
 import h2d.Bitmap;
 import h2d.Graphics;
 import h2d.Interactive;
@@ -241,7 +242,7 @@ class Board
 		tempB.indexX = tempSavedindexX;
 		tempB.indexY = tempSavedindexY;
 
-		Actuate.tween(tempA, .3, {
+		Actuate.tween(tempA, isRevertSwap ? TweenConfig.SWAP_REVERT_TIME : TweenConfig.SWAP_TIME, {
 			animationX: tempB.graphic.x,
 			animationY: tempB.graphic.y
 		}).onUpdate(function() {
@@ -249,7 +250,7 @@ class Board
 			tempA.graphic.y = tempA.animationY;
 		}).ease(Quart.easeOut);
 
-		Actuate.tween(tempB, .3, {
+		Actuate.tween(tempB, isRevertSwap ? TweenConfig.SWAP_REVERT_TIME : TweenConfig.SWAP_TIME, {
 			animationX: tempSavedX,
 			animationY: tempSavedY
 		}).onUpdate(function() {
@@ -391,43 +392,11 @@ class Board
 		if (target != null)
 		{
 			if (startEffect != null) startEffect(triggerElem.graphic.x, triggerElem.graphic.y);
-
-			var e = triggerElem.clone();
-
-			var path = new MotionPath().bezier(
-				target.graphic.x,
-				target.graphic.y,
-				target.graphic.x + (triggerElem.graphic.x - target.graphic.x) / 2,
-				target.graphic.y + (triggerElem.graphic.y - target.graphic.y) / 2 - 100
-			);
-
-			container.addChild(e.graphic);
-			Actuate.tween(e.graphic, .2, {
-				scaleY: .8,
-				y: e.graphic.y + 10
-			}).ease(Quad.easeOut).onUpdate(function() {
-				e.graphic.scaleY = e.graphic.scaleY;
-			}).onComplete(function() {
-				Actuate.tween(e.graphic, .1, {
-					scaleY: 1,
-					y: e.graphic.y - 10
-				}).ease(Quad.easeOut).onUpdate(function() {
-					e.graphic.scaleY = e.graphic.scaleY;
-				}).onComplete(function() {
-					Actuate.motionPath(e.graphic, .5, {
-						x: path.x,
-						y: path.y
-					}).ease(Linear.easeNone).onUpdate(function() {
-						e.graphic.scaleY = e.graphic.scaleY;
-					}).onComplete(function(){
-						e.graphic.remove();
-						e = null;
-						activateEffect(target.graphic.x, target.graphic.y);
-						map[target.indexY][target.indexX] = null;
-						target.graphic.remove();
-						target = null;
-					});
-				});
+			jumpElemToElem(target, triggerElem, function(){
+				activateEffect(target.graphic.x, target.graphic.y);
+				map[target.indexY][target.indexX] = null;
+				target.graphic.remove();
+				target = null;
 			});
 		}
 	}
@@ -437,43 +406,11 @@ class Board
 		if (target != null)
 		{
 			if (startEffect != null) startEffect(triggerElem.graphic.x, triggerElem.graphic.y);
-
-			var e = triggerElem.clone();
-
-			var path = new MotionPath().bezier(
-				target.graphic.x,
-				target.graphic.y,
-				target.graphic.x + (triggerElem.graphic.x - target.graphic.x) / 2,
-				target.graphic.y + (triggerElem.graphic.y - target.graphic.y) / 2 - 100
-			);
-
-			container.addChild(e.graphic);
-			Actuate.tween(e.graphic, .2, {
-				scaleY: .8,
-				y: e.graphic.y + 10
-			}).ease(Quad.easeOut).onUpdate(function() {
-				e.graphic.scaleY = e.graphic.scaleY;
-			}).onComplete(function() {
-				Actuate.tween(e.graphic, .1, {
-					scaleY: 1,
-					y: e.graphic.y - 10
-				}).ease(Quad.easeOut).onUpdate(function() {
-					e.graphic.scaleY = e.graphic.scaleY;
-				}).onComplete(function() {
-					Actuate.motionPath(e.graphic, .5, {
-						x: path.x,
-						y: path.y
-					}).ease(Linear.easeNone).onUpdate(function() {
-						e.graphic.scaleY = e.graphic.scaleY;
-					}).onComplete(function(){
-						e.graphic.remove();
-						e = null;
-						activateEffect(target.graphic.x, target.graphic.y);
-						target.graphic.alpha = 0;
-						target.type = ElemType.Random;
-						Actuate.tween(target.graphic, .3, { alpha: 1 });
-					});
-				});
+			jumpElemToElem(target, triggerElem, function(){
+				activateEffect(target.graphic.x, target.graphic.y);
+				target.graphic.alpha = 0;
+				target.type = ElemType.Random;
+				Actuate.tween(target.graphic, .3, { alpha: 1 });
 			});
 		}
 	}
@@ -483,41 +420,9 @@ class Board
 		if (target != null)
 		{
 			if (startEffect != null) startEffect(triggerElem.graphic.x, triggerElem.graphic.y);
-
-			var e = triggerElem.clone();
-
-			var path = new MotionPath().bezier(
-				target.graphic.x,
-				target.graphic.y,
-				target.graphic.x + (triggerElem.graphic.x - target.graphic.x) / 2,
-				target.graphic.y + (triggerElem.graphic.y - target.graphic.y) / 2 - 100
-			);
-
-			container.addChild(e.graphic);
-			Actuate.tween(e.graphic, .2, {
-				scaleY: .8,
-				y: e.graphic.y + 10
-			}).ease(Quad.easeOut).onUpdate(function() {
-				e.graphic.scaleY = e.graphic.scaleY;
-			}).onComplete(function() {
-				Actuate.tween(e.graphic, .1, {
-					scaleY: 1,
-					y: e.graphic.y - 10
-				}).ease(Quad.easeOut).onUpdate(function() {
-					e.graphic.scaleY = e.graphic.scaleY;
-				}).onComplete(function() {
-					Actuate.motionPath(e.graphic, .5, {
-						x: path.x,
-						y: path.y
-					}).ease(Linear.easeNone).onUpdate(function() {
-						e.graphic.scaleY = e.graphic.scaleY;
-					}).onComplete(function(){
-						e.graphic.remove();
-						e = null;
-						activateEffect(target.graphic.x, target.graphic.y);
-						target.frozenTurnCount = 2;
-					});
-				});
+			jumpElemToElem(target, triggerElem, function(){
+				activateEffect(target.graphic.x, target.graphic.y);
+				target.frozenTurnCount = 2;
 			});
 		}
 	}
@@ -527,47 +432,15 @@ class Board
 		if (target != null)
 		{
 			if (startEffect != null) startEffect(triggerElem.graphic.x, triggerElem.graphic.y);
-
-			var e = triggerElem.clone();
-
-			var path = new MotionPath().bezier(
-				target.graphic.x,
-				target.graphic.y,
-				target.graphic.x + (triggerElem.graphic.x - target.graphic.x) / 2,
-				target.graphic.y + (triggerElem.graphic.y - target.graphic.y) / 2 - 100
-			);
-
-			container.addChild(e.graphic);
-			Actuate.tween(e.graphic, .2, {
-				scaleY: .8,
-				y: e.graphic.y + 10
-			}).ease(Quad.easeOut).onUpdate(function() {
-				e.graphic.scaleY = e.graphic.scaleY;
-			}).onComplete(function() {
-				Actuate.tween(e.graphic, .1, {
-					scaleY: 1,
-					y: e.graphic.y - 10
-				}).ease(Quad.easeOut).onUpdate(function() {
-					e.graphic.scaleY = e.graphic.scaleY;
-				}).onComplete(function() {
-					Actuate.motionPath(e.graphic, .5, {
-						x: path.x,
-						y: path.y
-					}).ease(Linear.easeNone).onUpdate(function() {
-						e.graphic.scaleY = e.graphic.scaleY;
-					}).onComplete(function(){
-						e.graphic.remove();
-						e = null;
-						activateEffect(target.graphic.x, target.graphic.y);
-						if (BoardHelper.isMovableElem(map[target.indexY][target.indexX + 1])) activateEffect(target.graphic.x + Elem.SIZE, target.graphic.y);
-						if (BoardHelper.isMovableElem(map[target.indexY][target.indexX - 1])) activateEffect(target.graphic.x - Elem.SIZE, target.graphic.y);
-						map[target.indexY][target.indexX] = null;
-						shiftToLeft(target.indexX, target.indexY);
-						shiftToRight(target.indexX, target.indexY);
-						target.graphic.remove();
-						target = null;
-					});
-				});
+			jumpElemToElem(target, triggerElem, function(){
+				activateEffect(target.graphic.x, target.graphic.y);
+				if (BoardHelper.isMovableElem(map[target.indexY][target.indexX + 1])) activateEffect(target.graphic.x + Elem.SIZE, target.graphic.y);
+				if (BoardHelper.isMovableElem(map[target.indexY][target.indexX - 1])) activateEffect(target.graphic.x - Elem.SIZE, target.graphic.y);
+				map[target.indexY][target.indexX] = null;
+				shiftToLeft(target.indexX, target.indexY);
+				shiftToRight(target.indexX, target.indexY);
+				target.graphic.remove();
+				target = null;
 			});
 		}
 	}
@@ -683,6 +556,44 @@ class Board
 		}).onComplete(function(){
 			e.graphic.remove();
 			e = null;
+		});
+	}
+
+	function jumpElemToElem(target:Elem, triggerElem:Elem, onComplete:Void->Void)
+	{
+		var e = triggerElem.clone();
+
+		var path = new MotionPath().bezier(
+			target.graphic.x,
+			target.graphic.y,
+			target.graphic.x + (triggerElem.graphic.x - target.graphic.x) / 2,
+			target.graphic.y + (triggerElem.graphic.y - target.graphic.y) / 2 - 100
+		);
+
+		container.addChild(e.graphic);
+		Actuate.tween(e.graphic, TweenConfig.JUMP_PREPARE_TIME, {
+			scaleY: .8,
+			y: e.graphic.y + 10
+		}).ease(Quad.easeOut).onUpdate(function() {
+			e.graphic.scaleY = e.graphic.scaleY;
+		}).onComplete(function() {
+			Actuate.tween(e.graphic, TweenConfig.JUMP_START_TIME, {
+				scaleY: 1,
+				y: e.graphic.y - 10
+			}).ease(Quad.easeOut).onUpdate(function() {
+				e.graphic.scaleY = e.graphic.scaleY;
+			}).onComplete(function() {
+				Actuate.motionPath(e.graphic, TweenConfig.JUMP_TIME, {
+					x: path.x,
+					y: path.y
+				}).ease(Linear.easeNone).onUpdate(function() {
+					e.graphic.scaleY = e.graphic.scaleY;
+				}).onComplete(function(){
+					e.graphic.remove();
+					e = null;
+					onComplete();
+				});
+			});
 		});
 	}
 
@@ -892,7 +803,7 @@ class Board
 		{
 			alreadyAnimatedElems.push(e);
 
-			Actuate.tween(e, .2, {
+			Actuate.tween(e, TweenConfig.ELEM_BACKWARD_TIME, {
 				animationY: e.animationY - Elem.SIZE / 4,
 				rotation: Math.random() * Math.PI / 4 - Math.PI / 8
 			}).onUpdate(function() {
@@ -938,7 +849,7 @@ class Board
 
 	function getElemTweenSpeedByDistance(d:Float):Float
 	{
-		return d / Elem.SIZE * .15;
+		return d / Elem.SIZE * TweenConfig.ELEM_FALL_TIME;
 	}
 
 	function getElemByPosition(p:SimplePoint):Elem
