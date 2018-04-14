@@ -17,6 +17,8 @@ import motion.Actuate;
 class EffectHandler
 {
 	static public inline var EXPLODING_EFFECT_DURATION:Float = 1;
+	static public inline var SPLASH_EFFECT_DURATION:Float = .6;
+	static public inline var LIGHT_FOCUS_EFFECT_DURATION:Float = 1;
 
 	public var view(default, null):Layers;
 
@@ -29,8 +31,36 @@ class EffectHandler
 
 	public function addMonsterMatchEffect(x:Float, y:Float):Void
 	{
-		addExplosionLight(x, y);
+		addExplosionLight(x, y, Res.image.game.effect.light.toTile());
 		addExplosionEffect(x, y, Res.image.game.effect.star.toTexture());
+	}
+
+	public function addElem1StartEffect(x:Float, y:Float):Void
+	{
+		addFocusLightEffect(x, y, Res.image.game.effect.elem_1_light.toTile());
+	}
+
+	public function addElem1ActivateEffect(x:Float, y:Float):Void
+	{
+		addExplosionLight(x, y, Res.image.game.effect.elem_1_light.toTile());
+		addExplosionEffect(x, y, Res.image.game.effect.elem_1.toTexture());
+	}
+
+	public function addElem3StartEffect(x:Float, y:Float):Void
+	{
+		addFocusLightEffect(x, y, Res.image.game.effect.elem_3_light.toTile());
+	}
+
+	public function addElem3ActivateEffect(x:Float, y:Float):Void
+	{
+		addExplosionLight(x, y, Res.image.game.effect.elem_3_light.toTile());
+		addSplashEffect(x, y, Res.image.game.effect.elem_3_splash.toTile());
+	}
+
+	public function addElem7Effect(x:Float, y:Float):Void
+	{
+		addExplosionLight(x, y, Res.image.game.effect.light.toTile());
+		addExplosionEffect(x, y, Res.image.game.effect.elem_7.toTexture());
 	}
 
 	function addExplosionEffect(x:Float, y:Float, texture:Texture):Void
@@ -61,47 +91,77 @@ class EffectHandler
 		});
 	}
 
-	function addExplosionLight(x:Float, y:Float)
+	function addSplashEffect(x:Float, y:Float, tile:Tile):Void
 	{
-		var image:Bitmap = new Bitmap(Res.image.game.effect.light.toTile(), view);
+		var image:Bitmap = new Bitmap(tile, view);
 		image.x = x;
 		image.y = y;
-		image.setScale(.5);
+		image.rotation = Math.random() * (Math.PI / 4);
+		image.setScale(.4);
+		image.alpha = .9;
+
+		var tile:Tile = image.tile;
+		tile.dx = cast -tile.width / 2;
+		tile.dy = cast -tile.height / 2;
+
+		Actuate.tween(image, SPLASH_EFFECT_DURATION, {
+			scaleX: 1.4, scaleY: 1.4, rotation: Math.random() * (Math.PI / 4)
+		}).onUpdate(function(){
+			image.setScale(image.scaleX);
+		}).onComplete(function(){
+			Actuate.tween(image, .4, {
+				scaleX: 2, scaleY: 2, alpha: 0, rotation: Math.random() * (Math.PI / 4)
+			}).onUpdate(function(){
+				image.setScale(image.scaleX);
+			}).onComplete(function(){
+				removeBitmap(image);
+			});
+		});
+	}
+
+	function addExplosionLight(x:Float, y:Float, tile:Tile)
+	{
+		var image:Bitmap = new Bitmap(tile, view);
+		image.x = x;
+		image.y = y;
+		image.setScale(.8);
 
 		var tile:Tile = image.tile;
 		tile.dx = cast -tile.width / 2;
 		tile.dy = cast -tile.height / 2;
 
 		Actuate.tween(image, EXPLODING_EFFECT_DURATION, {
-			scaleX: 1, scaleY: 1, alpha: 0
+			scaleX: 1.5, scaleY: 1.5, alpha: 0
 		}).onUpdate(function(){
 			image.setScale(image.scaleX);
 		}).onComplete(function(){
-			removeExplosionLight(image);
+			removeBitmap(image);
 		});
 	}
 
-	function removeExplosionLight(img:Bitmap)
+	function addFocusLightEffect(x:Float, y:Float, tile:Tile)
+	{
+		var image:Bitmap = new Bitmap(tile, view);
+		image.x = x;
+		image.y = y;
+		image.setScale(3);
+
+		var tile:Tile = image.tile;
+		tile.dx = cast -tile.width / 2;
+		tile.dy = cast -tile.height / 2;
+
+		Actuate.tween(image, LIGHT_FOCUS_EFFECT_DURATION, {
+			scaleX: .5, scaleY: .5, alpha: 0
+		}).onUpdate(function(){
+			image.setScale(image.scaleX);
+		}).onComplete(function(){
+			removeBitmap(image);
+		});
+	}
+
+	function removeBitmap(img:Bitmap)
 	{
 		img.remove();
-	}
-
-	public function addElem1Effect(x:Float, y:Float):Void
-	{
-		addExplosionLight(x, y);
-		addExplosionEffect(x, y, Res.image.game.effect.elem_1.toTexture());
-	}
-
-	public function addElem3Effect(x:Float, y:Float):Void
-	{
-		addExplosionLight(x, y);
-		addExplosionEffect(x, y, Res.image.game.effect.elem_3.toTexture());
-	}
-
-	public function addElem7Effect(x:Float, y:Float):Void
-	{
-		addExplosionLight(x, y);
-		addExplosionEffect(x, y, Res.image.game.effect.elem_7.toTexture());
 	}
 
 	function removeEffect(g:ParticleGroup)

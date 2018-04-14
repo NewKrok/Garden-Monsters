@@ -103,11 +103,11 @@ class Elem
 -2	DONE Random block between 1 - 7
 -1	DONE Temporary empty block - Iterable can happen after match
  0	DONE Not playable block and it block the other elems
- 1	DONE After match it removes 1 nearby element too // RECHECK THE PART EFFECT
+ 1	DONE After match it removes 1 nearby element too
  2	After match it freezes 1 nearby elems for one turn - cant move and cant match
- 3	DONE After match it changes to random type 1 nearby element // RECHECK THE PART EFFECT
+ 3	DONE After match it changes to random type 1 nearby element
  4	After match it shifts to left and to right the elems - the left and the right elems dissapearing
  5	After match it removes the elem under it
  6	After match it removes the nearby similar type elems too
- 7	DONE After match it removes 1 random element too // IT SHOULD BE DIFFERENT // RECHECK THE PART EFFECT
+ 7	After match it removes 1 random element too // IT SHOULD BE DIFFERENT
 */

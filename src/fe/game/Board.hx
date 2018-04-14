@@ -322,9 +322,9 @@ class Board
 	{
 		switch(m[0].type)
 		{
-			case ElemType.Elem1: removeElemByElem(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem1Effect);
-			case ElemType.Elem3: changeElemTypeByElem(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem3Effect);
-			case ElemType.Elem7: removeElemByElem(getRandomNotMatchedPlayableElem(), m.random(), effectHandler.addElem7Effect);
+			case ElemType.Elem1: removeElemByElem(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem1StartEffect, effectHandler.addElem1ActivateEffect);
+			case ElemType.Elem3: changeElemTypeByElem(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem3StartEffect, effectHandler.addElem3ActivateEffect);
+			case ElemType.Elem7: removeElemByElem(getRandomNotMatchedPlayableElem(), m.random(), null, effectHandler.addElem7Effect);
 
 			case _:
 		}
@@ -382,10 +382,12 @@ class Board
 		return possibleElems.random();
 	}
 
-	function removeElemByElem(target:Elem, triggerElem:Elem, effect:Float->Float->Void)
+	function removeElemByElem(target:Elem, triggerElem:Elem, startEffect:Float->Float->Void, activateEffect:Float->Float->Void)
 	{
 		if (target != null)
 		{
+			if (startEffect != null) startEffect(triggerElem.graphic.x, triggerElem.graphic.y);
+
 			var e = triggerElem.clone();
 
 			var path = new MotionPath().bezier(
@@ -416,7 +418,7 @@ class Board
 					}).onComplete(function(){
 						e.graphic.remove();
 						e = null;
-						effect(target.graphic.x, target.graphic.y);
+						activateEffect(target.graphic.x, target.graphic.y);
 						map[target.indexY][target.indexX] = null;
 						target.graphic.remove();
 						target = null;
@@ -426,10 +428,12 @@ class Board
 		}
 	}
 
-	function changeElemTypeByElem(target:Elem, triggerElem:Elem, effect:Float->Float->Void)
+	function changeElemTypeByElem(target:Elem, triggerElem:Elem, startEffect:Float->Float->Void, activateEffect:Float->Float->Void)
 	{
 		if (target != null)
 		{
+			if (startEffect != null) startEffect(triggerElem.graphic.x, triggerElem.graphic.y);
+
 			var e = triggerElem.clone();
 
 			var path = new MotionPath().bezier(
@@ -460,8 +464,10 @@ class Board
 					}).onComplete(function(){
 						e.graphic.remove();
 						e = null;
-						effect(target.graphic.x, target.graphic.y);
+						activateEffect(target.graphic.x, target.graphic.y);
+						target.graphic.alpha = 0;
 						target.type = ElemType.Random;
+						Actuate.tween(target.graphic, .3, { alpha: 1 });
 					});
 				});
 			});
