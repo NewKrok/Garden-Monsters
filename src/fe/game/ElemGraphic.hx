@@ -6,6 +6,7 @@ import h2d.Bitmap;
 import h2d.Sprite;
 import h2d.Tile;
 import h2d.filter.Glow;
+import hxd.Res;
 import motion.Actuate;
 import motion.easing.Quad;
 
@@ -16,7 +17,9 @@ import motion.easing.Quad;
 class ElemGraphic extends Sprite
 {
 	public var hasMouseHover(default, set):Bool = false;
+	public var isFrozen(default, set):Bool = false;
 
+	var frozenBitmap:Bitmap;
 	var baseBitmap:Bitmap;
 	var hoverBitmap:Bitmap;
 
@@ -83,5 +86,17 @@ class ElemGraphic extends Sprite
 	{
 		scaleX = sX;
 		scaleY = sY;
+	}
+
+	function set_isFrozen(value:Bool):Bool
+	{
+		if (value)
+		{
+			if (frozenBitmap == null) frozenBitmap = makeGraphic(Res.image.game.effect.ice.toTile());
+			frozenBitmap.visible = true;
+		}
+		else if (frozenBitmap != null) frozenBitmap.visible = false;
+
+		return isFrozen = value;
 	}
 }

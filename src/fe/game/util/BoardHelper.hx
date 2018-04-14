@@ -361,6 +361,7 @@ class BoardHelper
 			for (o in t.expected)
 				if (map[cast x + o.x] == null
 					|| map[cast x + o.x][cast y + o.y] == null
+					|| map[cast x + o.x][cast y + o.y].isFrozen
 					|| map[cast x + o.x][cast y + o.y].type != cast type
 				) match = false;
 

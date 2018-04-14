@@ -158,7 +158,7 @@ class Board
 					y: e.relY - container.y - mask.y
 				});
 
-				if (focusElement != null && focusElement.type != ElemType.Empty && focusElement.type != ElemType.None)
+				if (focusElement != null && !focusElement.isFrozen && focusElement.type != ElemType.Empty && focusElement.type != ElemType.None)
 				{
 					focusElement.hasMouseHover = true;
 					selectedElemBackground.x = focusElement.graphic.x;
@@ -210,6 +210,8 @@ class Board
 
 		var tempA:Elem = map[targetIndexY][targetIndexX];
 		var tempB:Elem = map[indexY][indexX];
+
+		if (tempA.isFrozen || tempB.isFrozen) return;
 
 		if (!isRevertSwap && (tempA.isUnderSwapping || tempB.isUnderSwapping)) return;
 
@@ -323,6 +325,7 @@ class Board
 		switch(m[0].type)
 		{
 			case ElemType.Elem1: removeElemByElem(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem1StartEffect, effectHandler.addElem1ActivateEffect);
+			case ElemType.Elem2: freezeElemByElem(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem2StartEffect, effectHandler.addElem2ActivateEffect);
 			case ElemType.Elem3: changeElemTypeByElem(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem3StartEffect, effectHandler.addElem3ActivateEffect);
 			case ElemType.Elem7: removeElemByElem(getRandomNotMatchedPlayableElem(), m.random(), null, effectHandler.addElem7Effect);
 
@@ -474,6 +477,50 @@ class Board
 		}
 	}
 
+	function freezeElemByElem(target:Elem, triggerElem:Elem, startEffect:Float->Float->Void, activateEffect:Float->Float->Void)
+	{
+		if (target != null)
+		{
+			if (startEffect != null) startEffect(triggerElem.graphic.x, triggerElem.graphic.y);
+
+			var e = triggerElem.clone();
+
+			var path = new MotionPath().bezier(
+				target.graphic.x,
+				target.graphic.y,
+				target.graphic.x + (triggerElem.graphic.x - target.graphic.x) / 2,
+				target.graphic.y + (triggerElem.graphic.y - target.graphic.y) / 2 - 100
+			);
+
+			container.addChild(e.graphic);
+			Actuate.tween(e.graphic, .2, {
+				scaleY: .8,
+				y: e.graphic.y + 10
+			}).ease(Quad.easeOut).onUpdate(function() {
+				e.graphic.scaleY = e.graphic.scaleY;
+			}).onComplete(function() {
+				Actuate.tween(e.graphic, .1, {
+					scaleY: 1,
+					y: e.graphic.y - 10
+				}).ease(Quad.easeOut).onUpdate(function() {
+					e.graphic.scaleY = e.graphic.scaleY;
+				}).onComplete(function() {
+					Actuate.motionPath(e.graphic, .5, {
+						x: path.x,
+						y: path.y
+					}).ease(Linear.easeNone).onUpdate(function() {
+						e.graphic.scaleY = e.graphic.scaleY;
+					}).onComplete(function(){
+						e.graphic.remove();
+						e = null;
+						activateEffect(target.graphic.x, target.graphic.y);
+						target.frozenTurnCount = 2;
+					});
+				});
+			});
+		}
+	}
+
 	function isNotMatchedElem(e:Elem):Bool
 	{
 		var count:UInt = 0;
@@ -493,7 +540,20 @@ class Board
 
 		isAnimationInProgress = false;
 		checkMap();
-		removeAllMatch();
+
+		if (foundMatch.length == 0) turnEnd();
+		else removeAllMatch();
+	}
+
+	function turnEnd()
+	{
+		for (row in map)
+			for (e in row)
+				if (e.isFrozen && e.frozenTurnCount > 0)
+				{
+					e.frozenTurnCount--;
+					if (e.frozenTurnCount == 0) effectHandler.addIceBreakEffect(e.graphic.x, e.graphic.y);
+				}
 	}
 
 	function fillMap()
@@ -722,6 +782,8 @@ class Board
 		{
 			for (e in row)
 			{
+				if (e == null) continue;
+
 				var size = e.graphic.getSize();
 
 				if (e != null && e.type != ElemType.Blocker

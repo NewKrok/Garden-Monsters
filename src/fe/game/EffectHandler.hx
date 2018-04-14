@@ -9,6 +9,8 @@ import h3d.mat.Texture;
 import hpp.util.GeomUtil.SimplePoint;
 import hxd.Res;
 import motion.Actuate;
+import motion.MotionPath;
+import motion.easing.Quad;
 
 /**
  * ...
@@ -17,6 +19,7 @@ import motion.Actuate;
 class EffectHandler
 {
 	static public inline var EXPLODING_EFFECT_DURATION:Float = 1;
+	static public inline var ICE_BREAK_EFFECT_DURATION:Float = 1;
 	static public inline var SPLASH_EFFECT_DURATION:Float = .6;
 	static public inline var LIGHT_FOCUS_EFFECT_DURATION:Float = 1;
 
@@ -46,6 +49,17 @@ class EffectHandler
 		addExplosionEffect(x, y, Res.image.game.effect.elem_1.toTexture());
 	}
 
+	public function addElem2StartEffect(x:Float, y:Float):Void
+	{
+		addFocusLightEffect(x, y, Res.image.game.effect.elem_2_light.toTile());
+	}
+
+	public function addElem2ActivateEffect(x:Float, y:Float):Void
+	{
+		addExplosionLight(x, y, Res.image.game.effect.elem_2_light.toTile());
+		addExplosionEffect(x, y, Res.image.game.effect.elem_2.toTexture(), 60);
+	}
+
 	public function addElem3StartEffect(x:Float, y:Float):Void
 	{
 		addFocusLightEffect(x, y, Res.image.game.effect.elem_3_light.toTile());
@@ -63,14 +77,15 @@ class EffectHandler
 		addExplosionEffect(x, y, Res.image.game.effect.elem_7.toTexture());
 	}
 
-	function addExplosionEffect(x:Float, y:Float, texture:Texture):Void
+	function addExplosionEffect(x:Float, y:Float, texture:Texture, speed:Float = 40):Void
 	{
 		var g = new ParticleGroup(particles);
 
-		g.sizeRand = .3;
+		g.sizeRand = .5;
 		g.gravity = 1;
 		g.life = EXPLODING_EFFECT_DURATION / 2 + .1;
-		g.speed = 40;
+		g.speed = speed;
+		g.emitDelay = 0;
 		g.nparts = 10;
 		g.emitMode = PartEmitMode.Point;
 		g.emitDist = 30;
@@ -117,6 +132,43 @@ class EffectHandler
 				removeBitmap(image);
 			});
 		});
+	}
+
+	public function addIceBreakEffect(x:Float, y:Float):Void
+	{
+		var positions:Array<SimplePoint> = [{ x: -1, y: -1}, { x: 1, y: -1}, { x: -1, y: 1}, { x: 1, y: 1}];
+		var tile:Tile = Res.image.game.effect.ice_piece.toTile();
+		tile.dx = cast -tile.width / 2;
+		tile.dy = cast -tile.height / 2;
+
+		for (i in 0...4)
+		{
+			var image:Bitmap = new Bitmap(tile, view);
+			image.x = x + positions[i].x * tile.width / 2;
+			image.y = y + positions[i].y * tile.height / 2;
+			image.rotation = Math.floor(Math.random() * 4) * (Math.PI / 2);
+
+			var path = new MotionPath().bezier(
+				image.x + positions[i].x * (tile.width / 2),
+				image.y + positions[i].y * tile.height + Math.random() * 50 + 50,
+				image.x + positions[i].x * tile.width,
+				image.y + positions[i].y * tile.height
+			);
+
+			Actuate.tween(image, ICE_BREAK_EFFECT_DURATION, {
+				rotation: image.rotation + Math.random() * Math.PI - Math.PI / 2,
+				alpha: 0
+			});
+
+			Actuate.motionPath(image, ICE_BREAK_EFFECT_DURATION, {
+				x: path.x,
+				y: path.y
+			}).ease(Quad.easeOut).onUpdate(function(){
+				image.x = image.x;
+			}).onComplete(function(){
+				removeBitmap(image);
+			});
+		}
 	}
 
 	function addExplosionLight(x:Float, y:Float, tile:Tile)
