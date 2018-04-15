@@ -61,12 +61,12 @@ class ElemGraphic extends Sprite
 		if (value)
 		{
 			filter = new Glow(0xFFFF00, 1, 2, 1, 1);
-			Actuate.tween(this, .3, { sX: Math.random() * .2 + .9, sY: Math.random() * .2 + .9 }).ease(Quad.easeOut).onUpdate(updateView);
+			Actuate.tween(this, .3, { sX: Math.random() * .2 + .9, sY: Math.random() * .2 + .9 }, false).ease(Quad.easeOut).onUpdate(updateView);
 		}
 		else
 		{
 			filter = null;
-			Actuate.tween(this, .3, { sX: 1, sY: 1 }).ease(Quad.easeOut).onUpdate(updateView);
+			Actuate.tween(this, .3, { sX: 1, sY: 1 }, false).ease(Quad.easeOut).onUpdate(updateView);
 		}
 
 		baseBitmap.visible = !value;
@@ -77,8 +77,8 @@ class ElemGraphic extends Sprite
 
 	public function moveFinished()
 	{
-		Actuate.tween(this, .2, { y: y + 10, sX: Math.random() * .2 + 1, sY: Math.random() * .2 + .7 }).ease(Quad.easeOut).onUpdate(updateView).onComplete(function(){
-			Actuate.tween(this, .1, { y: y - 10, sX: 1, sY: 1 }).ease(Quad.easeOut).onUpdate(updateView);
+		Actuate.tween(this, .2, { y: y + 10, sX: Math.random() * .2 + 1, sY: Math.random() * .2 + .7 }, false).ease(Quad.easeOut).onUpdate(updateView).onComplete(function(){
+			Actuate.tween(this, .1, { y: y - 10, sX: 1, sY: 1 }, false).ease(Quad.easeOut).onUpdate(updateView);
 		});
 	}
 

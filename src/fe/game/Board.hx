@@ -329,6 +329,7 @@ class Board
 			case ElemType.Elem2: freezeElemByElem(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem2StartEffect, effectHandler.addElem2ActivateEffect);
 			case ElemType.Elem3: changeElemTypeByElem(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem3StartEffect, effectHandler.addElem3ActivateEffect);
 			case ElemType.Elem4: shiftRow(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem4StartEffect, effectHandler.addElem4ActivateEffect);
+			case ElemType.Elem5: removeRandomElemByElem(getRandomNotMatchedPlayableElem(), m.random(), effectHandler.addElem5StartEffect, effectHandler.addElem5ActivateEffect);
 			//case ElemType.Elem7: removeElemByElem(getRandomNotMatchedPlayableElem(), m.random(), null, effectHandler.addElem7Effect);
 
 			case _:
@@ -399,6 +400,94 @@ class Board
 				target = null;
 			});
 		}
+	}
+
+	function removeRandomElemByElem(target:Elem, triggerElem:Elem, startEffect:Float->Float->Void, activateEffect:Float->Float->Void)
+	{
+		if (target != null)
+		{
+			if (startEffect != null) startEffect(triggerElem.graphic.x, triggerElem.graphic.y);
+
+			var e = triggerElem.clone();
+			container.addChild(e.graphic);
+
+			Actuate.tween(e.graphic, TweenConfig.JUMP_UP_PREPARE_TIME, {
+				scaleX: .8,
+				scaleY: .8,
+			}).ease(Quad.easeOut).onUpdate(function() {
+				e.graphic.scaleY = e.graphic.scaleY;
+			}).onComplete(function() {
+				Actuate.tween(e.graphic, TweenConfig.JUMP_UP_START_TIME, {
+					scaleX: 2,
+					scaleY: 2,
+				}).ease(Quad.easeOut).onUpdate(function() {
+					e.graphic.scaleY = e.graphic.scaleY;
+				}).onComplete(function() {
+					Actuate.tween(e.graphic, TweenConfig.JUMP_UP_TIME, {
+						scaleX: 1,
+						scaleY: 1,
+					}).ease(Linear.easeNone).onUpdate(function() {
+						e.graphic.scaleY = e.graphic.scaleY;
+					}).onComplete(function(){
+						e.graphic.remove();
+						e = null;
+
+						elemFallDown(target);
+						shakeBoard(2);
+						activateEffect(target.graphic.x, target.graphic.y);
+						map[target.indexY][target.indexX] = null;
+						target.graphic.remove();
+						target = null;
+					});
+				});
+			});
+		}
+	}
+
+	function elemFallDown(e:Elem)
+	{
+		var elemClone = e.clone();
+		container.addChild(elemClone.graphic);
+
+		Actuate.tween(elemClone.graphic, TweenConfig.ELEM_FALL_OUT_FROM_GAME_TIME, {
+			y: elemClone.graphic.y + 200,
+			alpha: 0,
+			rotation: Math.random() * Math.PI / 2
+		}).ease(Quad.easeIn).onUpdate(function() {
+			elemClone.graphic.y = elemClone.graphic.y;
+		}).onComplete(function(){
+			elemClone.graphic.remove();
+			elemClone = null;
+		});
+	}
+
+	function shakeBoard(count:UInt)
+	{
+		if (count > 0) count--;
+
+		var basePos:SimplePoint = { x: container.x, y: container.y };
+		Actuate.tween(container, TweenConfig.CAMERA_SHAKE_MOVEMENT_TIME, {
+			x: basePos.x + Math.random() * 30 - 15,
+			y: basePos.y + Math.random() * 30 - 15
+		}).onUpdate(function(){
+			container.x = container.x;
+		}).onComplete(function(){
+			Actuate.tween(container, TweenConfig.CAMERA_SHAKE_MOVEMENT_TIME, {
+				x: basePos.x + Math.random() * 30 - 15,
+				y: basePos.y + Math.random() * 30 - 15
+			}).onUpdate(function(){
+				container.x = container.x;
+			}).onComplete(function(){
+				if (count == 0)
+					Actuate.tween(container, TweenConfig.CAMERA_SHAKE_MOVEMENT_TIME, { x: basePos.x, y: basePos.y }).onUpdate(function(){ container.x = container.x; });
+				else
+				{
+					container.x = basePos.x;
+					container.y = basePos.y;
+					shakeBoard(count - 1);
+				}
+			});
+		});
 	}
 
 	function changeElemTypeByElem(target:Elem, triggerElem:Elem, startEffect:Float->Float->Void, activateEffect:Float->Float->Void)
