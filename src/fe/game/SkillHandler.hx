@@ -44,15 +44,20 @@ class SkillHandler
 	public function handleElemSkill(match:Array<Elem>)
 	{
 		var type = match[0].type;
+		var matchClone = match.concat([]);
 		while (type == ElemType.Elem6) type = cast(1 + Math.floor(Math.random() * 7));
 
 		for (i in 0...match.length - 2)
+		{
+			var selectedElem = matchClone.random();
+			matchClone.remove(selectedElem);
+
 			switch(type)
 			{
 				case ElemType.Elem1:
 					removeElemByElem(
 						getRandomNearbyNotMatchedPlayableElem(match),
-						match.random(),
+						selectedElem,
 						effectHandler.addElem1StartEffect,
 						effectHandler.addElem1ActivateEffect
 					);
@@ -60,7 +65,7 @@ class SkillHandler
 				case ElemType.Elem2:
 					freezeElemByElem(
 						getRandomNearbyNotMatchedPlayableElem(match),
-						match.random(),
+						selectedElem,
 						effectHandler.addElem2StartEffect,
 						effectHandler.addElem2ActivateEffect
 					);
@@ -68,7 +73,7 @@ class SkillHandler
 				case ElemType.Elem3:
 					changeElemTypeByElem(
 						getRandomNearbyNotMatchedPlayableElem(match),
-						match.random(),
+						selectedElem,
 						effectHandler.addElem3StartEffect,
 						effectHandler.addElem3ActivateEffect
 					);
@@ -76,7 +81,7 @@ class SkillHandler
 				case ElemType.Elem4:
 					shiftRow(
 						getRandomNearbyNotMatchedPlayableElem(match),
-						match.random(),
+						selectedElem,
 						effectHandler.addElem4StartEffect,
 						effectHandler.addElem4ActivateEffect
 					);
@@ -84,7 +89,7 @@ class SkillHandler
 				case ElemType.Elem5:
 					removeRandomElemByElem(
 						getRandomNotMatchedPlayableElem(),
-						match.random(),
+						selectedElem,
 						effectHandler.addElem5StartEffect,
 						effectHandler.addElem5ActivateEffect
 					);
@@ -93,7 +98,7 @@ class SkillHandler
 					swapRandomElemsByElem(
 						getRandomNotMatchedPlayableElem(),
 						getRandomNotMatchedPlayableElem(),
-						match.random(),
+						selectedElem,
 						effectHandler.addElem7StartEffect,
 						effectHandler.addElem7Effect
 					);
@@ -101,6 +106,7 @@ class SkillHandler
 				case _:
 			}
 		}
+	}
 
 	function getRandomNearbyNotMatchedPlayableElem(m:Array<Elem>):Elem
 	{
