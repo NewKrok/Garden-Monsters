@@ -1,17 +1,19 @@
 package fe.state;
 
-import fe.game.Elem;
-import fe.game.SkillHandler;
-import h2d.Bitmap;
-import h2d.Layers;
-import haxe.Timer;
-import hpp.heaps.Base2dState;
-import hxd.Res;
-import motion.Actuate;
+import fe.Layout;
 import fe.game.Board;
 import fe.game.EffectHandler;
 import fe.game.GameModel;
+import fe.game.SkillHandler;
 import fe.game.util.BoardHelper;
+import h2d.Bitmap;
+import h2d.Interactive;
+import h2d.Layers;
+import haxe.Timer;
+import hpp.heaps.Base2dState;
+import hxd.Cursor;
+import hxd.Res;
+import motion.Actuate;
 
 /**
  * ...
@@ -22,9 +24,13 @@ class GameState extends Base2dState
 	var gameModel:GameModel;
 
 	var gameContainer:Layers;
+	var interactiveArea:Interactive;
+	var background:Bitmap;
 
 	var effectHandler:EffectHandler;
 	var skillHandler:SkillHandler;
+
+	var layout:Layout;
 
 	var now:Float;
 
@@ -37,22 +43,29 @@ class GameState extends Base2dState
 	{
 		gameModel = new GameModel();
 
-		new Bitmap(Res.image.game.background.toTile(), stage);
+		interactiveArea = new Interactive(stage.width, stage.height, stage);
+		interactiveArea.cursor = Cursor.Default;
+
+		background = new Bitmap(Res.image.game.background.toTile(), stage);
 
 		gameContainer = new Layers(stage);
 		effectHandler = new EffectHandler();
 		skillHandler = new SkillHandler();
 
-		resizeGameContainer();
 		reset();
 
 		//createRandomBoard(function(){ trace("Start Game!"); });
 
 		loadBoard();
 
-		effectHandler.view.x = 25 + Elem.SIZE / 2;
-		effectHandler.view.y = 25 + Elem.SIZE / 2;
 		gameContainer.addChild(effectHandler.view);
+
+		layout = new Layout(
+			stage,
+			gameContainer,
+			interactiveArea
+		);
+		onStageResize(stage.width, stage.height);
 	}
 
 	function createRandomBoard(onComplete:Void->Void)
@@ -64,7 +77,7 @@ class GameState extends Base2dState
 			Timer.delay(function(){ createRandomBoard(onComplete); }, 200);
 		else
 		{
-			board = new Board(gameContainer, map, effectHandler, skillHandler);
+			board = new Board(gameContainer, interactiveArea, map, effectHandler, skillHandler);
 
 			trace("Board created, time: " + (Date.now().getTime() - boardCreationStartTime) + "ms, possibilities: " + board.foundPossibilities.length + ", match: " + board.foundMatch.length);
 			onComplete();
@@ -83,7 +96,7 @@ class GameState extends Base2dState
 			[ -3, -2, -2, -2, -2, -2, -2, -2, -2, -3 ],
 			[ -3, -3, -2, -2, -2, -2, -2, -2, -3, -3 ]
 		]);
-		board = new Board(gameContainer, map, effectHandler, skillHandler);
+		board = new Board(gameContainer, interactiveArea, map, effectHandler, skillHandler);
 	}
 
 	override public function update(delta:Float)
@@ -98,22 +111,13 @@ class GameState extends Base2dState
 		pauseRequest();
 	}
 
-	override public function onStageResize(width:Float, height:Float)
+	override public function onStageResize(width:UInt, height:UInt)
 	{
 		super.onStageResize(width, height);
 
-		resizeGameContainer();
-	}
+		layout.update(width, height);
 
-	function resizeGameContainer()
-	{
-		/*var ratio:Float = stage.width / AppConfig.APP_WIDTH;
-		if (stage.height < AppConfig.APP_HEIGHT * ratio)
-			ratio = stage.height / AppConfig.APP_HEIGHT;
-
-		gameContainer.scaleX = gameContainer.scaleY = ratio;
-		gameContainer.x = stage.width / 2 - gameContainer.getSize().width / 2;
-		gameContainer.y = stage.height / 2 - gameContainer.getSize().height / 2;*/
+		background.tile.scaleToSize(cast width, cast height);
 	}
 
 	function resumeRequest()

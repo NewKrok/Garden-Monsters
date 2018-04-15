@@ -9,8 +9,6 @@ import h2d.Graphics;
 import h2d.Interactive;
 import h2d.Layers;
 import h2d.Mask;
-import h2d.filter.Glow;
-import hpp.heaps.HppG;
 import hpp.util.GeomUtil;
 import hpp.util.GeomUtil.SimplePoint;
 import hxd.Cursor;
@@ -35,6 +33,7 @@ class Board
 
 	var map:Array<Array<Elem>>;
 	var parent:Layers;
+	var interactiveArea:Interactive;
 	var mask:Mask;
 	var container:Layers;
 	var background:Graphics;
@@ -54,11 +53,13 @@ class Board
 
 	public function new(
 		parent:Layers,
+		interactiveArea:Interactive,
 		map:Array<Array<Elem>>,
 		effectHandler:EffectHandler,
 		skillHandler:SkillHandler
 	){
 		this.parent = parent;
+		this.interactiveArea = interactiveArea;
 		this.map = map;
 		this.effectHandler = effectHandler;
 		this.skillHandler = skillHandler;
@@ -67,6 +68,7 @@ class Board
 
 		container = new Layers(mask);
 		container.setPos(Elem.SIZE / 2, Elem.SIZE / 2);
+		effectHandler.view.setPos(Elem.SIZE / 2, Elem.SIZE / 2);
 
 		skillHandler.init(container, effectHandler, function(e) { moveElemToPosition(e); });
 
@@ -89,7 +91,6 @@ class Board
 
 		mask.width = Std.int(container.getSize().width + Elem.SIZE / 2);
 		mask.height = Std.int(container.getSize().height + Elem.SIZE / 2);
-		mask.setPos(25, 25);
 
 		createInteractive();
 	}
@@ -101,14 +102,11 @@ class Board
 
 	function createInteractive()
 	{
-		var i:Interactive = new Interactive(HppG.stage2d.width, HppG.stage2d.height, parent);
-		i.cursor = Cursor.Default;
-
-		i.onPush = function(e:Event)
+		interactiveArea.onPush = function(e:Event)
 		{
 			draggedElement = getElemByPosition({
-				x: e.relX - container.x - mask.x,
-				y: e.relY - container.y - mask.y
+				x: e.relX,
+				y: e.relY
 			});
 
 			if (draggedElement != null){
@@ -119,9 +117,9 @@ class Board
 			else focusElement = null;
 		};
 
-		i.onRelease = function(_) { swapElemRequest(); };
+		interactiveArea.onRelease = function(_) { swapElemRequest(); };
 
-		i.onMove = function(e:Event)
+		interactiveArea.onMove = function(e:Event)
 		{
 			if (isDragging)
 			{
@@ -157,8 +155,8 @@ class Board
 				}
 
 				focusElement = getElemByPosition({
-					x: e.relX - container.x - mask.x,
-					y: e.relY - container.y - mask.y
+					x: e.relX,
+					y: e.relY
 				});
 
 				if (focusElement != null && !focusElement.isFrozen && focusElement.type != ElemType.Empty && focusElement.type != ElemType.None)
@@ -167,9 +165,9 @@ class Board
 					selectedElemBackground.x = focusElement.graphic.x;
 					selectedElemBackground.y = focusElement.graphic.y;
 					selectedElemBackground.visible = true;
-					i.cursor = Cursor.Button;
+					interactiveArea.cursor = Cursor.Button;
 				}
-				else i.cursor = Cursor.Default;
+				else interactiveArea.cursor = Cursor.Default;
 			}
 			else selectedElemBackground.visible = false;
 		};
@@ -569,6 +567,9 @@ class Board
 
 	function getElemByPosition(p:SimplePoint):Elem
 	{
+		p.x -= Elem.SIZE / 2;
+		p.y -= Elem.SIZE / 2;
+
 		for (row in map)
 		{
 			for (e in row)
@@ -597,7 +598,7 @@ class Board
 			for (elem in row)
 				if (elem != null)
 				{
-					elem.graphic.filter = null;
+					elem.graphic.unmark();
 					elem.graphic.setScale(1);
 				}
 
@@ -614,7 +615,7 @@ class Board
 		}
 		showHelpTimer = Actuate.timer(5).onComplete(function() {
 			if (foundPossibilities.length == 1) trace("NO MORE MOVES!");
-			else for (m in foundPossibilities) if (m != null) m.graphic.filter = new Glow(0xFFFF00, 1, 1, 3, 1);
+			else for (m in foundPossibilities) if (m != null) m.graphic.mark();
 		});
 
 		debugMapTrace();

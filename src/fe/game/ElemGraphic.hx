@@ -19,6 +19,7 @@ class ElemGraphic extends Sprite
 	public var hasMouseHover(default, set):Bool = false;
 	public var isFrozen(default, set):Bool = false;
 
+	var marker:Bitmap;
 	var frozenBitmap:Bitmap;
 	var baseBitmap:Bitmap;
 	var hoverBitmap:Bitmap;
@@ -37,9 +38,11 @@ class ElemGraphic extends Sprite
 			hoverBitmap = null;
 		}
 
+		marker = makeGraphic(Res.image.game.elem_marker.toTile());
 		baseBitmap = makeGraphic(tileInfo.baseTile);
 		hoverBitmap = makeGraphic(tileInfo.secondTile);
 
+		marker.visible = false;
 		baseBitmap.visible = !hasMouseHover;
 		hoverBitmap.visible = hasMouseHover;
 	}
@@ -60,14 +63,10 @@ class ElemGraphic extends Sprite
 	{
 		if (value)
 		{
-			filter = new Glow(0xFFFF00, 1, 2, 1, 1);
 			Actuate.tween(this, .3, { sX: Math.random() * .2 + .9, sY: Math.random() * .2 + .9 }, false).ease(Quad.easeOut).onUpdate(updateView);
+			unmark();
 		}
-		else
-		{
-			filter = null;
-			Actuate.tween(this, .3, { sX: 1, sY: 1 }, false).ease(Quad.easeOut).onUpdate(updateView);
-		}
+		else Actuate.tween(this, .3, { sX: 1, sY: 1 }, false).ease(Quad.easeOut).onUpdate(updateView);
 
 		baseBitmap.visible = !value;
 		hoverBitmap.visible = value;
@@ -77,10 +76,16 @@ class ElemGraphic extends Sprite
 
 	public function moveFinished()
 	{
-		Actuate.tween(this, .2, { y: y + 10, sX: Math.random() * .2 + 1, sY: Math.random() * .2 + .7 }, false).ease(Quad.easeOut).onUpdate(updateView).onComplete(function(){
+		Actuate.tween(this, .2, {
+			y: y + 10, sX: Math.random() * .2 + 1, sY: Math.random() * .2 + .7
+		}, false).ease(Quad.easeOut).onUpdate(updateView).onComplete(function(){
 			Actuate.tween(this, .1, { y: y - 10, sX: 1, sY: 1 }, false).ease(Quad.easeOut).onUpdate(updateView);
 		});
 	}
+
+	public function mark() { marker.visible = true; }
+
+	public function unmark() { marker.visible = false; }
 
 	function updateView()
 	{
