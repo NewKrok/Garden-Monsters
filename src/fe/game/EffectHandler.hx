@@ -93,6 +93,11 @@ class EffectHandler
 		addExplosionEffect(x, y, Res.image.game.effect.elem_5.toTexture(), 60);
 	}
 
+	public function addElem7StartEffect(x:Float, y:Float):Void
+	{
+		addFocusLightEffect(x, y, Res.image.game.effect.elem_7_light.toTile());
+	}
+
 	public function addElem7Effect(x:Float, y:Float):Void
 	{
 		addExplosionLight(x, y, Res.image.game.effect.light.toTile());

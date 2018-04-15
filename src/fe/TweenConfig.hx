@@ -23,4 +23,8 @@ class TweenConfig
 	public static inline var CAMERA_SHAKE_MOVEMENT_TIME:Float = .05;
 
 	public static inline var ELEM_FALL_OUT_FROM_GAME_TIME:Float = 1;
+
+	public static inline var RUSH_PREPARE_TIME:Float = .05;
+	public static inline var RUSH_DELAY_TIME:Float = .1;
+	public static inline var RUSH_MOVE_TIME:Float = .2;
 }

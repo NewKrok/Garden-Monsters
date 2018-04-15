@@ -330,7 +330,7 @@ class Board
 			case ElemType.Elem3: changeElemTypeByElem(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem3StartEffect, effectHandler.addElem3ActivateEffect);
 			case ElemType.Elem4: shiftRow(getRandomNearbyNotMatchedPlayableElem(m), m.random(), effectHandler.addElem4StartEffect, effectHandler.addElem4ActivateEffect);
 			case ElemType.Elem5: removeRandomElemByElem(getRandomNotMatchedPlayableElem(), m.random(), effectHandler.addElem5StartEffect, effectHandler.addElem5ActivateEffect);
-			//case ElemType.Elem7: removeElemByElem(getRandomNotMatchedPlayableElem(), m.random(), null, effectHandler.addElem7Effect);
+			case ElemType.Elem7: swapRandomElemsByElem(getRandomNotMatchedPlayableElem(), getRandomNotMatchedPlayableElem(), m.random(), effectHandler.addElem7StartEffect, effectHandler.addElem7Effect);
 
 			case _:
 		}
@@ -646,6 +646,67 @@ class Board
 			e.graphic.remove();
 			e = null;
 		});
+	}
+
+	function swapRandomElemsByElem(targetA:Elem, targetB:Elem, triggerElem:Elem, startEffect:Float->Float->Void, activateEffect:Float->Float->Void)
+	{
+		if (targetA != null && targetB != null)
+		{
+			if (startEffect != null) startEffect(triggerElem.graphic.x, triggerElem.graphic.y);
+
+			var savedTargetBType = targetB.type;
+			var e = triggerElem.clone();
+			container.addChild(e.graphic);
+
+			Actuate.tween(e.graphic, TweenConfig.RUSH_PREPARE_TIME, {
+				x: e.graphic.x + 20
+			}).ease(Quad.easeOut).onUpdate(function() {
+				e.graphic.x = e.graphic.x;
+			}).onComplete(function() {
+				Actuate.tween(e.graphic, TweenConfig.RUSH_PREPARE_TIME, {
+					x: e.graphic.x - 40
+				}).ease(Quad.easeOut).onUpdate(function() {
+					e.graphic.x = e.graphic.x;
+				}).onComplete(function() {
+					Actuate.tween(e.graphic, TweenConfig.RUSH_PREPARE_TIME, {
+						x: e.graphic.x + 20
+					}).ease(Quad.easeOut).onUpdate(function() {
+						e.graphic.x = e.graphic.x;
+					}).onComplete(function() {
+						Actuate.tween(e.graphic, TweenConfig.RUSH_MOVE_TIME, {
+							x: targetA.graphic.x + 10,
+							y: targetA.graphic.y + 10,
+						}).delay(TweenConfig.RUSH_DELAY_TIME).ease(Quad.easeOut).onUpdate(function() {
+							e.graphic.x = e.graphic.x;
+						}).onComplete(function() {
+							targetA.graphic.visible = false;
+							Actuate.tween(e.graphic, TweenConfig.RUSH_MOVE_TIME, {
+								x: targetB.graphic.x + 10,
+								y: targetB.graphic.y + 10,
+							}).ease(Quad.easeOut).onUpdate(function() {
+								e.graphic.x = e.graphic.x;
+							}).onComplete(function() {
+								targetB.type = targetA.type;
+								activateEffect(targetB.graphic.x, targetB.graphic.y);
+								Actuate.tween(e.graphic, TweenConfig.RUSH_MOVE_TIME, {
+									x: targetA.graphic.x + 10,
+									y: targetA.graphic.y + 10,
+								}).ease(Quad.easeOut).onUpdate(function() {
+									e.graphic.x = e.graphic.x;
+								}).onComplete(function() {
+									targetA.type = savedTargetBType;
+									targetA.graphic.visible = true;
+									activateEffect(targetA.graphic.x, targetA.graphic.y);
+
+									e.graphic.remove();
+									e = null;
+								});
+							});
+						});
+					});
+				});
+			});
+		}
 	}
 
 	function jumpElemToElem(target:Elem, triggerElem:Elem, onComplete:Void->Void)
