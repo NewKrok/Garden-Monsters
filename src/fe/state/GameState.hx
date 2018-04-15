@@ -1,6 +1,7 @@
 package fe.state;
 
 import fe.game.Elem;
+import fe.game.SkillHandler;
 import h2d.Bitmap;
 import h2d.Layers;
 import haxe.Timer;
@@ -23,6 +24,7 @@ class GameState extends Base2dState
 	var gameContainer:Layers;
 
 	var effectHandler:EffectHandler;
+	var skillHandler:SkillHandler;
 
 	var now:Float;
 
@@ -39,6 +41,7 @@ class GameState extends Base2dState
 
 		gameContainer = new Layers(stage);
 		effectHandler = new EffectHandler();
+		skillHandler = new SkillHandler();
 
 		resizeGameContainer();
 		reset();
@@ -61,7 +64,7 @@ class GameState extends Base2dState
 			Timer.delay(function(){ createRandomBoard(onComplete); }, 200);
 		else
 		{
-			board = new Board(gameContainer, map, effectHandler);
+			board = new Board(gameContainer, map, effectHandler, skillHandler);
 
 			trace("Board created, time: " + (Date.now().getTime() - boardCreationStartTime) + "ms, possibilities: " + board.foundPossibilities.length + ", match: " + board.foundMatch.length);
 			onComplete();
@@ -80,7 +83,7 @@ class GameState extends Base2dState
 			[ -3, -2, -2, -2, -2, -2, -2, -2, -2, -3 ],
 			[ -3, -3, -2, -2, -2, -2, -2, -2, -3, -3 ]
 		]);
-		board = new Board(gameContainer, map, effectHandler);
+		board = new Board(gameContainer, map, effectHandler, skillHandler);
 	}
 
 	override public function update(delta:Float)

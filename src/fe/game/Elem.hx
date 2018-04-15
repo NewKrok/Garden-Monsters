@@ -121,6 +121,6 @@ class Elem
  3	DONE After match it changes to random type 1 nearby element
  4	DONE After match it shifts to left and to right the elems - the left and the right elems dissapearing
  5	DONE After match it remove 1 random elem
- 6	After match it ???
+ 6	After match it Use a random skill
  7	DONE After match it swaps 2 random elem
 */
