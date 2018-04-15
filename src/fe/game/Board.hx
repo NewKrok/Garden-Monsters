@@ -665,6 +665,7 @@ class Board
 
 						var downIndex:UInt = map.length - 1;
 						var noneIndex:Int = -1;
+
 						for (l in i + 1...map.length)
 						{
 							if (map[l][j] != null && map[l][j].type != ElemType.Empty)
@@ -672,6 +673,7 @@ class Board
 								if (noneIndex == -1 && map[l][j].type == ElemType.None)
 								{
 									noneIndex = l;
+									if (l == map.length - 1) downIndex = l - 1;
 								}
 								else
 								{

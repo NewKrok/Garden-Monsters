@@ -33,6 +33,8 @@ class TestBoard
 		testLongDoubleColDoubleMatch();
 		testMatchWithEmpty();
 		testMatchWithBlock();
+		testMatchWithNone();
+		testMatchWithNoneInTheCorner();
 
 		testPossibilityColLeft();
 		testPossibilityColLeftDouble();
@@ -321,6 +323,50 @@ class TestBoard
 
 		var expected = [
 			[ map[1][0], map[1][1], map[1][2] ]
+		];
+
+		if (!isEqual(BoardHelper.analyzeMap(map).matches, expected))
+			throw "Failed test!";
+	}
+
+	static function testMatchWithNone()
+	{
+		var map = BoardHelper.createMap([
+			[  3,  3,  3, -3 ],
+			[  2,  5,  4,  4 ],
+			[  7,  4,  4,  5 ],
+			[  7,  6,  4,  4 ],
+			[  7,  5,  5, -3 ],
+			[ -3,  1,  2,  2 ]
+		]);
+
+		var expected = [
+			[ map[0][0], map[0][1], map[0][2] ],
+			[ map[1][2], map[2][2], map[3][2] ],
+			[ map[2][0], map[3][0], map[4][0] ]
+		];
+
+		if (!isEqual(BoardHelper.analyzeMap(map).matches, expected))
+			throw "Failed test!";
+	}
+
+	static function testMatchWithNoneInTheCorner()
+	{
+		var map = BoardHelper.createMap([
+			[ -3, -3, 2, 4, 7, 6, 2, 7, -3, -3 ],
+			[ -3,  1, 5, 3, 1, 5, 3, 3,  1, -3 ],
+			[  1,  2, 5, 6, 4, 1, 5, 1,  4,  4 ],
+			[  3,  5, 5, 1, 6, 1, 7, 2,  2,  3 ],
+			[  3,  4, 1, 1, 2, 3, 5, 3,  7,  4 ],
+			[  3,  4, 2, 5, 4, 3, 2, 3,  4,  5 ],
+			[ -3,  4, 3, 1, 5, 2, 3, 6,  3, -3 ],
+			[ -3, -3, 3, 4, 5, 6, 5, 1, -3, -3 ]
+		]);
+
+		var expected = [
+			[ map[1][2], map[2][2], map[3][2] ],
+			[ map[3][0], map[4][0], map[5][0] ],
+			[ map[4][1], map[5][1], map[6][1] ]
 		];
 
 		if (!isEqual(BoardHelper.analyzeMap(map).matches, expected))

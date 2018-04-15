@@ -276,7 +276,7 @@ class BoardHelper
 					sameElemsInRow = [];
 				}
 
-				if (isMovableElem(elem) && elem != null && rowBaseType == elemType)
+				if (isMovableElem(elem) && rowBaseType == elemType)
 				{
 					sameElemsInRow.push(elem);
 
