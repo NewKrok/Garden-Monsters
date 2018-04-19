@@ -1,8 +1,11 @@
 package;
 
 import fe.asset.Fonts;
+import haxe.Json;
+import haxe.Timer;
 import hpp.heaps.Base2dApp;
 import hpp.heaps.Base2dStage.StageScaleMode;
+import hpp.util.Language;
 import hxd.Res;
 import fe.AppConfig;
 import fe.asset.ElemTile;
@@ -25,6 +28,9 @@ class Main extends Base2dApp
 
 		Fonts.init();
 		ElemTile.init();
+
+		//Language.setLang(Json.parse(Res.lang.lang_hu.entry.getText()));
+		Language.setLang(Json.parse(Res.lang.lang_en.entry.getText()));
 
 		//TestBoard.test();
 
