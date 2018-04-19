@@ -102,7 +102,13 @@ class GameState extends Base2dState
 		board.onSuccessfulSwap(function(){
 			gameModel.remainingMoves.set(gameModel.remainingMoves.value - 1);
 		});
+		board.onElemCollect(function(e){
+			if (gameModel.collectedElems.value.exists(e)) gameModel.collectedElems.value.set(e, gameModel.collectedElems.value.get(e) + 1);
+			else gameModel.collectedElems.value.set(e, 1);
+		});
+
 		gameModel.remainingMoves.set(data.maxMovement);
+		gameModel.elemGoals.set(data.elemGoals);
 	}
 
 	override public function update(delta:Float)

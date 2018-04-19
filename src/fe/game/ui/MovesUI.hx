@@ -26,7 +26,7 @@ class MovesUI extends Layers
 		label.textColor = 0xFFBF00;
 		label.textAlign = Align.Center;
 		label.x = back.tile.width / 2 + 2;
-		label.y = 20;
+		label.y = 10;
 		Language.registerTextHolder(cast label, "moves");
 
 		var countText = new Text(Fonts.DEFAULT_L, this);

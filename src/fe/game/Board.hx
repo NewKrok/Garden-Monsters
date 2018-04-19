@@ -53,6 +53,7 @@ class Board
 
 	var onSuccessfulSwapCallback:Void->Void = function(){};
 	var onTurnEndCallback:Void->Void = function(){};
+	var onElemCollectCallback:ElemType->Void = function(_){};
 
 	public function new(
 		parent:Layers,
@@ -73,7 +74,12 @@ class Board
 		container.setPos(Elem.SIZE / 2, Elem.SIZE / 2);
 		effectHandler.view.setPos(Elem.SIZE / 2, Elem.SIZE / 2);
 
-		skillHandler.init(container, effectHandler, function(e) { moveElemToPosition(e); });
+		skillHandler.init(
+			container,
+			effectHandler,
+			function(e) { moveElemToPosition(e); },
+			function(t) { onElemCollectCallback(t); }
+		);
 
 		background = new Graphics(container);
 		background.beginFill(0xFF0000);
@@ -100,6 +106,7 @@ class Board
 
 	public function onTurnEnd(callback:Void->Void):Void onTurnEndCallback = callback;
 	public function onSuccessfulSwap(callback:Void->Void):Void onSuccessfulSwapCallback = callback;
+	public function onElemCollect(callback:ElemType->Void):Void onElemCollectCallback = callback;
 
 	function addElemsToBoard()
 	{
@@ -314,6 +321,7 @@ class Board
 						for (e in m)
 							if (e == map[i][j])
 							{
+								onElemCollectCallback(e.type);
 								map[i][j].graphic.remove();
 								map[i][j] = null;
 								break;

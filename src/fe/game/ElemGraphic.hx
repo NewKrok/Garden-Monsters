@@ -49,7 +49,7 @@ class ElemGraphic extends Sprite
 
 	function makeGraphic(tile:Tile):Bitmap
 	{
-		var bmp  = new Bitmap(tile, this);
+		var bmp = new Bitmap(tile, this);
 
 		bmp.smooth = true;
 		bmp.scale(AppConfig.GAME_BITMAP_SCALE);

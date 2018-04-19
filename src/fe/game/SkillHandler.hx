@@ -25,14 +25,16 @@ class SkillHandler
 	var container:Layers;
 	var effectHandler:EffectHandler;
 	var moveElemToPosition:Elem->Void;
+	var onElemCollectCallback:ElemType->Void;
 
 	public function new() {}
 
-	public function init(container:Layers, effectHandler:EffectHandler, moveElemToPosition:Elem->Void)
+	public function init(container:Layers, effectHandler:EffectHandler, moveElemToPosition:Elem->Void, onElemCollectCallback:ElemType->Void)
 	{
 		this.container = container;
 		this.effectHandler = effectHandler;
 		this.moveElemToPosition = moveElemToPosition;
+		this.onElemCollectCallback = onElemCollectCallback;
 	}
 
 	public function update(map:Array<Array<Elem>>, foundMatch:Array<Array<Elem>>)
@@ -176,6 +178,7 @@ class SkillHandler
 		{
 			if (startEffect != null) startEffect(triggerElem.graphic.x, triggerElem.graphic.y);
 			jumpElemToElem(target, triggerElem, function(){
+				onElemCollectCallback(target.type);
 				activateEffect(target.graphic.x, target.graphic.y);
 				map[target.indexY][target.indexX] = null;
 				target.graphic.remove();
@@ -216,6 +219,7 @@ class SkillHandler
 
 						elemFallDown(target);
 						shakeBoard(2);
+						onElemCollectCallback(target.type);
 						activateEffect(target.graphic.x, target.graphic.y);
 						map[target.indexY][target.indexX] = null;
 						target.graphic.remove();

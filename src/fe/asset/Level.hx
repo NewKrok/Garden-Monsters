@@ -1,4 +1,5 @@
 package fe.asset;
+import fe.game.Elem.ElemType;
 
 /**
  * ...
@@ -17,6 +18,11 @@ class Level
 				[ -2, -2, -2, -2, -2, -2, -2, -2 ],
 				[ -3, -2, -2, -2, -2, -2, -2, -3 ],
 				[ -3, -3, -2, -2, -2, -2, -3, -3 ]
+			],
+			elemGoals: [
+				ElemType.Elem1 => 5,
+				ElemType.Elem2 => 10,
+				ElemType.Elem3 => 15
 			]
 		}
 	];
@@ -31,4 +37,5 @@ typedef LevelData =
 {
 	var maxMovement:UInt;
 	var rawMap:Array<Array<Int>>;
+	@:optional var elemGoals:Map<ElemType, UInt>;
 }

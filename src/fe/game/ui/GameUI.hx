@@ -2,7 +2,6 @@ package fe.game.ui;
 
 import fe.game.GameModel;
 import h2d.Flow;
-import h2d.Layers;
 import h2d.Sprite;
 
 /**
@@ -22,7 +21,7 @@ class GameUI extends Flow
 		isVertical = false;
 		horizontalSpacing = 20;
 
-		goalUI = new GoalUI(this);
+		goalUI = new GoalUI(this, gameModel.elemGoals, gameModel.collectedElems);
 		movesUI = new MovesUI(this, gameModel.remainingMoves);
 		helpsUI = new HelpsUI(this);
 	}
