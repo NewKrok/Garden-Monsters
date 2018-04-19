@@ -51,6 +51,9 @@ class Board
 
 	var showHelpTimer:Dynamic;
 
+	var onSuccessfulSwapCallback:Void->Void = function(){};
+	var onTurnEndCallback:Void->Void = function(){};
+
 	public function new(
 		parent:Layers,
 		interactiveArea:Interactive,
@@ -94,6 +97,9 @@ class Board
 
 		createInteractive();
 	}
+
+	public function onTurnEnd(callback:Void->Void):Void onTurnEndCallback = callback;
+	public function onSuccessfulSwap(callback:Void->Void):Void onSuccessfulSwapCallback = callback;
 
 	function addElemsToBoard()
 	{
@@ -266,6 +272,8 @@ class Board
 			}
 			else checkSwapResult(indexX, indexY, targetIndexX, targetIndexY);
 		});
+
+		onSuccessfulSwapCallback();
 	}
 
 	function checkSwapResult(indexX:UInt, indexY:UInt, targetIndexX:UInt, targetIndexY:UInt)
@@ -346,6 +354,8 @@ class Board
 					e.frozenTurnCount--;
 					if (e.frozenTurnCount == 0) effectHandler.addIceBreakEffect(e.graphic.x, e.graphic.y);
 				}
+
+		onTurnEndCallback();
 	}
 
 	function fillMap()

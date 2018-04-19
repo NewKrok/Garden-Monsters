@@ -1,6 +1,7 @@
 package fe;
 
 import fe.Layout.LayoutMode;
+import fe.game.ui.GameUI;
 import h2d.Interactive;
 import h2d.Layers;
 import hpp.heaps.Base2dStage;
@@ -11,24 +12,32 @@ import hpp.heaps.Base2dStage;
  */
 class Layout
 {
-	static inline var gameContainerDefaultWidth = 1050;
-	static inline var gameContainerDefaultHeight = 835;
+	static inline var gameUILandscapeTopPadding = 55;
+	static inline var gameUILandscapeLeftPadding = 55;
+	static inline var gameUIPortraitTopPadding = 55;
+
+	static inline var gameContainerDefaultWidth = 840;
+	static inline var gameContainerDefaultHeight = 630;
 	static inline var gameContainerLandscapeLeftPadding = 55;
-	static inline var gameContainerPortraitTopPadding = 55;
+	static inline var gameContainerPortraitTopPadding = 40;
 
 	var mode:LayoutMode = LayoutMode.Landscape;
+	var stage:Base2dStage;
+
 	var gameContainer:Layers;
 	var interactiveArea:Interactive;
-	var stage:Base2dStage;
+	var gameUI:GameUI;
 
 	public function new(
 		stage:Base2dStage,
 		gameContainer:Layers,
-		interactiveArea:Interactive
+		interactiveArea:Interactive,
+		gameUI:GameUI
 	){
 		this.stage = stage;
 		this.gameContainer = gameContainer;
 		this.interactiveArea = interactiveArea;
+		this.gameUI = gameUI;
 	}
 
 	public function update(width:UInt, height:UInt):Void
@@ -38,19 +47,29 @@ class Layout
 		var widthRatio = stage.width / stage.defaultWidth;
 		var heightRatio = stage.height / stage.defaultHeight;
 
-		interactiveArea.setScale(widthRatio);
-
 		if (mode == LayoutMode.Landscape)
 		{
+			gameUI.setScale(widthRatio);
+			gameUI.x = gameUILandscapeLeftPadding;
+			gameUI.y = gameUILandscapeTopPadding;
+
+			interactiveArea.setScale(heightRatio);
+
 			gameContainer.setScale((heightRatio * gameContainerDefaultHeight) / gameContainerDefaultHeight);
 			gameContainer.x = gameContainerLandscapeLeftPadding;
 			gameContainer.y = stage.height / 2 - gameContainerDefaultHeight * heightRatio / 2;
 		}
 		else
 		{
+			gameUI.setScale(widthRatio);
+			gameUI.x = stage.width / 2 - gameUI.getSize().width / 2;
+			gameUI.y = gameUIPortraitTopPadding * widthRatio;
+
+			interactiveArea.setScale(widthRatio);
+
 			gameContainer.setScale((widthRatio * gameContainerDefaultWidth) / Layout.gameContainerDefaultWidth);
 			gameContainer.x = stage.width / 2 - gameContainerDefaultWidth * widthRatio / 2;
-			gameContainer.y = gameContainerPortraitTopPadding;
+			gameContainer.y = gameUI.y + gameUI.getSize().height + gameContainerPortraitTopPadding * widthRatio;
 		}
 
 		interactiveArea.width = gameContainerDefaultWidth;

@@ -1,10 +1,10 @@
 package fe.menu.substate;
 
+import fe.asset.Fonts;
 import h2d.Bitmap;
 import h2d.Text;
 import hpp.heaps.Base2dSubState;
 import hxd.Res;
-import fe.Fonts;
 
 /**
  * ...

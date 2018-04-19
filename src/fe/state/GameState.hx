@@ -4,7 +4,9 @@ import fe.Layout;
 import fe.game.Board;
 import fe.game.EffectHandler;
 import fe.game.GameModel;
+import fe.asset.Level;
 import fe.game.SkillHandler;
+import fe.game.ui.GameUI;
 import fe.game.util.BoardHelper;
 import h2d.Bitmap;
 import h2d.Interactive;
@@ -26,6 +28,7 @@ class GameState extends Base2dState
 	var gameContainer:Layers;
 	var interactiveArea:Interactive;
 	var background:Bitmap;
+	var gameUI:GameUI;
 
 	var effectHandler:EffectHandler;
 	var skillHandler:SkillHandler;
@@ -49,6 +52,7 @@ class GameState extends Base2dState
 		background = new Bitmap(Res.image.game.background.toTile(), stage);
 
 		gameContainer = new Layers(stage);
+		gameUI = new GameUI(stage, gameModel);
 		effectHandler = new EffectHandler();
 		skillHandler = new SkillHandler();
 
@@ -56,14 +60,15 @@ class GameState extends Base2dState
 
 		//createRandomBoard(function(){ trace("Start Game!"); });
 
-		loadBoard();
+		loadLevel(Level.getLevelData(0));
 
 		gameContainer.addChild(effectHandler.view);
 
 		layout = new Layout(
 			stage,
 			gameContainer,
-			interactiveArea
+			interactiveArea,
+			gameUI
 		);
 		onStageResize(stage.width, stage.height);
 	}
@@ -84,19 +89,20 @@ class GameState extends Base2dState
 		}
 	}
 
-	function loadBoard()
+	function loadLevel(data:LevelData)
 	{
-		var map = BoardHelper.createMap([
-			[ -3, -3, -2, -2, -2, -2, -2, -2, -3, -3 ],
-			[ -3, -2, -2, -2, -2, -2, -2, -2, -2, -3 ],
-			[ -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 ],
-			[ -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 ],
-			[ -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 ],
-			[ -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 ],
-			[ -3, -2, -2, -2, -2, -2, -2, -2, -2, -3 ],
-			[ -3, -3, -2, -2, -2, -2, -2, -2, -3, -3 ]
-		]);
-		board = new Board(gameContainer, interactiveArea, map, effectHandler, skillHandler);
+		board = new Board(
+			gameContainer,
+			interactiveArea,
+			BoardHelper.createMap(data.rawMap),
+			effectHandler,
+			skillHandler
+		);
+
+		board.onSuccessfulSwap(function(){
+			gameModel.remainingMoves.set(gameModel.remainingMoves.value - 1);
+		});
+		gameModel.remainingMoves.set(data.maxMovement);
 	}
 
 	override public function update(delta:Float)

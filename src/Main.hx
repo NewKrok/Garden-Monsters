@@ -1,10 +1,10 @@
 package;
 
+import fe.asset.Fonts;
 import hpp.heaps.Base2dApp;
 import hpp.heaps.Base2dStage.StageScaleMode;
 import hxd.Res;
 import fe.AppConfig;
-import fe.Fonts;
 import fe.asset.ElemTile;
 import fe.state.GameState;
 import fe.state.MenuState;
