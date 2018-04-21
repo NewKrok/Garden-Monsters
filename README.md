@@ -7,6 +7,7 @@ Match3 game made in Haxe with Heaps
 ## Dependencies
 - **Heaps forked*** High Performance Game Framework. http://heaps.io/
 - **Actuate 1.8.7** Animating lib for Haxe projects. https://github.com/jgranick/actuate
+- **Tink State 0.6.4** Tinkerbell Reactive State Handling. https://github.com/haxetink/tink_state
 - **HPP Package** Some useful classes for haxe projects https://github.com/NewKrok/HPP-Package
 
 ## Notice
