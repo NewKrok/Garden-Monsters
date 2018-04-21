@@ -93,7 +93,6 @@ class Board
 		background.setScale(AppConfig.GAME_BITMAP_SCALE);
 		var backgroundA = new Graphics(background);
 		var backgroundB = new Graphics(background);
-		trace(tileB.width * AppConfig.GAME_BITMAP_SCALE);
 
 		for (i in 0...map[0].length)
 			for (j in 0...map.length)

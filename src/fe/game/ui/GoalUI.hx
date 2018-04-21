@@ -2,13 +2,13 @@ package fe.game.ui;
 
 import fe.asset.Fonts;
 import fe.game.Elem.ElemType;
+import fe.game.GameModel.ElemGoalData;
 import h2d.Bitmap;
 import h2d.Flow;
 import h2d.Layers;
 import h2d.Text;
 import hpp.util.Language;
 import hxd.Res;
-import tink.state.Observable;
 
 /**
  * ...
@@ -18,7 +18,7 @@ class GoalUI extends Layers
 {
 	var goalEntries:Array<GoalEntry> = [];
 
-	public function new(parent, elemGoals:Observable<Map<ElemType, UInt>>, collectedElems:Observable<Map<ElemType, UInt>>)
+	public function new(parent, elemGoals:Map<ElemType, ElemGoalData>)
 	{
 		super(parent);
 
@@ -33,23 +33,15 @@ class GoalUI extends Layers
 
 		var goals:Flow = new Flow(this);
 		goals.isVertical = false;
-		goals.horizontalSpacing = 10;
+		goals.horizontalSpacing = -12;
 
-		elemGoals.bind(function(d:Map<ElemType, UInt>)
+		for (key in elemGoals.keys())
 		{
-			for (goal in d.keys())
-			{
-				var entry = new GoalEntry(goals, cast goal, cast d.get(cast goal));
-				goalEntries.push(entry);
+			var entry = new GoalEntry(goals, key, elemGoals.get(key).expected, elemGoals.get(key).collected);
+			goalEntries.push(entry);
+		}
 
-				// TODO: It doesnt work at the moment!
-				collectedElems.bind(function(m){
-					if (m.exists(cast goal)) entry.updateValue(m.get(cast goal));
-				});
-			}
-
-			goals.x = back.getSize().width / 2 - goals.getSize().width / 2;
-			goals.y = back.getSize().height - goals.getSize().height - 15;
-		});
+		goals.x = back.getSize().width / 2 - goals.getSize().width / 2;
+		goals.y = back.getSize().height - goals.getSize().height - 15;
 	}
 }

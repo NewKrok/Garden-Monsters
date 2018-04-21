@@ -3,6 +3,7 @@ package fe.state;
 import fe.Layout;
 import fe.game.Board;
 import fe.game.EffectHandler;
+import fe.game.Elem.ElemType;
 import fe.game.GameModel;
 import fe.asset.Level;
 import fe.game.SkillHandler;
@@ -16,6 +17,7 @@ import hpp.heaps.Base2dState;
 import hxd.Cursor;
 import hxd.Res;
 import motion.Actuate;
+import tink.state.State;
 
 /**
  * ...
@@ -52,7 +54,6 @@ class GameState extends Base2dState
 		background = new Bitmap(Res.image.game.background.toTile(), stage);
 
 		gameContainer = new Layers(stage);
-		gameUI = new GameUI(stage, gameModel);
 		effectHandler = new EffectHandler();
 		skillHandler = new SkillHandler();
 
@@ -62,6 +63,7 @@ class GameState extends Base2dState
 
 		loadLevel(Level.getLevelData(0));
 
+		gameUI = new GameUI(stage, gameModel);
 		gameContainer.addChild(effectHandler.view);
 
 		layout = new Layout(
@@ -91,6 +93,19 @@ class GameState extends Base2dState
 
 	function loadLevel(data:LevelData)
 	{
+		gameModel.remainingMoves.set(data.maxMovement);
+
+		for (key in data.elemGoals.keys())
+		{
+			gameModel.elemGoals.set(
+				key,
+				{
+					expected: data.elemGoals.get(key),
+					collected: new State<UInt>(0)
+				}
+			);
+		}
+
 		board = new Board(
 			gameContainer,
 			interactiveArea,
@@ -103,12 +118,9 @@ class GameState extends Base2dState
 			gameModel.remainingMoves.set(gameModel.remainingMoves.value - 1);
 		});
 		board.onElemCollect(function(e){
-			if (gameModel.collectedElems.value.exists(e)) gameModel.collectedElems.value.set(e, gameModel.collectedElems.value.get(e) + 1);
-			else gameModel.collectedElems.value.set(e, 1);
+			if (gameModel.elemGoals.exists(e))
+				gameModel.elemGoals.get(e).collected.set(gameModel.elemGoals.get(e).collected.value + 1);
 		});
-
-		gameModel.remainingMoves.set(data.maxMovement);
-		gameModel.elemGoals.set(data.elemGoals);
 	}
 
 	override public function update(delta:Float)

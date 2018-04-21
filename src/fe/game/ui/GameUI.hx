@@ -21,7 +21,7 @@ class GameUI extends Flow
 		isVertical = false;
 		horizontalSpacing = 20;
 
-		goalUI = new GoalUI(this, gameModel.elemGoals, gameModel.collectedElems);
+		goalUI = new GoalUI(this, gameModel.elemGoals);
 		movesUI = new MovesUI(this, gameModel.remainingMoves);
 		helpsUI = new HelpsUI(this);
 	}
