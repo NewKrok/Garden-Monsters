@@ -9,6 +9,7 @@ import h2d.Graphics;
 import h2d.Interactive;
 import h2d.Layers;
 import h2d.Mask;
+import h2d.filter.Glow;
 import hpp.util.GeomUtil;
 import hpp.util.GeomUtil.SimplePoint;
 import hxd.Cursor;
@@ -25,6 +26,8 @@ import motion.easing.Quart;
  */
 class Board
 {
+	static inline var maskOffset:UInt = 10;
+
 	public var foundMatch:Array<Array<Elem>>;
 	public var foundPossibilities:Array<Elem>;
 
@@ -36,7 +39,7 @@ class Board
 	var interactiveArea:Interactive;
 	var mask:Mask;
 	var container:Layers;
-	var background:Graphics;
+	var background:Layers;
 	var selectedElemBackground:Bitmap;
 	var effectHandler:EffectHandler;
 	var skillHandler:SkillHandler;
@@ -71,7 +74,7 @@ class Board
 		mask = new Mask(100, 100, parent);
 
 		container = new Layers(mask);
-		container.setPos(Elem.SIZE / 2, Elem.SIZE / 2);
+		container.setPos(Elem.SIZE / 2 + maskOffset, Elem.SIZE / 2 + maskOffset);
 		effectHandler.view.setPos(Elem.SIZE / 2, Elem.SIZE / 2);
 
 		skillHandler.init(
@@ -81,25 +84,38 @@ class Board
 			function(t) { onElemCollectCallback(t); }
 		);
 
-		background = new Graphics(container);
-		background.beginFill(0xFF0000);
+		var tileA = Res.image.game.elem_background_a.toTile();
+		var tileB = Res.image.game.elem_background_b.toTile();
+
+		background = new Layers(container);
+		background.x = -Elem.SIZE / 2;
+		background.y = -Elem.SIZE / 2;
+		background.setScale(AppConfig.GAME_BITMAP_SCALE);
+		var backgroundA = new Graphics(background);
+		var backgroundB = new Graphics(background);
+		trace(tileB.width * AppConfig.GAME_BITMAP_SCALE);
+
 		for (i in 0...map[0].length)
 			for (j in 0...map.length)
-				if (map[j][i].type != ElemType.Blocker && map[j][i].type != ElemType.None && map[j][i].type != ElemType.Empty )
-					background.drawTile(i * Elem.SIZE - Elem.SIZE / 2 + 2.5, j * Elem.SIZE - Elem.SIZE / 2 + 2.5, Res.image.game.elem_background.toTile());
-		background.endFill();
+				if (map[j][i].type != ElemType.Blocker && map[j][i].type != ElemType.None && map[j][i].type != ElemType.Empty)
+					if ((i + j) % 2 == 1) backgroundA.drawTile(i * tileA.width, j * tileA.height, tileA);
+					else backgroundB.drawTile(i * tileB.width, j * tileB.height, tileB);
 
 		selectedElemBackground = new Bitmap(Res.image.game.elem_selected.toTile(), container);
+		selectedElemBackground.setScale(AppConfig.GAME_BITMAP_SCALE);
 		selectedElemBackground.tile.dx = cast -selectedElemBackground.tile.width / 2;
 		selectedElemBackground.tile.dy = cast -selectedElemBackground.tile.height / 2;
 		selectedElemBackground.visible = false;
+		background.filter = new Glow(0xA03F04, 1, 1, 14, 10);
 
 		addElemsToBoard();
 		checkMap();
 		removeAllMatch();
 
-		mask.width = Std.int(container.getSize().width + Elem.SIZE / 2);
-		mask.height = Std.int(container.getSize().height + Elem.SIZE / 2);
+		mask.x = -maskOffset;
+		mask.y = -maskOffset;
+		mask.width = Std.int(container.getSize().width + maskOffset * 2);
+		mask.height = Std.int(container.getSize().height + maskOffset * 2);
 
 		createInteractive();
 	}
@@ -585,8 +601,10 @@ class Board
 
 	function getElemByPosition(p:SimplePoint):Elem
 	{
-		p.x -= Elem.SIZE / 2;
-		p.y -= Elem.SIZE / 2;
+		p.x -= parent.x + Elem.SIZE * parent.scaleX / 2;
+		p.y -= parent.y + Elem.SIZE * parent.scaleY / 2;
+		p.x = (p.x / (parent.scaleX * 100)) * 100;
+		p.y = (p.y / (parent.scaleY * 100)) * 100;
 
 		for (row in map)
 		{
@@ -594,13 +612,11 @@ class Board
 			{
 				if (e == null) continue;
 
-				var size = e.graphic.getSize();
-
 				if (e != null && e.type != ElemType.Blocker
-					&& p.x > e.graphic.x - size.width / 2
-					&& p.x < e.graphic.x + size.width / 2
-					&& p.y > e.graphic.y - size.height / 2
-					&& p.y < e.graphic.y + size.height / 2
+					&& p.x > e.graphic.x - Elem.SIZE / 2
+					&& p.x <= e.graphic.x + Elem.SIZE / 2
+					&& p.y > e.graphic.y - Elem.SIZE / 2
+					&& p.y <= e.graphic.y + Elem.SIZE / 2
 				){
 					return e;
 				}

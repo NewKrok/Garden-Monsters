@@ -9,7 +9,7 @@ import hpp.util.GeomUtil.SimplePoint;
  */
 class Elem
 {
-	public static var SIZE(default, null):UInt = 105;
+	public static var SIZE(default, null):Float = 132.5;
 
 	public var hasMouseHover(default, set):Bool = false;
 	public var isFrozen(get, null):Bool;

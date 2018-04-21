@@ -27,7 +27,7 @@ class ElemTile
 			7 => { baseTile: Res.image.game.monster.monster_7_base.toTile(), secondTile: Res.image.game.monster.monster_7_second.toTile() },
 		];
 
-		emptyElemGraphic = { baseTile: Tile.fromColor(0, Elem.SIZE, Elem.SIZE, 0), secondTile: Tile.fromColor(0, Elem.SIZE, Elem.SIZE, 0) };
+		emptyElemGraphic = { baseTile: Tile.fromColor(0, cast Elem.SIZE, cast Elem.SIZE, 0), secondTile: Tile.fromColor(0, cast Elem.SIZE, cast Elem.SIZE, 0) };
 	}
 }
 

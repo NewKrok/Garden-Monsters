@@ -5,7 +5,6 @@ import fe.asset.ElemTile.MonsterTileInfo;
 import h2d.Bitmap;
 import h2d.Sprite;
 import h2d.Tile;
-import h2d.filter.Glow;
 import hxd.Res;
 import motion.Actuate;
 import motion.easing.Quad;
@@ -27,6 +26,14 @@ class ElemGraphic extends Sprite
 	var sX:Float = 1;
 	var sY:Float = 1;
 
+	public function new()
+	{
+		super();
+
+		marker = makeGraphic(Res.image.game.elem_marker.toTile());
+		marker.visible = false;
+	}
+
 	public function setTile(tileInfo:MonsterTileInfo):Void
 	{
 		if (baseBitmap != null)
@@ -38,11 +45,9 @@ class ElemGraphic extends Sprite
 			hoverBitmap = null;
 		}
 
-		marker = makeGraphic(Res.image.game.elem_marker.toTile());
 		baseBitmap = makeGraphic(tileInfo.baseTile);
 		hoverBitmap = makeGraphic(tileInfo.secondTile);
 
-		marker.visible = false;
 		baseBitmap.visible = !hasMouseHover;
 		hoverBitmap.visible = hasMouseHover;
 	}
