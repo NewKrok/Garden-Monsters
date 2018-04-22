@@ -104,6 +104,13 @@ class Elem
 	var Elem5 = 5;
 	var Elem6 = 6;
 	var Elem7 = 7;
+	var Elem8 = 8;
+	var Elem9 = 9;
+	var Elem10 = 10;
+	var Elem11 = 11;
+	var Elem12 = 12;
+	var Elem13 = 13;
+	var Elem14 = 14;
 }
 
 /* TEMPORARY INFO
@@ -118,4 +125,5 @@ class Elem
  5	DONE After match it remove 1 random elem
  6	After match it Use a random skill
  7	DONE After match it swaps 2 random elem
+ 8 and above	Classic elems
 */

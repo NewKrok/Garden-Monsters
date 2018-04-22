@@ -12,11 +12,13 @@ class Level
 		{
 			maxMovement: 20,
 			availableElemTypes: [
-				ElemType.Elem1,
-				ElemType.Elem2,
-				ElemType.Elem3,
-				ElemType.Elem4,
-				ElemType.Elem5,
+				ElemType.Elem8,
+				ElemType.Elem9,
+				ElemType.Elem10,
+				ElemType.Elem11,
+				ElemType.Elem12,
+				ElemType.Elem13,
+				ElemType.Elem14
 			],
 			rawMap: [
 				[ -3, -3, -2, -2, -2, -2, -3, -3 ],
@@ -29,9 +31,9 @@ class Level
 				[ -3, -3, -2, -2, -2, -2, -3, -3 ]
 			],
 			elemGoals: [
-				ElemType.Elem1 => 5,
-				ElemType.Elem2 => 10,
-				ElemType.Elem3 => 15
+				ElemType.Elem8 => 5,
+				ElemType.Elem9 => 10,
+				ElemType.Elem10 => 5
 			]
 		}
 	];
