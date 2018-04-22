@@ -23,15 +23,22 @@ class SkillHandler
 	var foundMatch:Array<Array<Elem>>;
 
 	var container:Layers;
+	var availableElemTypes:Array<ElemType>;
 	var effectHandler:EffectHandler;
 	var moveElemToPosition:Elem->Void;
 	var onElemCollectCallback:ElemType->Void;
 
 	public function new() {}
 
-	public function init(container:Layers, effectHandler:EffectHandler, moveElemToPosition:Elem->Void, onElemCollectCallback:ElemType->Void)
-	{
+	public function init(
+		container:Layers,
+		availableElemTypes:Array<ElemType>,
+		effectHandler:EffectHandler,
+		moveElemToPosition:Elem->Void,
+		onElemCollectCallback:ElemType-> Void
+	){
 		this.container = container;
+		this.availableElemTypes = availableElemTypes;
 		this.effectHandler = effectHandler;
 		this.moveElemToPosition = moveElemToPosition;
 		this.onElemCollectCallback = onElemCollectCallback;
@@ -284,7 +291,7 @@ class SkillHandler
 			jumpElemToElem(target, triggerElem, function(){
 				activateEffect(target.graphic.x, target.graphic.y);
 				target.graphic.alpha = 0;
-				target.type = ElemType.Random;
+				target.type = BoardHelper.createRandomElemType(availableElemTypes);
 				Actuate.tween(target.graphic, .3, { alpha: 1 });
 			});
 		}

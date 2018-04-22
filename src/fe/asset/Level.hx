@@ -11,6 +11,13 @@ class Level
 	[
 		{
 			maxMovement: 20,
+			availableElemTypes: [
+				ElemType.Elem1,
+				ElemType.Elem2,
+				ElemType.Elem3,
+				ElemType.Elem4,
+				ElemType.Elem5,
+			],
 			rawMap: [
 				[ -3, -3, -2, -2, -2, -2, -3, -3 ],
 				[ -3, -2, -2, -2, -2, -2, -2, -3 ],
@@ -39,5 +46,6 @@ typedef LevelData =
 {
 	var maxMovement:UInt;
 	var rawMap:Array<Array<Int>>;
+	var availableElemTypes:Array<ElemType>;
 	@:optional var elemGoals:Map<ElemType, UInt>;
 }

@@ -26,7 +26,7 @@ class Elem
 	public var graphic:ElemGraphic;
 	public var animationPath:Array<SimplePoint>;
 
-	public function new(row:UInt, col:UInt, type:ElemType = ElemType.Random)
+	public function new(row:UInt, col:UInt, type:ElemType)
 	{
 		indexX = col;
 		indexY = row;
@@ -54,11 +54,6 @@ class Elem
 	{
 		if (type == v) return v;
 
-		if (v == ElemType.Random)
-		{
-			v = cast(1 + Math.floor(Math.random() * 7));
-			while(v == type) v = cast(1 + Math.floor(Math.random() * 7));
-		}
 		type = v;
 
 		if (type == ElemType.Empty || type == ElemType.None || type == null) graphic.setTile(ElemTile.emptyElemGraphic);

@@ -53,10 +53,11 @@ class TestBoard
 	static private function testRandomPlayableMap()
 	{
 		var movePossibilities:UInt = 5;
+		var availableElemTypes = [ElemType.Elem1, ElemType.Elem2, ElemType.Elem3, ElemType.Elem4, ElemType.Elem5, ElemType.Elem6, ElemType.Elem7];
 
 		for (i in 0...100)
 		{
-			var map = BoardHelper.createRandomPlayableMap(10, 12, movePossibilities, 5);
+			var map = BoardHelper.createRandomPlayableMap(10, 12, movePossibilities, 5, availableElemTypes);
 			var mapData = BoardHelper.analyzeMap(map);
 			if (mapData.matches.length > 0 || mapData.movePossibilities.length < movePossibilities)
 			{

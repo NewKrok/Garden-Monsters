@@ -79,12 +79,13 @@ class GameState extends Base2dState
 	{
 		if (boardCreationStartTime == 0) boardCreationStartTime = Date.now().getTime();
 
-		var map = BoardHelper.createRandomPlayableMap(10, 8, 5, 5);
+		var availableElemTypes = [ElemType.Elem1, ElemType.Elem2, ElemType.Elem3, ElemType.Elem4, ElemType.Elem5, ElemType.Elem6, ElemType.Elem7];
+		var map = BoardHelper.createRandomPlayableMap(10, 8, 5, 5, availableElemTypes);
 		if (map == null)
 			Timer.delay(function(){ createRandomBoard(onComplete); }, 200);
 		else
 		{
-			board = new Board(gameContainer, interactiveArea, map, effectHandler, skillHandler);
+			board = new Board(gameContainer, interactiveArea, effectHandler, skillHandler, availableElemTypes, map);
 
 			trace("Board created, time: " + (Date.now().getTime() - boardCreationStartTime) + "ms, possibilities: " + board.foundPossibilities.length + ", match: " + board.foundMatch.length);
 			onComplete();
@@ -109,9 +110,10 @@ class GameState extends Base2dState
 		board = new Board(
 			gameContainer,
 			interactiveArea,
-			BoardHelper.createMap(data.rawMap),
 			effectHandler,
-			skillHandler
+			skillHandler,
+			data.availableElemTypes,
+			BoardHelper.createMap(data.rawMap, data.availableElemTypes)
 		);
 
 		board.onSuccessfulSwap(function(){

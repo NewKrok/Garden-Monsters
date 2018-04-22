@@ -33,6 +33,7 @@ class Board
 	public var underAnimationElems:Array<Elem>;
 
 	var map:Array<Array<Elem>>;
+	var availableElemTypes:Array<ElemType>;
 	var parent:Layers;
 	var interactiveArea:Interactive;
 	var mask:Mask;
@@ -58,15 +59,17 @@ class Board
 	public function new(
 		parent:Layers,
 		interactiveArea:Interactive,
-		map:Array<Array<Elem>>,
 		effectHandler:EffectHandler,
-		skillHandler:SkillHandler
+		skillHandler:SkillHandler,
+		availableElemTypes:Array<ElemType>,
+		map:Array<Array<Elem>>
 	){
 		this.parent = parent;
 		this.interactiveArea = interactiveArea;
-		this.map = map;
 		this.effectHandler = effectHandler;
 		this.skillHandler = skillHandler;
+		this.availableElemTypes = availableElemTypes;
+		this.map = map;
 
 		mask = new Mask(100, 100, parent);
 
@@ -76,6 +79,7 @@ class Board
 
 		skillHandler.init(
 			container,
+			availableElemTypes,
 			effectHandler,
 			function(e) { moveElemToPosition(e); },
 			function(t) { onElemCollectCallback(t); }
@@ -501,7 +505,7 @@ class Board
 							}
 						}
 
-						var newElem = map[i][j] = new Elem(i, j);
+						var newElem = map[i][j] = BoardHelper.createRandomElem(i, j, availableElemTypes);
 						newElem.animationPath.push({ x: newElem.graphic.x, y: newElem.graphic.y});
 						newElem.animationY = newElem.graphic.y = addingPosition;
 						container.addChild(newElem.graphic);

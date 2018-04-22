@@ -156,26 +156,41 @@ class BoardHelper
 		}
 	];
 
-	public static function createMap(rawMap:Array<Array<Int>>):Array<Array<Elem>>
+	public static function createMap(rawMap:Array<Array<Int>>, availableElemTypes:Array<ElemType> = null):Array<Array<Elem>>
 	{
 		var map:Array<Array<Elem>> = [];
+		availableElemTypes = availableElemTypes == null ? [] : availableElemTypes;
 
 		for (i in 0...rawMap.length)
 		{
 			map.push([]);
 			for (j in 0...rawMap[0].length)
 				if (rawMap[i][j] == null) map[i].push(null);
-				else map[i].push(new Elem(i, j, cast rawMap[i][j]));
+				else
+				{
+					var type:ElemType = cast rawMap[i][j];
+					map[i].push(
+						type == ElemType.Random
+							? createRandomElem(i, j, availableElemTypes)
+							: new Elem(i, j, type)
+					);
+				}
 		}
 
 		return map;
 	}
 
-	public static function createRandomPlayableMap(col:UInt, row:UInt, minimumStartPossiblities:UInt = 2, blockCount:UInt = 0):Array<Array<Elem>>
+	public static function createRandomPlayableMap(
+		col:UInt,
+		row:UInt,
+		minimumStartPossiblities:UInt = 2,
+		blockCount:UInt = 0,
+		availableElemTypes:Array<ElemType>
+	):Array<Array<Elem>>
 	{
 		var maxTry:UInt = 300;
 
-		var map = createRandomMap(col, row, blockCount);
+		var map = createRandomMap(col, row, blockCount, availableElemTypes);
 		var mapData = BoardHelper.analyzeMap(map);
 		var tryCount = 0;
 
@@ -184,7 +199,7 @@ class BoardHelper
 			|| mapData.movePossibilities.length < minimumStartPossiblities)
 			&& tryCount++ < maxTry
 		){
-			map = createRandomMap(col, row, blockCount);
+			map = createRandomMap(col, row, blockCount, availableElemTypes);
 			mapData = BoardHelper.analyzeMap(map);
 		}
 
@@ -193,20 +208,30 @@ class BoardHelper
 		return map;
 	}
 
-	public static function createRandomMap(col:UInt, row:UInt, blockCount:UInt = 0):Array<Array<Elem>>
+	public static function createRandomMap(col:UInt, row:UInt, blockCount:UInt = 0, availableElemTypes:Array<ElemType>):Array<Array<Elem>>
 	{
 		var map:Array<Array<Elem>> = [];
 
 		for (i in 0...row)
 		{
 			map.push([]);
-			for (j in 0...col) map[i].push(new Elem(i, j));
+			for (j in 0...col) map[i].push(createRandomElem(i, j, availableElemTypes));
 		}
 
 		for (i in 0...blockCount)
 			map[Math.floor(Math.random() * map.length)][Math.floor(Math.random() * map[0].length)].type = ElemType.Blocker;
 
 		return map;
+	}
+
+	public static function createRandomElem(row:UInt, col:UInt, availableElemTypes:Array<ElemType>):Elem
+	{
+		return new Elem(row, col, createRandomElemType(availableElemTypes));
+	}
+
+	public static function createRandomElemType(availableElemTypes:Array<ElemType>):ElemType
+	{
+		return availableElemTypes[Math.floor(Math.random() * availableElemTypes.length)];
 	}
 
 	public static function analyzeMap(map:Array<Array<Elem>>):MapData
