@@ -4,7 +4,7 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="bin\FruitEaters.js" />
+    <movie path="bin\GardenMonsters.js" />
     <movie fps="0" />
     <movie width="0" />
     <movie height="0" />
