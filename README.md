@@ -1,4 +1,4 @@
-# Fruit-Eaters
+# Garden-Monsters
 Match3 game made in Haxe with Heaps
 
 ## Try it now
