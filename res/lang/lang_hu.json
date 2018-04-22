@@ -1,7 +1,8 @@
 {
 	"h": {
 		"moves": "LÉPÉS",
-		"goals": "CÉL",
-		"helps": "SEGÍTSÉG"
+		"goals": "CÉLOK",
+		"helps": "SEGÍTSÉG",
+		"done": "KÉSZ"
 	}
 }

@@ -1,6 +1,7 @@
 package fe.state;
 
 import fe.Layout;
+import fe.game.Background;
 import fe.game.Board;
 import fe.game.EffectHandler;
 import fe.game.Elem.ElemType;
@@ -29,7 +30,7 @@ class GameState extends Base2dState
 
 	var gameContainer:Layers;
 	var interactiveArea:Interactive;
-	var background:Bitmap;
+	var background:Background;
 	var gameUI:GameUI;
 
 	var effectHandler:EffectHandler;
@@ -51,8 +52,7 @@ class GameState extends Base2dState
 		interactiveArea = new Interactive(stage.width, stage.height, stage);
 		interactiveArea.cursor = Cursor.Default;
 
-		background = new Bitmap(Res.image.game.background.toTile(), stage);
-
+		background = new Background(stage);
 		gameContainer = new Layers(stage);
 		effectHandler = new EffectHandler();
 		skillHandler = new SkillHandler();
@@ -68,6 +68,7 @@ class GameState extends Base2dState
 
 		layout = new Layout(
 			stage,
+			background,
 			gameContainer,
 			interactiveArea,
 			gameUI
@@ -142,8 +143,6 @@ class GameState extends Base2dState
 		super.onStageResize(width, height);
 
 		layout.update(width, height);
-
-		background.tile.scaleToSize(cast width, cast height);
 	}
 
 	function resumeRequest()

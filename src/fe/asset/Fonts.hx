@@ -15,7 +15,7 @@ class Fonts
 
 	public static function init()
 	{
-		DEFAULT_L  = Res.font.Cooper_Black_Regular.build(80);
+		DEFAULT_L  = Res.font.Cooper_Black_Regular.build(110);
 		DEFAULT_M  = Res.font.Cooper_Black_Regular.build(25);
 		DEFAULT_S  = Res.font.Cooper_Black_Regular.build(20);
 	}

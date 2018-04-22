@@ -20,21 +20,23 @@ class MovesUI extends Layers
 	{
 		super(parent);
 
-		var back = new Bitmap(Res.image.game.ui.short_ui_panel.toTile(), this);
-
-		var label = new Text(Fonts.DEFAULT_M, this);
-		label.textColor = 0xFFBF00;
-		label.textAlign = Align.Center;
-		label.x = back.tile.width / 2 + 2;
-		label.y = 10;
-		Language.registerTextHolder(cast label, "moves");
+		var back = new Bitmap(Res.image.game.ui.moves_back.toTile(), this);
+		back.smooth = true;
+		back.setScale(AppConfig.GAME_BITMAP_SCALE);
 
 		var countText = new Text(Fonts.DEFAULT_L, this);
 		countText.text = Std.string(remainingMoves.value);
 		countText.textColor = 0xFFBF00;
 		countText.textAlign = Align.Center;
-		countText.x = back.tile.width / 2 + 2;
-		countText.y = 40;
+		countText.x = back.getSize().width / 2 + 2;
+		countText.y = 30;
+
+		var label = new Text(Fonts.DEFAULT_M, this);
+		label.textColor = 0xFFFFFF;
+		label.textAlign = Align.Center;
+		label.x = back.getSize().width / 2 + 2;
+		label.y = countText.y + countText.textHeight;
+		Language.registerTextHolder(cast label, "moves");
 
 		remainingMoves.bind(function(v) {
 			countText.text = Std.string(v);

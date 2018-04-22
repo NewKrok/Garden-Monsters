@@ -33,7 +33,9 @@ class Level
 			elemGoals: [
 				ElemType.Elem8 => 5,
 				ElemType.Elem9 => 10,
-				ElemType.Elem10 => 5
+				ElemType.Elem10 => 5,
+				ElemType.Elem12 => 10,
+				ElemType.Elem13 => 5
 			]
 		}
 	];

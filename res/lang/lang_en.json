@@ -1,7 +1,8 @@
 {
 	"h": {
 		"moves": "MOVES",
-		"goals": "GOAL",
-		"helps": "HELP"
+		"goals": "GOALS",
+		"helps": "HELP",
+		"done": "DONE"
 	}
 }

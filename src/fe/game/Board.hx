@@ -311,7 +311,12 @@ class Board
 			for (row in map) for (e in row) e.animationPath = [];
 			isAnimationInProgress = true;
 
-			for (m in foundMatch) skillHandler.handleElemSkill(m);
+			var longestSkillTime:Float = 0;
+			for (m in foundMatch)
+			{
+				var skillTime = skillHandler.handleElemSkill(m);
+				if (skillTime > longestSkillTime) longestSkillTime = skillTime;
+			}
 
 			for (i in 0...map.length)
 			{
@@ -331,7 +336,7 @@ class Board
 				}
 			}
 
-			Actuate.timer(1).onComplete(function() {
+			Actuate.timer(longestSkillTime).onComplete(function() {
 				checkMap();
 				fillMap();
 

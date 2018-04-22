@@ -50,8 +50,10 @@ class SkillHandler
 		this.foundMatch = foundMatch;
 	}
 
-	public function handleElemSkill(match:Array<Elem>)
+	public function handleElemSkill(match:Array<Elem>):Float
 	{
+		var longestSkillTime:Float = 1;
+
 		var type = match[0].type;
 		var matchClone = match.concat([]);
 		while (type == ElemType.Elem6) type = cast(1 + Math.floor(Math.random() * 7));
@@ -112,9 +114,11 @@ class SkillHandler
 						effectHandler.addElem7Effect
 					);
 
-				case _:
+				case _: longestSkillTime = 0;
 			}
 		}
+
+		return longestSkillTime;
 	}
 
 	function getRandomNearbyNotMatchedPlayableElem(m:Array<Elem>):Elem

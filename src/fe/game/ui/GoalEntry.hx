@@ -9,6 +9,7 @@ import h2d.Layers;
 import h2d.Sprite;
 import h2d.Text;
 import h2d.Tile;
+import hpp.util.Language;
 import hxd.Res;
 import tink.state.Observable;
 
@@ -18,10 +19,9 @@ import tink.state.Observable;
  */
 class GoalEntry extends Layers
 {
-	var doneMarker:Bitmap;
-
 	var label:Text;
 	var maxCount:UInt;
+	var isChangedToDone:Bool;
 
 	public function new(parent:Sprite, elemType:ElemType, maxCount:UInt, collectedCount:Observable<UInt>)
 	{
@@ -29,34 +29,36 @@ class GoalEntry extends Layers
 
 		this.maxCount = maxCount;
 
-		var baseSize = new Graphics(this);
-		baseSize.drawRect(0, 0, 125, 10);
-
-		var back = new Bitmap(Res.image.game.ui.goal_back.toTile(), this);
-		back.x = baseSize.getSize().width / 2 - back.getSize().width / 2;
-		back.y = 25;
-
 		var elem = makeGraphic(ElemTile.tiles.get(cast elemType).baseTile.clone());
-		elem.x = baseSize.getSize().width / 2;
-		elem.y = 65;
+		elem.setScale(AppConfig.GAME_BITMAP_SCALE);
+		elem.y = 30;
 
-		label = new Text(Fonts.DEFAULT_S, this);
+		var infoBack = new Bitmap(Res.image.game.ui.goal_info_back.toTile(), this);
+		infoBack.smooth = true;
+		infoBack.setScale(AppConfig.GAME_BITMAP_SCALE);
+
+		elem.x = infoBack.getSize().width / 2;
+
+		label = new Text(Fonts.DEFAULT_M, this);
 		label.text = '0/0';
-		label.textColor = 0xFFBF00;
+		label.textColor = 0xFFFFFF;
 		label.textAlign = Align.Center;
-		label.x = baseSize.getSize().width / 2 + 2;
-		label.y = back.y + back.tile.height - label.getSize().height - 3;
+		label.x = infoBack.getSize().width / 2 + 2;
+		label.y = -2;
 
 		collectedCount.bind(function(e:UInt)
 		{
-			label.text = '$e/$maxCount';
-
-			if (e >= maxCount && doneMarker == null)
+			if (e >= maxCount)
 			{
-				doneMarker = new Bitmap(Res.image.game.ui.tick.toTile(), this);
-				doneMarker.x = back.x + back.getSize().width - doneMarker.tile.width / 2;
-				doneMarker.y = 15;
+				if (!isChangedToDone)
+				{
+					isChangedToDone = true;
+					label.textColor = 0xFFFF00;
+					label.y = 0;
+					Language.registerTextHolder(cast label, "done");
+				}
 			}
+			else label.text = '$e/$maxCount';
 		});
 	}
 
@@ -65,7 +67,6 @@ class GoalEntry extends Layers
 		var bmp = new Bitmap(tile, this);
 
 		bmp.smooth = true;
-		bmp.scale(.28);
 		bmp.tile.dx = cast -bmp.tile.width / 2;
 		bmp.tile.dy = -bmp.tile.height;
 
