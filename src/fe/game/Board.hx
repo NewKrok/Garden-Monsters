@@ -5,11 +5,9 @@ import fe.game.Elem.ElemType;
 import fe.game.util.BoardHelper;
 import fe.game.util.TweenHelper;
 import h2d.Bitmap;
-import h2d.Graphics;
 import h2d.Interactive;
 import h2d.Layers;
 import h2d.Mask;
-import h2d.filter.Glow;
 import hpp.util.GeomUtil;
 import hpp.util.GeomUtil.SimplePoint;
 import hxd.Cursor;
@@ -39,7 +37,6 @@ class Board
 	var interactiveArea:Interactive;
 	var mask:Mask;
 	var container:Layers;
-	var background:Layers;
 	var selectedElemBackground:Bitmap;
 	var effectHandler:EffectHandler;
 	var skillHandler:SkillHandler;
@@ -84,28 +81,13 @@ class Board
 			function(t) { onElemCollectCallback(t); }
 		);
 
-		var tileA = Res.image.game.elem_background_a.toTile();
-		var tileB = Res.image.game.elem_background_b.toTile();
-
-		background = new Layers(container);
-		background.x = -Elem.SIZE / 2;
-		background.y = -Elem.SIZE / 2;
-		background.setScale(AppConfig.GAME_BITMAP_SCALE);
-		var backgroundA = new Graphics(background);
-		var backgroundB = new Graphics(background);
-
-		for (i in 0...map[0].length)
-			for (j in 0...map.length)
-				if (map[j][i].type != ElemType.Blocker && map[j][i].type != ElemType.None && map[j][i].type != ElemType.Empty)
-					if ((i + j) % 2 == 1) backgroundA.drawTile(i * tileA.width, j * tileA.height, tileA);
-					else backgroundB.drawTile(i * tileB.width, j * tileB.height, tileB);
+		new BoardBackground(container, map);
 
 		selectedElemBackground = new Bitmap(Res.image.game.elem_selected.toTile(), container);
 		selectedElemBackground.setScale(AppConfig.GAME_BITMAP_SCALE);
 		selectedElemBackground.tile.dx = cast -selectedElemBackground.tile.width / 2;
 		selectedElemBackground.tile.dy = cast -selectedElemBackground.tile.height / 2;
 		selectedElemBackground.visible = false;
-		background.filter = new Glow(0xA03F04, 1, 1, 14, 10);
 
 		addElemsToBoard();
 		checkMap();
@@ -205,7 +187,7 @@ class Board
 	{
 		isDragging = false;
 
-		if (draggedElement != null)
+		if (draggedElement != null && dragDirection != null)
 		{
 			switch(dragDirection)
 			{

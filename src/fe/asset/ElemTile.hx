@@ -17,7 +17,7 @@ class ElemTile
 	static public function init()
 	{
 		tiles = [
-			0 => { baseTile: Res.image.game.monster.block_base.toTile(), secondTile: Res.image.game.monster.block_base.toTile() },
+			0 => { baseTile: Res.image.game.block_base.toTile(), secondTile: Res.image.game.block_base.toTile() },
 			1 => { baseTile: Res.image.game.monster.monster_1_base.toTile(), secondTile: Res.image.game.monster.monster_1_second.toTile() },
 			2 => { baseTile: Res.image.game.monster.monster_2_base.toTile(), secondTile: Res.image.game.monster.monster_2_second.toTile() },
 			3 => { baseTile: Res.image.game.monster.monster_3_base.toTile(), secondTile: Res.image.game.monster.monster_3_second.toTile() },
