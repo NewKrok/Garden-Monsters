@@ -417,21 +417,17 @@ class Board
 
 						if (upperElem.type == ElemType.Blocker)
 						{
-							if (downIndex - i > 1 || i - upperIndex > 1)
+							if (downIndex - i > 1 || i - upperIndex > 0)
 							{
-								var prevPossibleElem = map[downIndex - 2][j - 1];
-								var isPrevBlocked:Bool = map[downIndex - 1][j - 1] == null || map[downIndex - 1][j - 1].type == ElemType.Blocker;
-								var nextPossibleElem = map[downIndex - 2][j + 1];
-								var isNextBlocked:Bool = map[downIndex - 1][j + 1] == null || map[downIndex - 1][j + 1].type == ElemType.Blocker;
+								var prevPossibleElem = map[downIndex - 1][j - 1];
+								var nextPossibleElem = map[downIndex - 1][j + 1];
 
 								if (
 									(crossFillFromLeft
 										|| nextPossibleElem == null
 										|| nextPossibleElem.type == ElemType.Empty
-										|| nextPossibleElem.type == ElemType.Blocker
-										|| isNextBlocked)
+										|| nextPossibleElem.type == ElemType.Blocker)
 									&& prevPossibleElem != null
-									&& !isPrevBlocked
 									&& BoardHelper.isMovableElem(prevPossibleElem)
 								){
 									crossFillFromLeft = !crossFillFromLeft;
@@ -443,7 +439,7 @@ class Board
 										{ x: prevPossibleElem.indexX * Elem.SIZE, y: prevPossibleElem.indexY * Elem.SIZE }
 									);
 
-									map[downIndex - 2][j - 1] = null;
+									map[downIndex - 1][j - 1] = null;
 									map[prevPossibleElem.indexY][prevPossibleElem.indexX] = prevPossibleElem;
 
 									fillMap();
@@ -451,7 +447,6 @@ class Board
 								}
 								else if (
 									nextPossibleElem != null
-									&& !isNextBlocked
 									&& BoardHelper.isMovableElem(nextPossibleElem)
 								){
 									crossFillFromLeft = !crossFillFromLeft;
@@ -463,7 +458,7 @@ class Board
 										{ x: nextPossibleElem.indexX * Elem.SIZE, y: nextPossibleElem.indexY * Elem.SIZE }
 									);
 
-									map[downIndex - 2][j + 1] = null;
+									map[downIndex - 1][j + 1] = null;
 									map[nextPossibleElem.indexY][nextPossibleElem.indexX] = nextPossibleElem;
 
 									fillMap();
