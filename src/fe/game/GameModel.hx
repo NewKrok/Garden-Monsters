@@ -13,7 +13,7 @@ class GameModel
 
 	public var remainingMoves:State<UInt> = new State(0);
 	public var elemGoals:Map<ElemType, ElemGoalData> = new Map<ElemType, ElemGoalData>();
-	public var score:State<Float> = new State(0.0);
+	public var score:State<UInt> = new State(0);
 }
 
 typedef ElemGoalData =

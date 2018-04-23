@@ -67,7 +67,7 @@ class GoalUI extends Layers
 			goals.horizontalSpacing = 0;
 			goals.verticalSpacing = 120;
 			goals.x = -152;
-			goals.y = back.getSize().height / 2 - goals.getSize().height / 2 + 70;
+			goals.y = back.getSize().height / 2 - goals.getSize().height / 2 + 65;
 		}
 		else
 		{

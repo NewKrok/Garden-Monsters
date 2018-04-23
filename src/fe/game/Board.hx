@@ -280,8 +280,6 @@ class Board
 			}
 			else checkSwapResult(indexX, indexY, targetIndexX, targetIndexY);
 		});
-
-		onSuccessfulSwapCallback();
 	}
 
 	function checkSwapResult(indexX:UInt, indexY:UInt, targetIndexX:UInt, targetIndexY:UInt)
@@ -295,6 +293,7 @@ class Board
 			map[indexY][indexX].isUnderSwapping = false;
 			isAnimationInProgress = false;
 
+			onSuccessfulSwapCallback();
 			removeAllMatch();
 		}
 	}

@@ -13,6 +13,7 @@ class GameUI extends Layers
 {
 	var movesUI:MovesUI;
 	var goalUI:GoalUI;
+	var scoreUI:ScoreUI;
 	var helpsUI:HelpsUI;
 
 	var activeLayout:LayoutMode = null;
@@ -23,6 +24,7 @@ class GameUI extends Layers
 
 		goalUI = new GoalUI(this, gameModel.elemGoals);
 		movesUI = new MovesUI(this, gameModel.remainingMoves);
+		scoreUI = new ScoreUI(this, gameModel.score);
 		//helpsUI = new HelpsUI(this);
 	}
 
@@ -31,17 +33,26 @@ class GameUI extends Layers
 		if (activeLayout == mode) return;
 		activeLayout = mode;
 
+		movesUI.x = 30;
+		movesUI.y = 30;
+
 		goalUI.setLayoutMode(mode);
 
 		if (mode == LayoutMode.Landscape)
 		{
-			goalUI.x = 215;
-			goalUI.y = movesUI.getSize().height / 2 + 15;
+			goalUI.x = movesUI.x + 215;
+			goalUI.y = movesUI.y + movesUI.getSize().height / 2 + 15;
+
+			scoreUI.x = 2;
+			scoreUI.y = 0;
 		}
 		else
 		{
-			goalUI.x = movesUI.getSize().width / 2 + 15;
-			goalUI.y = 25;
+			goalUI.x = movesUI.x + movesUI.getSize().width / 2 + 15;
+			goalUI.y = movesUI.y + 25;
+
+			scoreUI.x = movesUI.x + goalUI.x + 90;
+			scoreUI.y = movesUI.y + goalUI.y + 149;
 		}
 	}
 }

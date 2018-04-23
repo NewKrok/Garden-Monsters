@@ -17,8 +17,7 @@ class Level
 				ElemType.Elem10,
 				ElemType.Elem11,
 				ElemType.Elem12,
-				ElemType.Elem13,
-				ElemType.Elem14
+				ElemType.Elem13
 			],
 			rawMap: [
 				[ -3, -3, -2, -2, -2, -2, -3, -3 ],

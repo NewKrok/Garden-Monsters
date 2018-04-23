@@ -114,7 +114,7 @@ class SkillHandler
 						effectHandler.addElem7Effect
 					);
 
-				case _: longestSkillTime = 0;
+				case _: longestSkillTime = .2;
 			}
 		}
 

@@ -9,13 +9,15 @@ import hxd.Res;
  */
 class Fonts
 {
+	public static var DEFAULT_XL(default, null):Font;
 	public static var DEFAULT_L(default, null):Font;
 	public static var DEFAULT_M(default, null):Font;
 	public static var DEFAULT_S(default, null):Font;
 
 	public static function init()
 	{
-		DEFAULT_L  = Res.font.Cooper_Black_Regular.build(110);
+		DEFAULT_XL  = Res.font.Cooper_Black_Regular.build(110);
+		DEFAULT_L  = Res.font.Cooper_Black_Regular.build(35);
 		DEFAULT_M  = Res.font.Cooper_Black_Regular.build(25);
 		DEFAULT_S  = Res.font.Cooper_Black_Regular.build(20);
 	}

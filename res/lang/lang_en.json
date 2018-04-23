@@ -3,6 +3,7 @@
 		"moves": "MOVES",
 		"goals": "GOALS",
 		"helps": "HELP",
-		"done": "DONE"
+		"done": "DONE",
+		"score": "SCORE"
 	}
 }

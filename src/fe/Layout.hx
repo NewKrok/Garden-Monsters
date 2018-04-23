@@ -14,15 +14,10 @@ import hpp.heaps.Base2dStage;
  */
 class Layout
 {
-	static inline var gameUILandscapeTopPadding = 30;
-	static inline var gameUILandscapeLeftPadding = 30;
-	static inline var gameUIPortraitTopPadding = 30;
-	static inline var gameUIPortraitLeftPadding = 30;
-
 	static var gameContainerDefaultWidth = Elem.SIZE * 8;
 	static var gameContainerDefaultHeight = Elem.SIZE * 8;
-	static inline var gameContainerLandscapeLeftPadding = 40;
-	static inline var gameContainerPortraitTopPadding = 40;
+	static inline var gameContainerLandscapeLeftPadding = 340;
+	static inline var gameContainerPortraitTopPadding = 350;
 
 	var mode:LayoutMode = LayoutMode.Landscape;
 	var stage:Base2dStage;
@@ -60,22 +55,18 @@ class Layout
 		if (mode == LayoutMode.Landscape)
 		{
 			gameUI.setScale(heightRatio);
-			gameUI.x = gameUILandscapeLeftPadding * heightRatio;
-			gameUI.y = gameUILandscapeTopPadding * heightRatio;
 
 			gameContainer.setScale((heightRatio * gameContainerDefaultHeight) / gameContainerDefaultHeight);
-			gameContainer.x = gameUI.x + gameUI.getSize().width + gameContainerLandscapeLeftPadding;
+			gameContainer.x = gameUI.x + gameContainerLandscapeLeftPadding;
 			gameContainer.y = stage.height / 2 - gameContainerDefaultHeight * heightRatio / 2;
 		}
 		else
 		{
 			gameUI.setScale(widthRatio);
-			gameUI.x = gameUIPortraitLeftPadding * widthRatio;
-			gameUI.y = gameUIPortraitTopPadding * widthRatio;
 
 			gameContainer.setScale((widthRatio * gameContainerDefaultWidth) / Layout.gameContainerDefaultWidth);
 			gameContainer.x = stage.width / 2 - gameContainerDefaultWidth * widthRatio / 2;
-			gameContainer.y = gameUI.y + gameUI.getSize().height + gameContainerPortraitTopPadding * widthRatio;
+			gameContainer.y = gameUI.y + gameContainerPortraitTopPadding * widthRatio;
 		}
 
 		interactiveArea.width = stage.width;
@@ -84,7 +75,7 @@ class Layout
 
 	function calculateLayoutMode(width:UInt, height:UInt)
 	{
-		mode = (width > height && width > gameContainerDefaultWidth + gameContainerLandscapeLeftPadding * 2)
+		mode = (width > height && width > gameContainerDefaultWidth)
 			? LayoutMode.Landscape
 			: LayoutMode.Portrait;
 	}

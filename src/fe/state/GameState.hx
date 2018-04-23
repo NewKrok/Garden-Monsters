@@ -123,6 +123,9 @@ class GameState extends Base2dState
 		board.onElemCollect(function(e){
 			if (gameModel.elemGoals.exists(e))
 				gameModel.elemGoals.get(e).collected.set(gameModel.elemGoals.get(e).collected.value + 1);
+
+			// TODO add to config + multiplier
+			gameModel.score.set(gameModel.score.value + 50);
 		});
 	}
 
