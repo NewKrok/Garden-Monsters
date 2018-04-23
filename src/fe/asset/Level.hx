@@ -29,6 +29,11 @@ class Level
 				[ -3, -2, -2, -2, -2, -2, -2, -3 ],
 				[ -3, -3, -2, -2, -2, -2, -3, -3 ]
 			],
+			starRequirements: [
+				500,
+				1200,
+				2700
+			],
 			elemGoals: [
 				ElemType.Elem8 => 5,
 				ElemType.Elem9 => 10,
@@ -50,5 +55,6 @@ typedef LevelData =
 	var maxMovement:UInt;
 	var rawMap:Array<Array<Int>>;
 	var availableElemTypes:Array<ElemType>;
+	var starRequirements:Array<UInt>;
 	@:optional var elemGoals:Map<ElemType, UInt>;
 }

@@ -96,6 +96,7 @@ class GameState extends Base2dState
 	function loadLevel(data:LevelData)
 	{
 		gameModel.remainingMoves.set(data.maxMovement);
+		gameModel.starRequirements = data.starRequirements.concat([]);
 
 		for (key in data.elemGoals.keys())
 		{

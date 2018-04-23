@@ -14,17 +14,21 @@ class GameUI extends Layers
 	var movesUI:MovesUI;
 	var goalUI:GoalUI;
 	var scoreUI:ScoreUI;
+	var starsUI:StarsUI;
 	var helpsUI:HelpsUI;
 
 	var activeLayout:LayoutMode = null;
 
-	public function new(parent:Sprite, gameModel:GameModel)
-	{
+	public function new(
+		parent:Sprite,
+		gameModel:GameModel
+	){
 		super(parent);
 
 		goalUI = new GoalUI(this, gameModel.elemGoals);
-		movesUI = new MovesUI(this, gameModel.remainingMoves);
+		movesUI = new MovesUI(this, gameModel.remainingMoves, gameModel.stars);
 		scoreUI = new ScoreUI(this, gameModel.score);
+		starsUI = new StarsUI(this, gameModel.stars);
 		//helpsUI = new HelpsUI(this);
 	}
 
@@ -35,6 +39,9 @@ class GameUI extends Layers
 
 		movesUI.x = 30;
 		movesUI.y = 30;
+
+		starsUI.x = movesUI.x + 20;
+		starsUI.y = movesUI.y + 160;
 
 		goalUI.setLayoutMode(mode);
 
