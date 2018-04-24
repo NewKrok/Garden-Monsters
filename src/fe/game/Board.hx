@@ -18,6 +18,8 @@ import motion.easing.Linear;
 import motion.easing.Quad;
 import motion.easing.Quart;
 
+using hpp.util.ArrayUtil;
+
 /**
  * ...
  * @author Krisztian Somoracz
@@ -44,6 +46,7 @@ class Board
 
 	var isDragging:Bool = false;
 	var isAnimationInProgress:Bool = false;
+	var isShuffleInProgress:Bool = false;
 	var crossFillFromLeft:Bool = true;
 	var dragDirection:DragDirection;
 	var dragStartPoint:SimplePoint = { x: 0, y: 0 };
@@ -118,6 +121,8 @@ class Board
 	{
 		interactiveArea.onPush = function(e:Event)
 		{
+			if (isShuffleInProgress) return;
+
 			draggedElement = getElemByPosition({
 				x: e.relX,
 				y: e.relY
@@ -135,6 +140,8 @@ class Board
 
 		interactiveArea.onMove = function(e:Event)
 		{
+			if (isShuffleInProgress) return;
+
 			if (isDragging)
 			{
 				var d:Float = GeomUtil.getDistance({ x: e.relX, y: e.relY }, dragStartPoint);
@@ -367,6 +374,8 @@ class Board
 					e.frozenTurnCount--;
 					if (e.frozenTurnCount == 0) effectHandler.addIceBreakEffect(e.graphic.x, e.graphic.y);
 				}
+
+		if (foundPossibilities.length == 0) shuffleElems();
 
 		onTurnEndCallback();
 	}
@@ -631,12 +640,54 @@ class Board
 			Actuate.stop(showHelpTimer, null, false, false);
 			showHelpTimer = null;
 		}
-		showHelpTimer = Actuate.timer(5).onComplete(function() {
-			if (foundPossibilities.length == 1) trace("NO MORE MOVES!");
-			else for (m in foundPossibilities) if (m != null) m.graphic.mark();
-		});
+
+		if (foundPossibilities.length > 0)
+		{
+			showHelpTimer = Actuate.timer(5).onComplete(function() {
+				for (m in foundPossibilities) if (m != null) m.graphic.mark();
+			});
+		}
 
 		debugMapTrace();
+	}
+
+	function shuffleElems():Void
+	{
+		isShuffleInProgress = true;
+
+		var allMovableElem = [];
+		for (row in map)
+			for (elem in row)
+				if (BoardHelper.isMovableElem(elem))
+					allMovableElem.push(elem);
+
+		allMovableElem.shuffle();
+
+		for (i in 0...map.length)
+			for (j in 0...map[0].length)
+				if (BoardHelper.isMovableElem(map[i][j]))
+				{
+					var tempObj = map[i][j];
+					map[i][j] = allMovableElem[allMovableElem.length - 1];
+					map[i][j].indexX = j;
+					map[i][j].indexY = i;
+					map[i][j].animationPath = [
+						{ x: j * Elem.SIZE, y: i * Elem.SIZE }
+					];
+
+					allMovableElem.pop();
+				}
+
+		var mapData = BoardHelper.analyzeMap(map);
+		if (mapData.matches.length > 0 || mapData.movePossibilities.length == 0) shuffleElems();
+		else
+		{
+			Actuate.timer(2).onComplete(function()
+			{
+				for (row in map) for (elem in row) if (BoardHelper.isMovableElem(elem)) moveElemToPosition(elem);
+				isShuffleInProgress = false;
+			});
+		}
 	}
 
 	function debugMapTrace()
@@ -644,13 +695,13 @@ class Board
 		trace("#Map");
 		for (row in map)
 		{
-			var rowText:String = "| ";
+			var rowText:String = "[ ";
 			for (elem in row)
 			{
-				if (elem == null) rowText += " N | ";
-				else rowText += ((elem.type != ElemType.Empty) ? " " : "") + elem.type + " | ";
+				if (elem == null) rowText += " N, ";
+				else rowText += ((elem.type.toInt() < 10 && elem.type.toInt() > -1) ? " " : "") + elem.type + ", ";
 			}
-			trace(rowText);
+			trace(rowText.substr(0, rowText.length - 2) + " ]");
 		}
 	}
 }

@@ -111,6 +111,8 @@ class Elem
 	var Elem12 = 12;
 	var Elem13 = 13;
 	var Elem14 = 14;
+
+	@:to public function toInt():Int return this;
 }
 
 /* TEMPORARY INFO

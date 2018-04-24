@@ -40,7 +40,7 @@ class GameUI extends Layers
 		movesUI.x = 30;
 		movesUI.y = 30;
 
-		starsUI.x = movesUI.x + 20;
+		starsUI.x = movesUI.x + 27;
 		starsUI.y = movesUI.y + 160;
 
 		goalUI.setLayoutMode(mode);
@@ -58,7 +58,7 @@ class GameUI extends Layers
 			goalUI.x = movesUI.x + movesUI.getSize().width / 2 + 15;
 			goalUI.y = movesUI.y + 25;
 
-			scoreUI.x = movesUI.x + goalUI.x + 90;
+			scoreUI.x = movesUI.x + goalUI.x + 220;
 			scoreUI.y = movesUI.y + goalUI.y + 149;
 		}
 	}

@@ -43,9 +43,15 @@ class TestBoard
 		testPossibilityRowDown();
 		testPossibilityRowDownDouble();
 		testPossibilityRowUp();
+		testPossibilityFirstRowDown();
+		testPossibilityLastRowUp();
+		testPossibilityRowToRight();
 		testPossibility3Possibility();
 		testPossibility5Possibility();
 		testPossibility9Possibility();
+
+		testPossibilityRealMap();
+		testPossibilityRealMap2();
 
 		trace("Test finished! Time: " + (Date.now().getTime() - testStartTime) + "ms");
 	}
@@ -458,6 +464,42 @@ class TestBoard
 			throw "Failed test!";
 	}
 
+	static private function testPossibilityFirstRowDown()
+	{
+		var map = BoardHelper.createMap([
+			[ 6, 2, 3 ],
+			[ 1, 6, 6 ],
+			[ 5, 3, 2 ]
+		]);
+
+		if (!checkPossibilities(map, 1))
+			throw "Failed test!";
+	}
+
+	static private function testPossibilityLastRowUp()
+	{
+		var map = BoardHelper.createMap([
+			[ 1, 2, 3 ],
+			[ 6, 6, 2 ],
+			[ 5, 3, 6 ]
+		]);
+
+		if (!checkPossibilities(map, 1))
+			throw "Failed test!";
+	}
+
+	static private function testPossibilityRowToRight()
+	{
+		var map = BoardHelper.createMap([
+			[ 1, 2, 3, 1 ],
+			[ 6, 4, 6, 6 ],
+			[ 5, 3, 1, 4 ]
+		]);
+
+		if (!checkPossibilities(map, 1))
+			throw "Failed test!";
+	}
+
 	static private function testPossibility3Possibility()
 	{
 		var map = BoardHelper.createMap([
@@ -494,6 +536,40 @@ class TestBoard
 		]);
 
 		if (!checkPossibilities(map, 9))
+			throw "Failed test!";
+	}
+
+	static private function testPossibilityRealMap()
+	{
+		var map = BoardHelper.createMap([
+			[ -3, -3, 12,  9,  9, 11, -3, -3],
+			[ -3, 11, 13, 13, 11, 12, 13, -3],
+			[  8, 10, 12, 13, 13, 10, 13, 13],
+			[ 11,  8, 12,  0,  0,  9,  8,  9],
+			[ 12,  9, 11,  0,  0,  8, 11, 12],
+			[ 11,  9, 10, 12, 11, 12, 12, 10],
+			[ -3, 12, 11, 13, 12, 11,  8, -3],
+			[ -3, -3, 13, 12, 11, 13, -3, -3],
+		]);
+
+		if (!checkPossibilities(map, 8))
+			throw "Failed test!";
+	}
+
+	static private function testPossibilityRealMap2()
+	{
+		var map = BoardHelper.createMap([
+			[ -3, -3, 11, 13, 12, 11, -3, -3 ],
+			[ -3, 13, 12, 10,  9, 10, 13, -3 ],
+			[  8,  9,  9, 10, 12, 11, 10,  9 ],
+			[ 10, 11, 10,  0,  0,  8, 12, 10 ],
+			[ 12,  8, 12,  0,  0, 13,  9,  9 ],
+			[ 11,  9, 13, 11,  9, 13, 10, 12 ],
+			[ -3,  9,  8, 12, 13, 11, 12, -3 ],
+			[ -3, -3, 11, 11, 10,  8, -3, -3 ]
+		]);
+
+		if (!checkPossibilities(map, 1))
 			throw "Failed test!";
 	}
 

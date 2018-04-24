@@ -26,6 +26,8 @@ class ElemGraphic extends Sprite
 	var sX:Float = 1;
 	var sY:Float = 1;
 
+	var isMarked:Bool = false;
+
 	public function new()
 	{
 		super();
@@ -69,9 +71,13 @@ class ElemGraphic extends Sprite
 		if (value)
 		{
 			Actuate.tween(this, .3, { sX: Math.random() * .2 + .9, sY: Math.random() * .2 + .9 }, false).ease(Quad.easeOut).onUpdate(updateView);
-			unmark();
+			marker.visible = false;
 		}
-		else Actuate.tween(this, .3, { sX: 1, sY: 1 }, false).ease(Quad.easeOut).onUpdate(updateView);
+		else
+		{
+			Actuate.tween(this, .3, { sX: 1, sY: 1 }, false).ease(Quad.easeOut).onUpdate(updateView);
+			if (isMarked) marker.visible = true;
+		}
 
 		baseBitmap.visible = !value;
 		hoverBitmap.visible = value;
@@ -88,9 +94,17 @@ class ElemGraphic extends Sprite
 		});
 	}
 
-	public function mark() { marker.visible = true; }
+	public function mark()
+	{
+		marker.visible = true;
+		isMarked = true;
+	}
 
-	public function unmark() { marker.visible = false; }
+	public function unmark()
+	{
+		marker.visible = false;
+		isMarked = false;
+	}
 
 	function updateView()
 	{
