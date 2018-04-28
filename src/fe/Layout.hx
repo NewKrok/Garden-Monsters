@@ -3,6 +3,7 @@ package fe;
 import fe.Layout.LayoutMode;
 import fe.game.Background;
 import fe.game.Elem;
+import fe.game.dialog.GameDialog;
 import fe.game.ui.GameUI;
 import h2d.Interactive;
 import h2d.Layers;
@@ -26,19 +27,22 @@ class Layout
 	var gameContainer:Layers;
 	var interactiveArea:Interactive;
 	var gameUI:GameUI;
+	var gameDialog:GameDialog;
 
 	public function new(
 		stage:Base2dStage,
 		background:Background,
 		gameContainer:Layers,
 		interactiveArea:Interactive,
-		gameUI:GameUI
+		gameUI:GameUI,
+		gameDialog:GameDialog
 	){
 		this.stage = stage;
 		this.background = background;
 		this.gameContainer = gameContainer;
 		this.interactiveArea = interactiveArea;
 		this.gameUI = gameUI;
+		this.gameDialog = gameDialog;
 	}
 
 	public function update(width:UInt, height:UInt):Void
@@ -55,6 +59,7 @@ class Layout
 		if (mode == LayoutMode.Landscape)
 		{
 			gameUI.setScale(heightRatio);
+			gameDialog.setScale(heightRatio);
 
 			gameContainer.setScale((heightRatio * gameContainerDefaultHeight) / gameContainerDefaultHeight);
 			gameContainer.x = gameUI.x + gameContainerLandscapeLeftPadding;
@@ -63,11 +68,15 @@ class Layout
 		else
 		{
 			gameUI.setScale(widthRatio);
+			gameDialog.setScale(widthRatio);
 
 			gameContainer.setScale((widthRatio * gameContainerDefaultWidth) / Layout.gameContainerDefaultWidth);
 			gameContainer.x = stage.width / 2 - gameContainerDefaultWidth * widthRatio / 2;
 			gameContainer.y = gameUI.y + gameContainerPortraitTopPadding * widthRatio;
 		}
+
+		gameDialog.x = gameContainer.x + gameContainer.getSize().width / 2;
+		gameDialog.y = gameContainer.y + gameContainer.getSize().height / 2;
 
 		interactiveArea.width = stage.width;
 		interactiveArea.height = stage.height;

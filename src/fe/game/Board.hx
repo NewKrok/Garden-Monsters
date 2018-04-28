@@ -58,6 +58,7 @@ class Board
 	var onSuccessfulSwapCallback:Void->Void = function(){};
 	var onTurnEndCallback:Void->Void = function(){};
 	var onElemCollectCallback:ElemType->Void = function(_){};
+	var onNoMoreMovesCallback:Void->Void = function(){};
 
 	public function new(
 		parent:Layers,
@@ -111,6 +112,7 @@ class Board
 	public function onTurnEnd(callback:Void->Void):Void onTurnEndCallback = callback;
 	public function onSuccessfulSwap(callback:Void->Void):Void onSuccessfulSwapCallback = callback;
 	public function onElemCollect(callback:ElemType->Void):Void onElemCollectCallback = callback;
+	public function onNoMoreMoves(callback:Void->Void):Void onNoMoreMovesCallback = callback;
 
 	function addElemsToBoard()
 	{
@@ -375,9 +377,12 @@ class Board
 					if (e.frozenTurnCount == 0) effectHandler.addIceBreakEffect(e.graphic.x, e.graphic.y);
 				}
 
-		if (foundPossibilities.length == 0) shuffleElems();
-
-		onTurnEndCallback();
+		if (foundPossibilities.length == 0)
+		{
+			shuffleElems(onTurnEndCallback);
+			onNoMoreMovesCallback();
+		}
+		else onTurnEndCallback();
 	}
 
 	function fillMap()
@@ -651,7 +656,7 @@ class Board
 		debugMapTrace();
 	}
 
-	function shuffleElems():Void
+	function shuffleElems(onFinished:Void->Void):Void
 	{
 		isShuffleInProgress = true;
 
@@ -679,12 +684,20 @@ class Board
 				}
 
 		var mapData = BoardHelper.analyzeMap(map);
-		if (mapData.matches.length > 0 || mapData.movePossibilities.length == 0) shuffleElems();
+		if (mapData.matches.length > 0 || mapData.movePossibilities.length == 0) shuffleElems(onFinished);
 		else
 		{
-			Actuate.timer(2).onComplete(function()
+			Actuate.timer(1).onComplete(function()
 			{
-				for (row in map) for (elem in row) if (BoardHelper.isMovableElem(elem)) moveElemToPosition(elem);
+				var isFirstElem:Bool = true;
+				for (row in map)
+					for (elem in row)
+						if (BoardHelper.isMovableElem(elem))
+						{
+							moveElemToPosition(elem, isFirstElem ? onFinished : null);
+
+							isFirstElem = false;
+						}
 				isShuffleInProgress = false;
 			});
 		}

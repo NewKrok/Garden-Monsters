@@ -4,6 +4,8 @@
 		"goals": "GOALS",
 		"helps": "HELP",
 		"done": "DONE",
-		"score": "SCORE"
+		"score": "SCORE",
+		"no_more_moves": "no more moves",
+		"shuffle": "SHUFFLE"
 	}
 }

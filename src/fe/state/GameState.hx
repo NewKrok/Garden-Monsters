@@ -8,6 +8,7 @@ import fe.game.Elem.ElemType;
 import fe.game.GameModel;
 import fe.asset.Level;
 import fe.game.SkillHandler;
+import fe.game.dialog.GameDialog;
 import fe.game.ui.GameUI;
 import fe.game.util.BoardHelper;
 import h2d.Bitmap;
@@ -32,6 +33,7 @@ class GameState extends Base2dState
 	var interactiveArea:Interactive;
 	var background:Background;
 	var gameUI:GameUI;
+	var gameDialog:GameDialog;
 
 	var effectHandler:EffectHandler;
 	var skillHandler:SkillHandler;
@@ -64,6 +66,7 @@ class GameState extends Base2dState
 		loadLevel(Level.getLevelData(0));
 
 		gameUI = new GameUI(stage, gameModel);
+		gameDialog = new GameDialog(stage, gameModel);
 		gameContainer.addChild(effectHandler.view);
 
 		layout = new Layout(
@@ -71,7 +74,8 @@ class GameState extends Base2dState
 			background,
 			gameContainer,
 			interactiveArea,
-			gameUI
+			gameUI,
+			gameDialog
 		);
 		onStageResize(stage.width, stage.height);
 	}
@@ -127,6 +131,12 @@ class GameState extends Base2dState
 
 			// TODO add to config + multiplier
 			gameModel.score.set(gameModel.score.value + 50);
+		});
+		board.onNoMoreMoves(function(){
+			gameDialog.openNoMoreMovesDialog();
+		});
+		board.onTurnEnd(function(){
+			gameDialog.closeNoMoreMovesDialog();
 		});
 	}
 

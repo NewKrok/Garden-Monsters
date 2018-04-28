@@ -17,12 +17,10 @@ class HelpsUI extends Layers
 	{
 		super(parent);
 
-		var back = new Bitmap(Res.image.game.ui.long_ui_panel.toTile(), this);
-
 		var label = new Text(Fonts.DEFAULT_M, this);
 		label.textColor = 0xFFBF00;
 		label.textAlign = Align.Center;
-		label.x = back.tile.width / 2 + 2;
+		//label.x = back.tile.width / 2 + 2;
 		label.y = 10;
 		Language.registerTextHolder(cast label, "helps");
 	}

@@ -4,6 +4,8 @@
 		"goals": "CÉLOK",
 		"helps": "SEGÍTSÉG",
 		"done": "KÉSZ",
-		"score": "PONT"
+		"score": "PONT",
+		"no_more_moves": "nincs több lépés",
+		"shuffle": "KEVERÉS"
 	}
 }

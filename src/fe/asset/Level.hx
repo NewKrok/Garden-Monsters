@@ -1,4 +1,5 @@
 package fe.asset;
+
 import fe.game.Elem.ElemType;
 
 /**
