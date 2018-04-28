@@ -4,6 +4,7 @@ import fe.Layout;
 import fe.game.Background;
 import fe.game.Board;
 import fe.game.EffectHandler;
+import fe.game.Elem;
 import fe.game.Elem.ElemType;
 import fe.game.GameModel;
 import fe.asset.Level;
@@ -113,31 +114,43 @@ class GameState extends Base2dState
 			);
 		}
 
-		board = new Board(
-			gameContainer,
-			interactiveArea,
-			effectHandler,
-			skillHandler,
-			data.availableElemTypes,
-			BoardHelper.createMap(data.rawMap, data.availableElemTypes)
-		);
+		createMap(data.rawMap, data.availableElemTypes, function(map)
+		{
+			board = new Board(
+				gameContainer,
+				interactiveArea,
+				effectHandler,
+				skillHandler,
+				data.availableElemTypes,
+				map
+			);
 
-		board.onSuccessfulSwap(function(){
-			gameModel.remainingMoves.set(gameModel.remainingMoves.value - 1);
-		});
-		board.onElemCollect(function(e){
-			if (gameModel.elemGoals.exists(e))
-				gameModel.elemGoals.get(e).collected.set(gameModel.elemGoals.get(e).collected.value + 1);
+			board.onSuccessfulSwap(function(){
+				gameModel.remainingMoves.set(gameModel.remainingMoves.value - 1);
+			});
+			board.onElemCollect(function(e){
+				if (gameModel.elemGoals.exists(e))
+					gameModel.elemGoals.get(e).collected.set(gameModel.elemGoals.get(e).collected.value + 1);
 
-			// TODO add to config + multiplier
-			gameModel.score.set(gameModel.score.value + 50);
+				// TODO add to config + multiplier
+				gameModel.score.set(gameModel.score.value + 50);
+			});
+			board.onNoMoreMoves(function(){
+				gameDialog.openNoMoreMovesDialog();
+			});
+			board.onTurnEnd(function(){
+				gameDialog.closeNoMoreMovesDialog();
+			});
 		});
-		board.onNoMoreMoves(function(){
-			gameDialog.openNoMoreMovesDialog();
-		});
-		board.onTurnEnd(function(){
-			gameDialog.closeNoMoreMovesDialog();
-		});
+	}
+
+	function createMap(rawMap:Array<Array<Int>>, availableElemTypes:Array<ElemType> = null, onComplete:Array<Array<Elem>>->Void):Void
+	{
+		var map = BoardHelper.createMap(rawMap, availableElemTypes);
+
+		var mapData = BoardHelper.analyzeMap(map);
+		if (mapData.matches.length > 0 || mapData.movePossibilities.length == 0) createMap(rawMap, availableElemTypes, onComplete);
+		else onComplete(map);
 	}
 
 	override public function update(delta:Float)
