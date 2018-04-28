@@ -10,6 +10,7 @@ import hpp.util.GeomUtil.SimplePoint;
 import hxd.Res;
 import motion.Actuate;
 import motion.MotionPath;
+import motion.easing.Linear;
 import motion.easing.Quad;
 
 /**
@@ -19,8 +20,12 @@ import motion.easing.Quad;
 class EffectHandler
 {
 	static public inline var EXPLODING_EFFECT_DURATION:Float = 1;
+	static public inline var EXPLODING_SPARK_EFFECT_DURATION:Float = .5;
 	static public inline var ICE_BREAK_EFFECT_DURATION:Float = 1;
 	static public inline var SPLASH_EFFECT_DURATION:Float = .6;
+	static public inline var BOMB_EFFECT_DURATION:Float = .2;
+	static public inline var VORTEX_EFFECT_START_DURATION:Float = .3;
+	static public inline var VORTEX_EFFECT_FINISH_DURATION:Float = .7;
 	static public inline var LIGHT_FOCUS_EFFECT_DURATION:Float = 1;
 
 	public var view(default, null):Layers;
@@ -30,6 +35,71 @@ class EffectHandler
 	public function new()
 	{
 		particles = new Particles(view = new Layers());
+	}
+
+	public function addBombEffect(x:Float, y:Float):Void
+	{
+		var image:Bitmap = new Bitmap(Res.image.game.effect.bomb.toTile(), view);
+		image.x = x;
+		image.y = y - 10;
+		image.setScale(AppConfig.GAME_BITMAP_SCALE);
+
+		var tile:Tile = image.tile;
+		tile.dx = cast -tile.width / 2;
+		tile.dy = cast -tile.height / 2;
+
+		Actuate.tween(image, BOMB_EFFECT_DURATION, {
+			scaleX: AppConfig.GAME_BITMAP_SCALE * 1.1, scaleY: AppConfig.GAME_BITMAP_SCALE * 1.1
+		}).ease(Linear.easeNone).onUpdate(function(){
+			image.setScale(image.scaleX);
+		}).onComplete(function(){
+			Actuate.tween(image, BOMB_EFFECT_DURATION, {
+				scaleX: AppConfig.GAME_BITMAP_SCALE * .8, scaleY: AppConfig.GAME_BITMAP_SCALE * .8
+			}).ease(Linear.easeNone).onUpdate(function(){
+				image.setScale(image.scaleX);
+			}).onComplete(function(){
+				addExplosionLight(x, y, Res.image.game.effect.explosion.toTile());
+				addExplosionSparkEffect(x, y, Res.image.game.effect.explosion_spark.toTexture());
+				Actuate.tween(image, BOMB_EFFECT_DURATION, {
+					scaleX: AppConfig.GAME_BITMAP_SCALE * 1.3, scaleY: AppConfig.GAME_BITMAP_SCALE * 1.3, alpha: 0
+				}).ease(Linear.easeNone).onUpdate(function(){
+					image.setScale(image.scaleX);
+				}).onComplete(function(){
+					removeBitmap(image);
+				});
+			});
+		});
+	}
+
+	public function addVortexEffect(x:Float, y:Float):Void
+	{
+		var image:Bitmap = new Bitmap(Res.image.game.effect.vortex.toTile(), view);
+		image.x = x;
+		image.y = y - 10;
+		image.setScale(AppConfig.GAME_BITMAP_SCALE * .4);
+
+		var tile:Tile = image.tile;
+		tile.dx = cast -tile.width / 2;
+		tile.dy = cast -tile.height / 2;
+
+		Actuate.tween(image, VORTEX_EFFECT_START_DURATION, {
+			scaleX: AppConfig.GAME_BITMAP_SCALE * 1.4,
+			scaleY: AppConfig.GAME_BITMAP_SCALE * 1.4,
+			rotation: Math.PI * 2
+		}).ease(Linear.easeNone).onUpdate(function(){
+			image.setScale(image.scaleX);
+		}).onComplete(function(){
+			Actuate.tween(image, VORTEX_EFFECT_FINISH_DURATION, {
+				scaleX: AppConfig.GAME_BITMAP_SCALE * .8,
+				scaleY: AppConfig.GAME_BITMAP_SCALE * .8,
+				alpha: 0,
+				rotation: Math.PI * 4
+			}).ease(Linear.easeNone).onUpdate(function(){
+				image.setScale(image.scaleX);
+			}).onComplete(function(){
+				removeBitmap(image);
+			});
+		});
 	}
 
 	public function addMonsterMatchEffect(x:Float, y:Float):Void
@@ -129,6 +199,34 @@ class EffectHandler
 		particles.addGroup(g);
 
 		Actuate.timer(EXPLODING_EFFECT_DURATION).onComplete(function() {
+			removeEffect(g);
+		});
+	}
+
+	function addExplosionSparkEffect(x:Float, y:Float, texture:Texture):Void
+	{
+		var g = new ParticleGroup(particles);
+
+		g.sizeRand = .2;
+		g.life = EXPLODING_SPARK_EFFECT_DURATION / 2 + .1;
+		g.speed = 200;
+		g.emitDelay = 0;
+		g.nparts = 20;
+		g.emitMode = PartEmitMode.Point;
+		g.emitDist = 200;
+		g.emitLoop = false;
+		g.speedRand = .5;
+		g.fadeIn = 0;
+		g.fadeOut = .5;
+		g.rotSpeed = Math.PI / 5;
+		g.rotSpeedRand = Math.PI / 5;
+		g.texture = texture;
+		g.dx = cast x;
+		g.dy = cast y;
+
+		particles.addGroup(g);
+
+		Actuate.timer(EXPLODING_SPARK_EFFECT_DURATION).onComplete(function() {
 			removeEffect(g);
 		});
 	}

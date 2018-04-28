@@ -413,6 +413,11 @@ class BoardHelper
 	{
 		return type != ElemType.Empty && type != ElemType.Blocker && type != ElemType.None;
 	}
+
+	static public function isFruitElem(elem:Elem):Bool
+	{
+		return elem != null && elem.type.toInt() > 7;
+	}
 }
 
 typedef MapData = {

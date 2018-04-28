@@ -58,63 +58,90 @@ class SkillHandler
 		var matchClone = match.concat([]);
 		while (type == ElemType.Elem6) type = cast(1 + Math.floor(Math.random() * 7));
 
-		for (i in 0...match.length - 2)
+		if (BoardHelper.isFruitElem(match[0]))
 		{
 			var selectedElem = matchClone.random();
-			matchClone.remove(selectedElem);
 
-			switch(type)
+			if (match.length < 4) longestSkillTime = .2;
+			else if (match.length == 4)
 			{
-				case ElemType.Elem1:
-					removeElemByElem(
-						getRandomNearbyNotMatchedPlayableElem(match),
-						selectedElem,
-						effectHandler.addElem1StartEffect,
-						effectHandler.addElem1ActivateEffect
-					);
+				longestSkillTime = .5;
+				removeNearbyElemsByElem(
+					selectedElem,
+					effectHandler.addBombEffect,
+					effectHandler.addMonsterMatchEffect
+				);
+			}
+			else if (match.length > 4)
+			{
+				longestSkillTime = .4;
+				removeAllSameTypeElemsByElem(
+					selectedElem,
+					effectHandler.addVortexEffect,
+					effectHandler.addMonsterMatchEffect
+				);
+			}
+		}
+		else
+		{
+			for (i in 0...match.length - 2)
+			{
+				var selectedElem = matchClone.random();
+				matchClone.remove(selectedElem);
 
-				case ElemType.Elem2:
-					freezeElemByElem(
-						getRandomNearbyNotMatchedPlayableElem(match),
-						selectedElem,
-						effectHandler.addElem2StartEffect,
-						effectHandler.addElem2ActivateEffect
-					);
+				switch(type)
+				{
+					case ElemType.Elem1:
+						removeElemByElem(
+							getRandomNearbyNotMatchedPlayableElem(match),
+							selectedElem,
+							effectHandler.addElem1StartEffect,
+							effectHandler.addElem1ActivateEffect
+						);
 
-				case ElemType.Elem3:
-					changeElemTypeByElem(
-						getRandomNearbyNotMatchedPlayableElem(match),
-						selectedElem,
-						effectHandler.addElem3StartEffect,
-						effectHandler.addElem3ActivateEffect
-					);
+					case ElemType.Elem2:
+						freezeElemByElem(
+							getRandomNearbyNotMatchedPlayableElem(match),
+							selectedElem,
+							effectHandler.addElem2StartEffect,
+							effectHandler.addElem2ActivateEffect
+						);
 
-				case ElemType.Elem4:
-					shiftRow(
-						getRandomNearbyNotMatchedPlayableElem(match),
-						selectedElem,
-						effectHandler.addElem4StartEffect,
-						effectHandler.addElem4ActivateEffect
-					);
+					case ElemType.Elem3:
+						changeElemTypeByElem(
+							getRandomNearbyNotMatchedPlayableElem(match),
+							selectedElem,
+							effectHandler.addElem3StartEffect,
+							effectHandler.addElem3ActivateEffect
+						);
 
-				case ElemType.Elem5:
-					removeRandomElemByElem(
-						getRandomNotMatchedPlayableElem(),
-						selectedElem,
-						effectHandler.addElem5StartEffect,
-						effectHandler.addElem5ActivateEffect
-					);
+					case ElemType.Elem4:
+						shiftRow(
+							getRandomNearbyNotMatchedPlayableElem(match),
+							selectedElem,
+							effectHandler.addElem4StartEffect,
+							effectHandler.addElem4ActivateEffect
+						);
 
-				case ElemType.Elem7:
-					swapRandomElemsByElem(
-						getRandomNotMatchedPlayableElem(),
-						getRandomNotMatchedPlayableElem(),
-						selectedElem,
-						effectHandler.addElem7StartEffect,
-						effectHandler.addElem7Effect
-					);
+					case ElemType.Elem5:
+						removeRandomElemByElem(
+							getRandomNotMatchedPlayableElem(),
+							selectedElem,
+							effectHandler.addElem5StartEffect,
+							effectHandler.addElem5ActivateEffect
+						);
 
-				case _: longestSkillTime = .2;
+					case ElemType.Elem7:
+						swapRandomElemsByElem(
+							getRandomNotMatchedPlayableElem(),
+							getRandomNotMatchedPlayableElem(),
+							selectedElem,
+							effectHandler.addElem7StartEffect,
+							effectHandler.addElem7Effect
+						);
+
+					case _: longestSkillTime = .2;
+				}
 			}
 		}
 
@@ -181,6 +208,84 @@ class SkillHandler
 			if (m.indexOf(e) > -1) return false;
 
 		return true;
+	}
+
+	function removeNearbyElemsByElem(triggerElem:Elem, startEffect:Float->Float->Void, activateEffect:Float->Float->Void)
+	{
+		var nearbyElems:Array<SimplePoint> = [
+			{ x: -1, y: -1 }, { x: -1, y: 0 }, { x: -1, y: 1 },
+			{ x: 0,  y: -1 }, 				   { x: 0,  y: 1 },
+			{ x: 1,  y: -1 }, { x: 1,  y: 0 }, { x: 1,  y: 1 }
+		];
+
+		if (startEffect != null) startEffect(triggerElem.graphic.x, triggerElem.graphic.y);
+
+		Actuate.timer(.5).onComplete(function(){
+			for (d in nearbyElems)
+			{
+				if (map[cast triggerElem.indexY + d.y] == null) continue;
+
+				var selectedElem = map[cast triggerElem.indexY + d.y][cast triggerElem.indexX + d.x];
+
+				if (
+					selectedElem != null
+					&& selectedElem.type != ElemType.Blocker
+					&& selectedElem.type != ElemType.Empty
+					&& selectedElem.type != ElemType.None
+					&& isNotMatchedElem(selectedElem)
+				)
+				{
+					onElemCollectCallback(selectedElem.type);
+					activateEffect(selectedElem.graphic.x, selectedElem.graphic.y);
+					map[selectedElem.indexY][selectedElem.indexX] = null;
+					selectedElem.graphic.remove();
+					selectedElem = null;
+				}
+			}
+		});
+	}
+
+	function removeAllSameTypeElemsByElem(triggerElem:Elem, startEffect:Float->Float->Void, activateEffect:Float->Float->Void)
+	{
+		for (row in map)
+			for (e in row)
+			{
+				if (e == null) continue;
+
+				if (
+					e.type == triggerElem.type
+					&& isNotMatchedElem(e)
+				)
+				{
+					var clone = e.clone();
+					container.addChild(clone.graphic);
+					startEffect(clone.graphic.x, clone.graphic.y);
+
+					map[e.indexY][e.indexX] = null;
+					e.graphic.remove();
+					e = null;
+
+					Actuate.tween(clone.graphic, .2, {
+						scaleX: .8,
+						scaleY: .8,
+					}).ease(Quad.easeOut).onUpdate(function() {
+						clone.graphic.scaleY = clone.graphic.scaleY;
+					}).onComplete(function() {
+						Actuate.tween(clone.graphic, .4, {
+							scaleX: 1.2,
+							scaleY: 1.2,
+							alpha: 0
+						}).ease(Quad.easeOut).onUpdate(function() {
+							clone.graphic.scaleY = clone.graphic.scaleY;
+						}).onComplete(function() {
+							onElemCollectCallback(clone.type);
+							activateEffect(clone.graphic.x, clone.graphic.y);
+							clone.graphic.remove();
+							clone = null;
+						});
+					});
+				}
+			}
 	}
 
 	function removeElemByElem(target:Elem, triggerElem:Elem, startEffect:Float->Float->Void, activateEffect:Float->Float->Void)
