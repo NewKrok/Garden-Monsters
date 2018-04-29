@@ -11,11 +11,15 @@ import tink.state.State;
 class GameModel
 {
 	public var remainingMoves:State<UInt> = new State(0);
-	public var starRequirements:Array<UInt> = null;
 	public var elemGoals:Map<ElemType, ElemGoalData> = new Map<ElemType, ElemGoalData>();
 	public var score:State<UInt> = new State(0);
+	public var playersBestScore:State<UInt> = new State(0);
+	public var isPossibleToPlay:State<Bool> = new State(false);
 
 	public var stars:Observable<UInt>;
+
+	public var starRequirements:Array<UInt> = null;
+	public var levelId:UInt = 0;
 
 	public function new()
 	{

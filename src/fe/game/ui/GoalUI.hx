@@ -61,7 +61,7 @@ class GoalUI extends Layers
 			infoTextBack.y = back.getSize().height - infoTextBack.getSize().height / 2 - 44;
 
 			label.x = infoTextBack.x + infoTextBack.getSize().width / 2 - label.textWidth / 2;
-			label.y = infoTextBack.y + 5;
+			label.y = infoTextBack.y + 3;
 
 			goals.isVertical = true;
 			goals.horizontalSpacing = 0;

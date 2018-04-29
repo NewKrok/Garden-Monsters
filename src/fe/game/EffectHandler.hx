@@ -209,7 +209,7 @@ class EffectHandler
 
 		g.sizeRand = .2;
 		g.life = EXPLODING_SPARK_EFFECT_DURATION / 2 + .1;
-		g.speed = 200;
+		g.speed = 100;
 		g.emitDelay = 0;
 		g.nparts = 20;
 		g.emitMode = PartEmitMode.Point;
@@ -220,6 +220,7 @@ class EffectHandler
 		g.fadeOut = .5;
 		g.rotSpeed = Math.PI / 5;
 		g.rotSpeedRand = Math.PI / 5;
+		g.sizeIncr = 2;
 		g.texture = texture;
 		g.dx = cast x;
 		g.dy = cast y;

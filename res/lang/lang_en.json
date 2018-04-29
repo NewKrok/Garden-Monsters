@@ -1,11 +1,13 @@
 {
 	"h": {
 		"moves": "MOVES",
-		"goals": "GOALS",
+		"goals": "Goals",
 		"helps": "HELP",
 		"done": "DONE",
-		"score": "SCORE",
+		"score": "Score",
 		"no_more_moves": "no more moves",
-		"shuffle": "SHUFFLE"
+		"shuffle": "SHUFFLE",
+		"level_num": "Level ${level}",
+		"your_best": "Your Best Score"
 	}
 }

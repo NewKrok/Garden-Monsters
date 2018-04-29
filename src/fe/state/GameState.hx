@@ -1,24 +1,24 @@
 package fe.state;
 
 import fe.Layout;
+import fe.asset.Level;
 import fe.game.Background;
 import fe.game.Board;
 import fe.game.EffectHandler;
 import fe.game.Elem;
 import fe.game.Elem.ElemType;
 import fe.game.GameModel;
-import fe.asset.Level;
 import fe.game.SkillHandler;
 import fe.game.dialog.GameDialog;
 import fe.game.ui.GameUI;
 import fe.game.util.BoardHelper;
-import h2d.Bitmap;
 import h2d.Interactive;
 import h2d.Layers;
 import haxe.Timer;
 import hpp.heaps.Base2dState;
 import hxd.Cursor;
 import hxd.Res;
+import hxd.res.Sound;
 import motion.Actuate;
 import tink.state.State;
 
@@ -42,14 +42,20 @@ class GameState extends Base2dState
 	var layout:Layout;
 
 	var now:Float;
-
 	var isPaused:Bool;
 
 	var board:Board;
 	var boardCreationStartTime:Float = 0;
 
+	var backgroundLoopMusic:Sound;
+
 	override function build()
 	{
+		backgroundLoopMusic = if (Sound.supportedFormat(Mp3) || Sound.supportedFormat(OggVorbis)) Res.sound.game_loop else null;
+		backgroundLoopMusic.getData().load(function(){
+			backgroundLoopMusic.play(true, AppConfig.MUSIC_VOLUME, AppConfig.CHANNEL_GROUP_MUSIC);
+		});
+
 		gameModel = new GameModel();
 
 		interactiveArea = new Interactive(stage.width, stage.height, stage);
@@ -64,7 +70,8 @@ class GameState extends Base2dState
 
 		//createRandomBoard(function(){ trace("Start Game!"); });
 
-		loadLevel(Level.getLevelData(0));
+		gameModel.levelId = 0;
+		loadLevel(Level.getLevelData(gameModel.levelId));
 
 		gameUI = new GameUI(stage, gameModel);
 		gameDialog = new GameDialog(stage, gameModel);
@@ -78,6 +85,15 @@ class GameState extends Base2dState
 			gameUI,
 			gameDialog
 		);
+
+		gameModel.isPossibleToPlay.set(false);
+		gameDialog.openGoalsDialog();
+		Actuate.timer(3).onComplete(function()
+		{
+			gameModel.isPossibleToPlay.set(true);
+			gameDialog.closeGoalsDialog();
+		});
+
 		onStageResize(stage.width, stage.height);
 	}
 
@@ -91,7 +107,7 @@ class GameState extends Base2dState
 			Timer.delay(function(){ createRandomBoard(onComplete); }, 200);
 		else
 		{
-			board = new Board(gameContainer, interactiveArea, effectHandler, skillHandler, availableElemTypes, map);
+			board = new Board(gameContainer, interactiveArea, effectHandler, skillHandler, availableElemTypes, gameModel.isPossibleToPlay, map);
 
 			trace("Board created, time: " + (Date.now().getTime() - boardCreationStartTime) + "ms, possibilities: " + board.foundPossibilities.length + ", match: " + board.foundMatch.length);
 			onComplete();
@@ -122,11 +138,13 @@ class GameState extends Base2dState
 				effectHandler,
 				skillHandler,
 				data.availableElemTypes,
+				gameModel.isPossibleToPlay,
 				map
 			);
 
 			board.onSuccessfulSwap(function(){
 				gameModel.remainingMoves.set(gameModel.remainingMoves.value - 1);
+				if (gameModel.remainingMoves.value == 0) gameModel.isPossibleToPlay.set(false);
 			});
 			board.onElemCollect(function(e){
 				if (gameModel.elemGoals.exists(e))

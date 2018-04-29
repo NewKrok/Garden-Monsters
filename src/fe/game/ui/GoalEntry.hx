@@ -23,7 +23,7 @@ class GoalEntry extends Layers
 	var maxCount:UInt;
 	var isChangedToDone:Bool;
 
-	public function new(parent:Sprite, elemType:ElemType, maxCount:UInt, collectedCount:Observable<UInt>)
+	public function new(parent:Sprite, elemType:ElemType, maxCount:UInt, collectedCount:Observable<UInt>, isPreview:Bool = false)
 	{
 		super(parent);
 
@@ -40,26 +40,29 @@ class GoalEntry extends Layers
 		elem.x = infoBack.getSize().width / 2;
 
 		label = new Text(Fonts.DEFAULT_M, this);
-		label.text = '0/0';
+		label.text = isPreview ? Std.string(maxCount) : '0/0';
 		label.textColor = 0xFFFFFF;
 		label.textAlign = Align.Center;
 		label.x = infoBack.getSize().width / 2 + 2;
 		label.y = -2;
 
-		collectedCount.bind(function(e:UInt)
+		if (!isPreview)
 		{
-			if (e >= maxCount)
+			collectedCount.bind(function(e:UInt)
 			{
-				if (!isChangedToDone)
+				if (e >= maxCount)
 				{
-					isChangedToDone = true;
-					label.textColor = 0xFFFF00;
-					label.y = 0;
-					Language.registerTextHolder(cast label, "done");
+					if (!isChangedToDone)
+					{
+						isChangedToDone = true;
+						label.textColor = 0xFFFF00;
+						label.y = 0;
+						Language.registerTextHolder(cast label, "done");
+					}
 				}
-			}
-			else label.text = '$e/$maxCount';
-		});
+				else label.text = '$e/$maxCount';
+			});
+		}
 	}
 
 	function makeGraphic(tile:Tile):Bitmap

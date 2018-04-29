@@ -1,11 +1,13 @@
 {
 	"h": {
 		"moves": "LÉPÉS",
-		"goals": "CÉLOK",
+		"goals": "Célok",
 		"helps": "SEGÍTSÉG",
 		"done": "KÉSZ",
-		"score": "PONT",
+		"score": "Pont",
 		"no_more_moves": "nincs több lépés",
-		"shuffle": "KEVERÉS"
+		"shuffle": "KEVERÉS",
+		"level_num": "Szint ${level}",
+		"your_best": "Legjobb Eredményed"
 	}
 }

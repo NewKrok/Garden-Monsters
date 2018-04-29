@@ -17,6 +17,7 @@ import motion.Actuate;
 import motion.easing.Linear;
 import motion.easing.Quad;
 import motion.easing.Quart;
+import tink.state.Observable;
 
 using hpp.util.ArrayUtil;
 
@@ -52,6 +53,7 @@ class Board
 	var dragStartPoint:SimplePoint = { x: 0, y: 0 };
 	var draggedElement:Elem;
 	var focusElement:Elem;
+	var isPossibleToPlay:Observable<Bool>;
 
 	var showHelpTimer:Dynamic;
 
@@ -66,6 +68,7 @@ class Board
 		effectHandler:EffectHandler,
 		skillHandler:SkillHandler,
 		availableElemTypes:Array<ElemType>,
+		isPossibleToPlay:Observable<Bool>,
 		map:Array<Array<Elem>>
 	){
 		this.parent = parent;
@@ -73,6 +76,7 @@ class Board
 		this.effectHandler = effectHandler;
 		this.skillHandler = skillHandler;
 		this.availableElemTypes = availableElemTypes;
+		this.isPossibleToPlay = isPossibleToPlay;
 		this.map = map;
 
 		mask = new Mask(100, 100, parent);
@@ -121,9 +125,13 @@ class Board
 
 	function createInteractive()
 	{
+		isPossibleToPlay.bind(function(v){
+			if (!v) interactiveArea.cursor = Cursor.Default;
+		});
+
 		interactiveArea.onPush = function(e:Event)
 		{
-			if (isShuffleInProgress) return;
+			if (isShuffleInProgress || !isPossibleToPlay.value) return;
 
 			draggedElement = getElemByPosition({
 				x: e.relX,
@@ -138,11 +146,16 @@ class Board
 			else focusElement = null;
 		};
 
-		interactiveArea.onRelease = function(_) { swapElemRequest(); };
+		interactiveArea.onRelease = function(_)
+		{
+			if (isShuffleInProgress || !isPossibleToPlay.value) return;
+
+			swapElemRequest();
+		};
 
 		interactiveArea.onMove = function(e:Event)
 		{
-			if (isShuffleInProgress) return;
+			if (isShuffleInProgress || !isPossibleToPlay.value) return;
 
 			if (isDragging)
 			{
