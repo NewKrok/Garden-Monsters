@@ -34,7 +34,8 @@ class Main extends Base2dApp
 
 		//TestBoard.test();
 
-		changeState(GameState);
+		//changeState(GameState);
+		changeState(MenuState);
 	}
 
 	static function main()

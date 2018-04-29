@@ -1,7 +1,8 @@
 package fe.game.ui;
+import fe.game.GameLayout;
 
 import fe.AppConfig;
-import fe.Layout.LayoutMode;
+import fe.game.GameLayout.LayoutMode;
 import fe.asset.Fonts;
 import fe.game.Elem.ElemType;
 import fe.game.GameModel.ElemGoalData;

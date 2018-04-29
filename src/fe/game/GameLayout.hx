@@ -1,6 +1,5 @@
-package fe;
+package fe.game;
 
-import fe.Layout.LayoutMode;
 import fe.game.Background;
 import fe.game.Elem;
 import fe.game.dialog.GameDialog;
@@ -13,7 +12,7 @@ import hpp.heaps.Base2dStage;
  * ...
  * @author Krisztian Somoracz
  */
-class Layout
+class GameLayout
 {
 	static var gameContainerDefaultWidth = Elem.SIZE * 8;
 	static var gameContainerDefaultHeight = Elem.SIZE * 8;
@@ -70,7 +69,7 @@ class Layout
 			gameUI.setScale(widthRatio);
 			gameDialog.setScale(widthRatio);
 
-			gameContainer.setScale((widthRatio * gameContainerDefaultWidth) / Layout.gameContainerDefaultWidth);
+			gameContainer.setScale((widthRatio * gameContainerDefaultWidth) / GameLayout.gameContainerDefaultWidth);
 			gameContainer.x = stage.width / 2 - gameContainerDefaultWidth * widthRatio / 2;
 			gameContainer.y = gameUI.y + gameContainerPortraitTopPadding * widthRatio;
 		}

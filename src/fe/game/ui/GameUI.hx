@@ -1,6 +1,7 @@
 package fe.game.ui;
+import fe.game.GameLayout;
 
-import fe.Layout.LayoutMode;
+import fe.game.GameLayout.LayoutMode;
 import fe.game.GameModel;
 import h2d.Layers;
 import h2d.Sprite;

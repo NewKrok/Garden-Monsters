@@ -1,6 +1,6 @@
 package fe.state;
 
-import fe.Layout;
+import fe.game.GameLayout;
 import fe.asset.Level;
 import fe.game.Background;
 import fe.game.Board;
@@ -39,7 +39,7 @@ class GameState extends Base2dState
 	var effectHandler:EffectHandler;
 	var skillHandler:SkillHandler;
 
-	var layout:Layout;
+	var layout:GameLayout;
 
 	var now:Float;
 	var isPaused:Bool;
@@ -52,9 +52,10 @@ class GameState extends Base2dState
 	override function build()
 	{
 		backgroundLoopMusic = if (Sound.supportedFormat(Mp3) || Sound.supportedFormat(OggVorbis)) Res.sound.game_loop else null;
-		backgroundLoopMusic.getData().load(function(){
-			backgroundLoopMusic.play(true, AppConfig.MUSIC_VOLUME, AppConfig.CHANNEL_GROUP_MUSIC);
-		});
+		if (backgroundLoopMusic != null)
+			backgroundLoopMusic.getData().load(function(){
+				backgroundLoopMusic.play(true, AppConfig.MUSIC_VOLUME, AppConfig.CHANNEL_GROUP_MUSIC);
+			});
 
 		gameModel = new GameModel();
 
@@ -77,7 +78,7 @@ class GameState extends Base2dState
 		gameDialog = new GameDialog(stage, gameModel);
 		gameContainer.addChild(effectHandler.view);
 
-		layout = new Layout(
+		layout = new GameLayout(
 			stage,
 			background,
 			gameContainer,
