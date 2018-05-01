@@ -22,11 +22,13 @@ class NoMoreMovesDialog extends BaseDialog
 		content.horizontalAlign = FlowAlign.Middle;
 
 		var title = new Text(Fonts.DEFAULT_M, content);
+		title.smooth = true;
 		title.textColor = 0xFFBF00;
 		title.textAlign = Align.Left;
 		Language.registerTextHolder(cast title, "no_more_moves");
 
 		var description = new Text(Fonts.DEFAULT_XL, content);
+		description.smooth = true;
 		description.textColor = 0xFFFFFF;
 		description.textAlign = Align.Left;
 		Language.registerTextHolder(cast description, "shuffle");

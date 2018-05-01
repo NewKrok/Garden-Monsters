@@ -28,6 +28,7 @@ class ScoreUI extends Layers
 		back.setScale(AppConfig.GAME_BITMAP_SCALE);
 
 		var label = new Text(Fonts.DEFAULT_M, this);
+		label.smooth = true;
 		label.textColor = 0xFFBF00;
 		label.textAlign = Align.Left;
 		label.x = 33;
@@ -35,6 +36,7 @@ class ScoreUI extends Layers
 		Language.registerTextHolder(cast label, "score");
 
 		var countText = new Text(Fonts.DEFAULT_L, this);
+		countText.smooth = true;
 		countText.text = Std.string(localScore);
 		countText.textColor = 0xFFFFFF;
 		countText.textAlign = Align.Left;

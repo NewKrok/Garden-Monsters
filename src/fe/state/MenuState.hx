@@ -1,11 +1,13 @@
 package fe.state;
 
 import fe.menu.MenuLayout;
+import fe.menu.ui.LevelButton;
 import h2d.Bitmap;
 import h2d.Interactive;
 import h2d.Layers;
 import hpp.heaps.Base2dState;
 import hpp.heaps.Base2dSubState;
+import hpp.heaps.HppG;
 import hpp.util.GeomUtil;
 import hxd.Event;
 import hxd.Res;
@@ -56,6 +58,36 @@ class MenuState extends Base2dState
 		backgroundBottom.smooth = true;
 		backgroundBottom.setScale(AppConfig.GAME_BITMAP_SCALE);
 		backgroundBottom.y = backgroundTop.getSize().height;
+
+		var levelButtonPoints:Array<SimplePoint> = [
+			{ x: 1729, y: 3858 },
+			{ x: 1270, y: 3603 },
+			{ x: 766, y: 3718 },
+			{ x: 317, y: 3556 },
+			{ x: 486, y: 3183 },
+			{ x: 982, y: 3155 },
+			{ x: 1250, y: 2832 },
+			{ x: 1628, y: 2543 },
+			{ x: 1788, y: 2110 },
+			{ x: 1330, y: 1896 },
+			{ x: 926, y: 2117 },
+			{ x: 567, y: 2363 },
+			{ x: 237, y: 2133 },
+			{ x: 290, y: 1659 },
+			{ x: 655, y: 1393 },
+			{ x: 1074, y: 1273 },
+			{ x: 1471, y: 1172 },
+			{ x: 1701, y: 815 },
+			{ x: 1552, y: 384 },
+			{ x: 1028, y: 71 }
+		];
+		var buttonPadding = 20;
+		for (i in 0...levelButtonPoints.length)
+		{
+			var levelButton = new LevelButton(menuContainer, i, startLevel);
+			levelButton.x = (levelButtonPoints[i].x + levelButton.getSize().width / 2 + buttonPadding) * AppConfig.GAME_BITMAP_SCALE;
+			levelButton.y = (levelButtonPoints[i].y + levelButton.getSize().height / 2 + buttonPadding) * AppConfig.GAME_BITMAP_SCALE;
+		}
 
 		interactiveArea.onPush = function(e:Event)
 		{
@@ -116,7 +148,11 @@ class MenuState extends Base2dState
 		onStageResize(0, 0);
 
 		menuContainer.y = -menuContainer.getSize().height + stage.height;
-		Actuate.timer(6).onComplete(function(){ changeState(GameState); });
+	}
+
+	function startLevel(levelId:UInt):Void
+	{
+		HppG.changeState(GameState, [levelId]);
 	}
 
 	function normalizeContainerY(baseY:Float):Float
@@ -125,13 +161,6 @@ class MenuState extends Base2dState
 		baseY = Math.min(baseY, 0);
 
 		return baseY;
-	}
-
-	function startGame()
-	{
-		playSubStateChangeSound();
-
-		changeState(GameState);
 	}
 
 	function openWelcomePage()

@@ -38,6 +38,7 @@ class GoalUI extends Layers
 		infoTextBack.setScale(AppConfig.GAME_BITMAP_SCALE);
 
 		label = new Text(Fonts.DEFAULT_M, this);
+		label.smooth = true;
 		label.textColor = 0xFFBF00;
 		label.textAlign = Align.Left;
 

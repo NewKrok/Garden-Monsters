@@ -40,6 +40,7 @@ class GoalEntry extends Layers
 		elem.x = infoBack.getSize().width / 2;
 
 		label = new Text(Fonts.DEFAULT_M, this);
+		label.smooth = true;
 		label.text = isPreview ? Std.string(maxCount) : '0/0';
 		label.textColor = 0xFFFFFF;
 		label.textAlign = Align.Center;

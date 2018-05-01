@@ -27,6 +27,7 @@ class MovesUI extends Layers
 		back.setScale(AppConfig.GAME_BITMAP_SCALE);
 
 		var countText = new Text(Fonts.DEFAULT_XXL, this);
+		countText.smooth = true;
 		countText.text = Std.string(remainingMoves.value);
 		countText.textColor = 0xFFBF00;
 		countText.textAlign = Align.Center;
@@ -34,6 +35,7 @@ class MovesUI extends Layers
 		countText.y = 30;
 
 		var label = new Text(Fonts.DEFAULT_M, this);
+		label.smooth = true;
 		label.textColor = 0xFFFFFF;
 		label.textAlign = Align.Center;
 		label.x = back.getSize().width / 2 + 2;

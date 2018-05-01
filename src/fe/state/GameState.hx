@@ -15,6 +15,7 @@ import fe.game.util.BoardHelper;
 import h2d.Interactive;
 import h2d.Layers;
 import haxe.Timer;
+import hpp.heaps.Base2dStage;
 import hpp.heaps.Base2dState;
 import hxd.Cursor;
 import hxd.Res;
@@ -48,6 +49,13 @@ class GameState extends Base2dState
 	var boardCreationStartTime:Float = 0;
 
 	var backgroundLoopMusic:Sound;
+
+	public function new(stage:Base2dStage, levelId:UInt)
+	{
+		super(stage);
+
+		trace('OPEN LEVEL $levelId');
+	}
 
 	override function build()
 	{

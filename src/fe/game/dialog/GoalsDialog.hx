@@ -42,12 +42,14 @@ class GoalsDialog extends BaseDialog
 		var header:Sprite = new Sprite(parent);
 
 		var levelText = new Text(Fonts.DEFAULT_L, header);
+		levelText.smooth = true;
 		levelText.textColor = 0xFFBF00;
 		levelText.textAlign = Align.Left;
 		levelText.y = 10;
 		Language.registerTextHolder(cast levelText, "level_num", ["${level}" => levelId]);
 
 		var goalsText = new Text(Fonts.DEFAULT_L, header);
+		goalsText.smooth = true;
 		goalsText.textColor = 0xFFBF00;
 		goalsText.textAlign = Align.Right;
 		goalsText.x = getSize().width - 90;
@@ -83,12 +85,14 @@ class GoalsDialog extends BaseDialog
 		footer.verticalAlign = FlowAlign.Middle;
 
 		var playersBestScoreLabel = new Text(Fonts.DEFAULT_M, footer);
+		playersBestScoreLabel.smooth = true;
 		playersBestScoreLabel.textColor = 0xFFBF00;
 		playersBestScoreLabel.textAlign = Align.Left;
 		playersBestScoreLabel.y = 10;
 		Language.registerTextHolder(cast playersBestScoreLabel, "your_best");
 
 		var playersBestScoreText = new Text(Fonts.DEFAULT_L, footer);
+		playersBestScoreText.smooth = true;
 		playersBestScoreText.textColor = 0xFFFFFF;
 		playersBestScoreText.textAlign = Align.Left;
 		playersBestScoreText.x = getSize().width - 90;

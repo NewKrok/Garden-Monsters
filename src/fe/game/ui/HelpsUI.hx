@@ -18,6 +18,7 @@ class HelpsUI extends Layers
 		super(parent);
 
 		var label = new Text(Fonts.DEFAULT_M, this);
+		label.smooth = true;
 		label.textColor = 0xFFBF00;
 		label.textAlign = Align.Center;
 		//label.x = back.tile.width / 2 + 2;
