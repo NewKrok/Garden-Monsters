@@ -17,6 +17,7 @@ import h2d.Layers;
 import haxe.Timer;
 import hpp.heaps.Base2dStage;
 import hpp.heaps.Base2dState;
+import hpp.heaps.HppG;
 import hxd.Cursor;
 import hxd.Res;
 import hxd.res.Sound;
@@ -52,9 +53,10 @@ class GameState extends Base2dState
 
 	public function new(stage:Base2dStage, levelId:UInt)
 	{
-		super(stage);
+		gameModel = new GameModel();
+		gameModel.levelId = levelId;
 
-		trace('OPEN LEVEL $levelId');
+		super(stage);
 	}
 
 	override function build()
@@ -64,8 +66,6 @@ class GameState extends Base2dState
 			backgroundLoopMusic.getData().load(function(){
 				backgroundLoopMusic.play(true, AppConfig.MUSIC_VOLUME, AppConfig.CHANNEL_GROUP_MUSIC);
 			});
-
-		gameModel = new GameModel();
 
 		interactiveArea = new Interactive(stage.width, stage.height, stage);
 		interactiveArea.cursor = Cursor.Default;
@@ -77,9 +77,6 @@ class GameState extends Base2dState
 
 		reset();
 
-		//createRandomBoard(function(){ trace("Start Game!"); });
-
-		gameModel.levelId = 0;
 		loadLevel(Level.getLevelData(gameModel.levelId));
 
 		gameUI = new GameUI(stage, gameModel);
@@ -167,6 +164,14 @@ class GameState extends Base2dState
 			});
 			board.onTurnEnd(function(){
 				gameDialog.closeNoMoreMovesDialog();
+
+				if (gameModel.remainingMoves.value == 0)
+				{
+					Actuate.timer(2).onComplete(function()
+					{
+						HppG.changeState(MenuState);
+					});
+				}
 			});
 		});
 	}
