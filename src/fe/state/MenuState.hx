@@ -13,8 +13,7 @@ import hxd.Event;
 import hxd.Res;
 import hxd.res.Sound;
 import hxd.Cursor;
-import fe.menu.substate.CampaignPage;
-import fe.menu.substate.SettingsPage;
+import fe.menu.substate.LevelPreview;
 import fe.menu.substate.WelcomePage;
 import motion.Actuate;
 import motion.easing.Linear;
@@ -27,11 +26,11 @@ class MenuState extends Base2dState
 	var layout:MenuLayout;
 
 	var welcomePage:WelcomePage;
-	var settingsPage:SettingsPage;
-	var campaignPage:CampaignPage;
+	var levelPreview:LevelPreview;
+
+	var levelButtons:Array<LevelButton>;
 
 	var backgroundLoopMusic:Sound;
-	var subStateChangeSound:Sound;
 
 	var isDragging:Bool = false;
 	var dragStartPoint:SimplePoint = { x: 0, y: 0 };
@@ -42,9 +41,6 @@ class MenuState extends Base2dState
 
 	override function build()
 	{
-		//backgroundLoopMusic = if (Sound.supportedFormat(Mp3)) Res.sound.Eerie_Cyber_World_Looping else null;
-		//subStateChangeSound = if (Sound.supportedFormat(Mp3)) Res.sound.UI_Quirky20 else null;
-
 		interactiveArea = new Interactive(stage.width, stage.height, stage);
 		interactiveArea.cursor = Cursor.Default;
 
@@ -82,15 +78,19 @@ class MenuState extends Base2dState
 			{ x: 1028, y: 71 }
 		];
 		var buttonPadding = 20;
+		levelButtons = [];
 		for (i in 0...levelButtonPoints.length)
 		{
-			var levelButton = new LevelButton(menuContainer, i, startLevel);
+			var levelButton = new LevelButton(menuContainer, i, startLevelRequest);
 			levelButton.x = (levelButtonPoints[i].x + levelButton.getSize().width / 2 + buttonPadding) * AppConfig.GAME_BITMAP_SCALE;
 			levelButton.y = (levelButtonPoints[i].y + levelButton.getSize().height / 2 + buttonPadding) * AppConfig.GAME_BITMAP_SCALE;
+			levelButtons.push(levelButton);
 		}
 
 		interactiveArea.onPush = function(e:Event)
 		{
+			if (activeSubState == welcomePage) return;
+
 			Actuate.stop(menuContainer);
 
 			isDragging = true;
@@ -135,8 +135,7 @@ class MenuState extends Base2dState
 		};
 
 		welcomePage = new WelcomePage();
-		settingsPage = new SettingsPage();
-		campaignPage = new CampaignPage();
+		levelPreview = new LevelPreview();
 
 		layout = new MenuLayout(
 			stage,
@@ -144,15 +143,48 @@ class MenuState extends Base2dState
 			interactiveArea
 		);
 
-		openSubState(welcomePage);
+		openWelcomePage();
+
 		onStageResize(0, 0);
 
 		menuContainer.y = -menuContainer.getSize().height + stage.height;
 	}
 
-	function startLevel(levelId:UInt):Void
+	function startLevelRequest(levelId:UInt):Void
 	{
-		HppG.changeState(GameState, [levelId]);
+		openLevelPreview(levelId);
+		//HppG.changeState(GameState, [levelId]);
+	}
+
+	function openWelcomePage():Void
+	{
+		openSubState(welcomePage);
+		interactiveArea.cursor = Cursor.Button;
+
+		for (b in levelButtons) b.isEnabled = false;
+
+		interactiveArea.onClick = function(e:Event)
+		{
+			if (activeSubState == welcomePage)
+			{
+				backgroundLoopMusic = if (Sound.supportedFormat(Mp3)) Res.sound.game_loop else null;
+				if (backgroundLoopMusic != null) backgroundLoopMusic.play(true, AppConfig.MUSIC_VOLUME, AppConfig.CHANNEL_GROUP_MUSIC);
+
+				interactiveArea.onClick = function(_){};
+				interactiveArea.cursor = Cursor.Default;
+
+				closeSubState();
+				for (b in levelButtons) b.isEnabled = true;
+			}
+		}
+	}
+
+	function openLevelPreview(levelId:UInt):Void
+	{
+		levelPreview.updateContent(levelId);
+		openSubState(levelPreview);
+
+		for (b in levelButtons) b.isEnabled = false;
 	}
 
 	function normalizeContainerY(baseY:Float):Float
@@ -161,33 +193,6 @@ class MenuState extends Base2dState
 		baseY = Math.min(baseY, 0);
 
 		return baseY;
-	}
-
-	function openWelcomePage()
-	{
-		playSubStateChangeSound();
-		openSubState(welcomePage);
-	}
-
-	function openSettingsPage()
-	{
-		playSubStateChangeSound();
-		openSubState(settingsPage);
-	}
-
-	function openCampaignPage()
-	{
-		playSubStateChangeSound();
-		openSubState(campaignPage);
-	}
-
-	override function onSubStateChanged(activeSubState:Base2dSubState):Void
-	{
-	}
-
-	function playSubStateChangeSound():Void
-	{
-		if (subStateChangeSound != null) subStateChangeSound.play();
 	}
 
 	override public function onStageResize(width:UInt, height:UInt)
@@ -223,9 +228,7 @@ class MenuState extends Base2dState
 	override public function dispose()
 	{
 		/*backgroundLoopMusic.stop();
-		backgroundLoopMusic.dispose();
-		subStateChangeSound.stop();
-		subStateChangeSound.dispose();*/
+		backgroundLoopMusic.dispose();*/
 
 		super.dispose();
 	}

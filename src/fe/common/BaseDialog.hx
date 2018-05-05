@@ -1,4 +1,4 @@
-package fe.game.dialog;
+package fe.common;
 
 import h2d.Bitmap;
 import h2d.Layers;

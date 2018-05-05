@@ -1,6 +1,7 @@
 package fe.game.dialog;
 
 import fe.asset.Fonts;
+import fe.common.BaseDialog;
 import fe.game.Elem.ElemType;
 import fe.game.GameModel.ElemGoalData;
 import fe.game.ui.GoalEntry;
@@ -22,7 +23,7 @@ class GoalsDialog extends BaseDialog
 {
 	public function new(parent, levelId:UInt, elemGoals:Map<ElemType, ElemGoalData>, playersBestScore:Observable<UInt>)
 	{
-		super(parent, Res.image.game.dialog.dialog_background_m.toTile(), { x: -5, y: -5 });
+		super(parent, Res.image.common.dialog.dialog_background_m.toTile(), { x: -5, y: -5 });
 
 		var content:Flow = new Flow(this);
 		content.isVertical = true;
@@ -61,7 +62,7 @@ class GoalsDialog extends BaseDialog
 	{
 		var container:Layers = new Layers(parent);
 
-		var back = new Bitmap(Res.image.game.dialog.start_dialog_goals_back.toTile(), container);
+		var back = new Bitmap(Res.image.game.ui.start_dialog_goals_back.toTile(), container);
 		back.smooth = true;
 		back.setScale(AppConfig.GAME_BITMAP_SCALE);
 
@@ -88,15 +89,12 @@ class GoalsDialog extends BaseDialog
 		playersBestScoreLabel.smooth = true;
 		playersBestScoreLabel.textColor = 0xFFBF00;
 		playersBestScoreLabel.textAlign = Align.Left;
-		playersBestScoreLabel.y = 10;
 		Language.registerTextHolder(cast playersBestScoreLabel, "your_best");
 
 		var playersBestScoreText = new Text(Fonts.DEFAULT_L, footer);
 		playersBestScoreText.smooth = true;
 		playersBestScoreText.textColor = 0xFFFFFF;
 		playersBestScoreText.textAlign = Align.Left;
-		playersBestScoreText.x = getSize().width - 90;
-		playersBestScoreText.y = 10;
 
 		playersBestScore.bind(function(v) {
 			playersBestScoreText.text = playersBestScore.value == 0 ? "N/A" : NumberUtil.formatNumber(v);

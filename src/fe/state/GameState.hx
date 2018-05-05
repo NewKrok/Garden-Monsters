@@ -61,7 +61,7 @@ class GameState extends Base2dState
 
 	override function build()
 	{
-		backgroundLoopMusic = if (Sound.supportedFormat(Mp3) || Sound.supportedFormat(OggVorbis)) Res.sound.game_loop else null;
+		backgroundLoopMusic = if (Sound.supportedFormat(Mp3)) Res.sound.game_loop else null;
 		if (backgroundLoopMusic != null)
 			backgroundLoopMusic.getData().load(function(){
 				backgroundLoopMusic.play(true, AppConfig.MUSIC_VOLUME, AppConfig.CHANNEL_GROUP_MUSIC);

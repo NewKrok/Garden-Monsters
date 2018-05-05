@@ -1,6 +1,7 @@
 package fe.game.dialog;
 
 import fe.asset.Fonts;
+import fe.common.BaseDialog;
 import h2d.Flow;
 import h2d.Text;
 import hpp.util.Language;
@@ -14,7 +15,7 @@ class NoMoreMovesDialog extends BaseDialog
 {
 	public function new(parent)
 	{
-		super(parent, Res.image.game.dialog.dialog_background_s.toTile(), { x: -5, y: 0 });
+		super(parent, Res.image.common.dialog.dialog_background_s.toTile(), { x: -5, y: 0 });
 
 		var content:Flow = new Flow(this);
 		content.isVertical = true;
