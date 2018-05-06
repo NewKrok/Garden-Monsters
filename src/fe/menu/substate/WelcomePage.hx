@@ -13,6 +13,9 @@ import hpp.heaps.Base2dSubState;
 import hpp.util.Language;
 import hxd.Res;
 import motion.Actuate;
+import motion.easing.Linear;
+import tink.CoreApi.Future;
+import tink.CoreApi.Noise;
 
 /**
  * ...
@@ -56,6 +59,17 @@ class WelcomePage extends Base2dSubState implements ScalebaleSubState
 		content.y = dialog.getSize().height / 2 - content.getSize().height / 2 - 5;
 
 		Actuate.timer(.2).onComplete(function() { dialog.open(); });
+		Actuate.tween(background, .5, { alpha: 1 });
+	}
+
+	public function closeRequest():Future<Noise>
+	{
+		var t = Future.trigger();
+
+		Actuate.tween(background, .5, { alpha: 0 }).ease(Linear.easeNone);
+		dialog.close().handle(function(){ t.trigger(Noise); });
+
+		return t.asFuture();
 	}
 
 	override public function onStageResize(width:Float, height:Float)

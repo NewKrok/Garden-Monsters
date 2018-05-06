@@ -15,6 +15,7 @@ import hpp.heaps.ui.BaseButton;
 import hpp.util.Language;
 import hxd.Res;
 import motion.Actuate;
+import motion.easing.Linear;
 import tink.state.Observable;
 
 /**
@@ -34,18 +35,18 @@ class StartLevelPage extends Base2dSubState implements ScalebaleSubState
 	var startButton:BaseButton;
 
 	var startRequest:Void->Void;
-	var closeRequest:Void->Void;
+	var closeRequestCallBack:Void->Void;
 	var selectedLevelId:Observable<UInt>;
 	var selectedRawMap:Observable<Array<Array<Int>>>;
 
 	public function new(
 		startRequest:Void->Void,
-		closeRequest:Void->Void,
+		closeRequestCallBack:Void->Void,
 		selectedLevelId:Observable<UInt>,
 		selectedRawMap:Observable<Array<Array<Int>>>
 	){
 		this.startRequest = startRequest;
-		this.closeRequest = closeRequest;
+		this.closeRequestCallBack = closeRequestCallBack;
 		this.selectedLevelId = selectedLevelId;
 		this.selectedRawMap = selectedRawMap;
 
@@ -70,7 +71,7 @@ class StartLevelPage extends Base2dSubState implements ScalebaleSubState
 		buildFooter(content);
 
 		closeButton = new BaseButton(dialogWrapper, {
-			onClick: function(_){ closeRequest(); },
+			onClick: closeRequest,
 			baseGraphic: Res.image.menu.ui.close_button.toTile(),
 			overGraphic: Res.image.menu.ui.close_button_over.toTile()
 		});
@@ -151,6 +152,21 @@ class StartLevelPage extends Base2dSubState implements ScalebaleSubState
 	{
 		onStageResize(HppG.stage2d.width, HppG.stage2d.height);
 		mapPreview.updateView();
+		dialog.open();
+
+		background.alpha = 0;
+		Actuate.tween(background, .5, { alpha: 1 }).ease(Linear.easeNone);
+		startButton.visible = true;
+		closeButton.visible = true;
+	}
+
+	public function closeRequest(_)
+	{
+		Actuate.tween(background, .5, { alpha: 0 }).ease(Linear.easeNone);
+		startButton.visible = false;
+		closeButton.visible = false;
+
+		dialog.close().handle(function(){ closeRequestCallBack(); });
 	}
 
 	public function setScale(v:Float):Void

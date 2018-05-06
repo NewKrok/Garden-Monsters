@@ -235,7 +235,13 @@ class Level
 
 	public static function getLevelData(id:UInt):LevelData
 	{
-		return data[id];
+		if (id < data.length) return data[id];
+		else return {
+			maxMovement: 0,
+			rawMap: [],
+			availableElemTypes: [],
+			starRequirements: []
+		};
 	}
 }
 

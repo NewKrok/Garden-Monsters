@@ -5,6 +5,8 @@ import h2d.Layers;
 import h2d.Tile;
 import hpp.util.GeomUtil.SimplePoint;
 import motion.Actuate;
+import tink.CoreApi.Future;
+import tink.CoreApi.Noise;
 
 /**
  * ...
@@ -40,11 +42,15 @@ class BaseDialog extends Layers
 		}).onUpdate(function(){ y = y; });
 	}
 
-	public function close():Void
+	public function close():Future<Noise>
 	{
+		var t = Future.trigger();
+
 		Actuate.tween(this, .5, {
 			alpha: 0,
 			y: defaultY - 50
-		}).onUpdate(function(){ y = y; }).onComplete(function(){ visible = false; });
+		}).onUpdate(function(){ y = y; }).onComplete(function(){ visible = false; t.trigger(Noise); });
+
+		return t.asFuture();
 	}
 }

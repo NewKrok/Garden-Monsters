@@ -180,10 +180,12 @@ class MenuState extends Base2dState
 		{
 			if (activeSubState == welcomePage)
 			{
-				backgroundLoopMusic = if (Sound.supportedFormat(Mp3)) Res.sound.game_loop else null;
-				if (backgroundLoopMusic != null) backgroundLoopMusic.play(true, AppConfig.MUSIC_VOLUME, AppConfig.CHANNEL_GROUP_MUSIC);
+				welcomePage.closeRequest().handle(function(){
+					backgroundLoopMusic = if (Sound.supportedFormat(Mp3)) Res.sound.game_loop else null;
+					if (backgroundLoopMusic != null) backgroundLoopMusic.play(true, AppConfig.MUSIC_VOLUME, AppConfig.CHANNEL_GROUP_MUSIC);
 
-				closeSubState();
+					closeSubState();
+				});
 			}
 		}
 	}

@@ -29,6 +29,8 @@ class MapPreview extends Sprite
 		back = new Bitmap(Res.image.menu.ui.preview_back.toTile(), this);
 		back.smooth = true;
 		back.setScale(AppConfig.GAME_BITMAP_SCALE);
+
+		updateView();
 	}
 
 	// TODO: why the blocks dispose after close substate???
