@@ -181,7 +181,7 @@ class GameState extends Base2dState
 		var map = BoardHelper.createMap(rawMap, availableElemTypes);
 
 		var mapData = BoardHelper.analyzeMap(map);
-		if (mapData.matches.length > 0 || mapData.movePossibilities.length == 0) createMap(rawMap, availableElemTypes, onComplete);
+		if (mapData.matches.length > 0 || mapData.movePossibilities.length < 2) createMap(rawMap, availableElemTypes, onComplete);
 		else onComplete(map);
 	}
 

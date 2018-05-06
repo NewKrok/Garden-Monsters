@@ -195,8 +195,8 @@ class Level
 			],
 			elemGoals: [
 				ElemType.Elem2 => 15,
-				ElemType.Elem8 => 5,
-				ElemType.Elem9 => 5,
+				ElemType.Elem8 => 6,
+				ElemType.Elem9 => 6,
 				ElemType.Elem10 => 20,
 			]
 		},
@@ -229,6 +229,41 @@ class Level
 				ElemType.Elem3 => 10,
 				ElemType.Elem8 => 15,
 				ElemType.Elem11 => 10,
+			]
+		},
+
+		// LV 8 =====================================
+		{
+			maxMovement: 22,
+			availableElemTypes: [
+				ElemType.Elem1,
+				ElemType.Elem2,
+				ElemType.Elem3,
+				ElemType.Elem8,
+				ElemType.Elem9,
+				ElemType.Elem11
+			],
+			rawMap: [
+				[ -2, -2, -2, -2, -2 ],
+				[ -2, -3, -2, -2, -2 ],
+				[ -2, -2, -2, -2, -2 ],
+				[ -2, -2, -3, -2, -2 ],
+				[ -2, -2, -3, -2, -2 ],
+				[ -2, -2, -2, -2, -2 ],
+				[ -2, -2, -2, -3, -2 ],
+				[ -2, -2, -2, -2, -2 ]
+			],
+			starRequirements: [
+				3000,
+				5000,
+				6000
+			],
+			elemGoals: [
+				ElemType.Elem1 => 10,
+				ElemType.Elem2 => 10,
+				ElemType.Elem3 => 10,
+				ElemType.Elem8 => 6,
+				ElemType.Elem11 => 6,
 			]
 		}
 	];

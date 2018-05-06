@@ -23,15 +23,20 @@ import motion.easing.Linear;
 
 class MenuState extends Base2dState
 {
+	static inline var MAX_OVERDRAG:UInt = 50;
+
 	var menuModel:MenuModel;
 
 	var menuContainer:Layers;
+	var backgroundContainer:Layers;
 	var interactiveArea:Interactive;
 
 	var layout:MenuLayout;
 
 	var welcomePage:WelcomePage;
 	var startLevelPage:StartLevelPage;
+	var leafTop:Bitmap;
+	var leafBottom:Bitmap;
 
 	var levelButtons:Array<LevelButton>;
 
@@ -57,15 +62,26 @@ class MenuState extends Base2dState
 		interactiveArea.cursor = Cursor.Default;
 
 		menuContainer = new Layers(stage);
+		backgroundContainer = new Layers(menuContainer);
 
-		var backgroundTop = new Bitmap(Res.image.menu.map_top.toTile(), menuContainer);
+		var backgroundTop = new Bitmap(Res.image.menu.map_top.toTile(), backgroundContainer);
 		backgroundTop.smooth = true;
 		backgroundTop.setScale(AppConfig.GAME_BITMAP_SCALE);
 
-		var backgroundBottom = new Bitmap(Res.image.menu.map_bottom.toTile(), menuContainer);
+		leafTop = new Bitmap(Res.image.menu.leaf_total.toTile(), menuContainer);
+		leafTop.smooth = true;
+		leafTop.setScale(AppConfig.GAME_BITMAP_SCALE);
+
+		var backgroundBottom = new Bitmap(Res.image.menu.map_bottom.toTile(), backgroundContainer);
 		backgroundBottom.smooth = true;
 		backgroundBottom.setScale(AppConfig.GAME_BITMAP_SCALE);
 		backgroundBottom.y = backgroundTop.getSize().height;
+
+		leafBottom = new Bitmap(Res.image.menu.leaf_total.toTile(), menuContainer);
+		leafBottom.smooth = true;
+		leafBottom.setScale(AppConfig.GAME_BITMAP_SCALE);
+		leafBottom.tile.flipY();
+		leafBottom.y = backgroundContainer.getSize().height;
 
 		var levelButtonPoints:Array<SimplePoint> = [
 			{ x: 1729, y: 3858 },
@@ -117,13 +133,33 @@ class MenuState extends Base2dState
 
 		interactiveArea.onRelease = function(_)
 		{
-			if (isDragging && Date.now().getTime() - dragForceTime < 30)
+			Actuate.stop(menuContainer);
+
+			if (menuContainer.y > 0)
 			{
-				Actuate.stop(menuContainer);
-				Actuate.tween(menuContainer, Math.abs(.02 * dragForce), {
-					y: normalizeContainerY(menuContainer.y + dragForce * 5)
+				Actuate.tween(menuContainer, .4, {
+					y: normalizeContainerY(menuContainer.y, false)
 				}).onUpdate(function() {
 					menuContainer.y = menuContainer.y;
+					recalculateLeafPositions();
+				});
+			}
+			else if (menuContainer.y < -backgroundContainer.getSize().height * menuContainer.scaleY + stage.height)
+			{
+				Actuate.tween(menuContainer, .4, {
+					y: normalizeContainerY(menuContainer.y, false)
+				}).onUpdate(function() {
+					menuContainer.y = menuContainer.y;
+					recalculateLeafPositions();
+				});
+			}
+			else if (isDragging && Date.now().getTime() - dragForceTime < 30)
+			{
+				Actuate.tween(menuContainer, Math.abs(.02 * dragForce), {
+					y: normalizeContainerY(menuContainer.y + dragForce * 5, false)
+				}).onUpdate(function() {
+					menuContainer.y = menuContainer.y;
+					recalculateLeafPositions();
 				});
 			}
 
@@ -142,6 +178,8 @@ class MenuState extends Base2dState
 					dragForce = e.relY - prevCheckForceYPoint;
 					prevCheckForceYPoint = Std.int(e.relY);
 					dragForceTime = Date.now().getTime();
+
+					recalculateLeafPositions();
 				}
 			}
 		};
@@ -166,7 +204,18 @@ class MenuState extends Base2dState
 
 		onStageResize(0, 0);
 
-		menuContainer.y = -menuContainer.getSize().height + stage.height;
+		menuContainer.y = -backgroundContainer.getSize().height * menuContainer.scaleY + stage.height;
+	}
+
+	function recalculateLeafPositions()
+	{
+		if (menuContainer.y > 0) leafTop.y = -menuContainer.y / menuContainer.scaleY;
+		else leafTop.y = 0;
+
+		var bottomDiff = (-backgroundContainer.getSize().height * menuContainer.scaleY + stage.height) - menuContainer.y;
+		bottomDiff = Math.min(bottomDiff, MAX_OVERDRAG * menuContainer.scaleY);
+		if (bottomDiff > 0) leafBottom.y = backgroundContainer.getSize().height + bottomDiff / menuContainer.scaleY;
+		else leafBottom.y = backgroundContainer.getSize().height;
 	}
 
 	function openWelcomePage():Void
@@ -203,10 +252,10 @@ class MenuState extends Base2dState
 		for (b in levelButtons) b.isEnabled = false;
 	}
 
-	function normalizeContainerY(baseY:Float):Float
+	function normalizeContainerY(baseY:Float, withOverFlow:Bool = true):Float
 	{
-		baseY = Math.max(baseY, -menuContainer.getSize().height + stage.height);
-		baseY = Math.min(baseY, 0);
+		baseY = Math.max(baseY, -backgroundContainer.getSize().height * menuContainer.scaleY + stage.height - (withOverFlow ? MAX_OVERDRAG * menuContainer.scaleY : 0));
+		baseY = Math.min(baseY, withOverFlow ? MAX_OVERDRAG * menuContainer.scaleY : 0);
 
 		return baseY;
 	}
@@ -223,10 +272,12 @@ class MenuState extends Base2dState
 	{
 		super.onStageResize(width, height);
 
+		layout.update(width, height);
+
 		Actuate.stop(menuContainer);
 		menuContainer.y = normalizeContainerY(menuContainer.y);
 
-		layout.update(width, height);
+		recalculateLeafPositions();
 	}
 
 	function resumeRequest()

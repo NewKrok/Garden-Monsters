@@ -697,7 +697,7 @@ class Board
 				}
 
 		var mapData = BoardHelper.analyzeMap(map);
-		if (mapData.matches.length > 0 || mapData.movePossibilities.length == 0) shuffleElems(onFinished);
+		if (mapData.matches.length > 0 || mapData.movePossibilities.length < 2) shuffleElems(onFinished);
 		else
 		{
 			Actuate.timer(1).onComplete(function()
