@@ -2,6 +2,7 @@ package fe.menu.substate;
 
 import fe.asset.Fonts;
 import fe.common.BaseDialog;
+import fe.common.ScalebaleSubState;
 import h2d.Flow;
 import h2d.Flow.FlowAlign;
 import h2d.Graphics;
@@ -17,7 +18,7 @@ import motion.Actuate;
  * ...
  * @author Krisztian Somoracz
  */
-class WelcomePage extends Base2dSubState
+class WelcomePage extends Base2dSubState implements ScalebaleSubState
 {
 	var background:Graphics;
 	var dialogWrapper:Sprite;
@@ -66,5 +67,16 @@ class WelcomePage extends Base2dSubState
 
 		dialogWrapper.x = stage.width / 2;
 		dialogWrapper.y = stage.height / 2;
+	}
+
+	public function setScale(v:Float):Void
+	{
+		dialogWrapper.setScale(v);
+
+		if (stage != null)
+		{
+			dialogWrapper.x = stage.width / 2;
+			dialogWrapper.y = stage.height / 2;
+		}
 	}
 }

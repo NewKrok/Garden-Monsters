@@ -1,10 +1,13 @@
 package fe.state;
 
+import fe.asset.Level;
+import fe.menu.MenuModel;
 import fe.menu.MenuLayout;
 import fe.menu.ui.LevelButton;
 import h2d.Bitmap;
 import h2d.Interactive;
 import h2d.Layers;
+import hpp.heaps.Base2dStage;
 import hpp.heaps.Base2dState;
 import hpp.heaps.Base2dSubState;
 import hpp.heaps.HppG;
@@ -13,20 +16,22 @@ import hxd.Event;
 import hxd.Res;
 import hxd.res.Sound;
 import hxd.Cursor;
-import fe.menu.substate.LevelPreview;
+import fe.menu.substate.StartLevelPage;
 import fe.menu.substate.WelcomePage;
 import motion.Actuate;
 import motion.easing.Linear;
 
 class MenuState extends Base2dState
 {
+	var menuModel:MenuModel;
+
 	var menuContainer:Layers;
 	var interactiveArea:Interactive;
 
 	var layout:MenuLayout;
 
 	var welcomePage:WelcomePage;
-	var levelPreview:LevelPreview;
+	var startLevelPage:StartLevelPage;
 
 	var levelButtons:Array<LevelButton>;
 
@@ -38,6 +43,13 @@ class MenuState extends Base2dState
 	var dragForce:Float = 0;
 	var prevCheckForceYPoint:Int = 0;
 	var dragForceTime:Float = 0;
+
+	public function new(stage:Base2dStage, levelId:UInt)
+	{
+		menuModel = new MenuModel();
+
+		super(stage);
+	}
 
 	override function build()
 	{
@@ -89,7 +101,7 @@ class MenuState extends Base2dState
 
 		interactiveArea.onPush = function(e:Event)
 		{
-			if (activeSubState == welcomePage) return;
+			if (activeSubState != null) return;
 
 			Actuate.stop(menuContainer);
 
@@ -135,11 +147,18 @@ class MenuState extends Base2dState
 		};
 
 		welcomePage = new WelcomePage();
-		levelPreview = new LevelPreview();
+		startLevelPage = new StartLevelPage(
+			function(){ HppG.changeState(GameState, [menuModel.selectedLevelId.value]); },
+			closeSubState,
+			menuModel.selectedLevelId,
+			menuModel.selectedRawMap
+		);
 
 		layout = new MenuLayout(
 			stage,
 			menuContainer,
+			welcomePage,
+			startLevelPage,
 			interactiveArea
 		);
 
@@ -148,12 +167,6 @@ class MenuState extends Base2dState
 		onStageResize(0, 0);
 
 		menuContainer.y = -menuContainer.getSize().height + stage.height;
-	}
-
-	function startLevelRequest(levelId:UInt):Void
-	{
-		openLevelPreview(levelId);
-		//HppG.changeState(GameState, [levelId]);
 	}
 
 	function openWelcomePage():Void
@@ -170,19 +183,20 @@ class MenuState extends Base2dState
 				backgroundLoopMusic = if (Sound.supportedFormat(Mp3)) Res.sound.game_loop else null;
 				if (backgroundLoopMusic != null) backgroundLoopMusic.play(true, AppConfig.MUSIC_VOLUME, AppConfig.CHANNEL_GROUP_MUSIC);
 
-				interactiveArea.onClick = function(_){};
-				interactiveArea.cursor = Cursor.Default;
-
 				closeSubState();
-				for (b in levelButtons) b.isEnabled = true;
 			}
 		}
 	}
 
-	function openLevelPreview(levelId:UInt):Void
+	function startLevelRequest(levelId:UInt):Void
 	{
-		levelPreview.updateContent(levelId);
-		openSubState(levelPreview);
+		if (levelId != menuModel.selectedLevelId.value)
+		{
+			menuModel.selectedLevelId.set(levelId);
+			menuModel.selectedRawMap.set(Level.getLevelData(levelId).rawMap);
+		}
+
+		openSubState(startLevelPage);
 
 		for (b in levelButtons) b.isEnabled = false;
 	}
@@ -193,6 +207,14 @@ class MenuState extends Base2dState
 		baseY = Math.min(baseY, 0);
 
 		return baseY;
+	}
+
+	override public function onSubStateClosed()
+	{
+		interactiveArea.onClick = function(_){};
+		interactiveArea.cursor = Cursor.Default;
+
+		for (b in levelButtons) b.isEnabled = true;
 	}
 
 	override public function onStageResize(width:UInt, height:UInt)

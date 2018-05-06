@@ -1,17 +1,14 @@
 package;
 
+import fe.AppConfig;
+import fe.asset.ElemTile;
 import fe.asset.Fonts;
+import fe.state.MenuState;
 import haxe.Json;
-import haxe.Timer;
 import hpp.heaps.Base2dApp;
 import hpp.heaps.Base2dStage.StageScaleMode;
 import hpp.util.Language;
 import hxd.Res;
-import fe.AppConfig;
-import fe.asset.ElemTile;
-import fe.state.GameState;
-import fe.state.MenuState;
-import test.TestBoard;
 
 /**
  * ...

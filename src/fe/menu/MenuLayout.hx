@@ -1,5 +1,6 @@
 package fe.menu;
 
+import fe.common.ScalebaleSubState;
 import h2d.Interactive;
 import h2d.Layers;
 import h2d.Sprite;
@@ -17,15 +18,21 @@ class MenuLayout
 	var stage:Base2dStage;
 
 	var menuContainer:Sprite;
+	var welcomePage:ScalebaleSubState;
+	var startLevelPage:ScalebaleSubState;
 	var interactiveArea:Interactive;
 
 	public function new(
 		stage:Base2dStage,
 		menuContainer:Layers,
+		welcomePage:ScalebaleSubState,
+		startLevelPage:ScalebaleSubState,
 		interactiveArea:Interactive
 	){
 		this.stage = stage;
 		this.menuContainer = menuContainer;
+		this.welcomePage = welcomePage;
+		this.startLevelPage = startLevelPage;
 		this.interactiveArea = interactiveArea;
 	}
 
@@ -40,9 +47,13 @@ class MenuLayout
 
 		if (mode == LayoutMode.Landscape)
 		{
+			welcomePage.setScale(heightRatio);
+			startLevelPage.setScale(heightRatio);
 		}
 		else
 		{
+			welcomePage.setScale(widthRatio);
+			startLevelPage.setScale(widthRatio);
 		}
 
 		interactiveArea.width = stage.width;
