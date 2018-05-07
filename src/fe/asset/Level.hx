@@ -265,6 +265,103 @@ class Level
 				ElemType.Elem8 => 6,
 				ElemType.Elem11 => 6,
 			]
+		},
+
+		// LV 9 =====================================
+		{
+			maxMovement: 25,
+			availableElemTypes: [
+				ElemType.Elem4,
+				ElemType.Elem8,
+				ElemType.Elem9,
+				ElemType.Elem10,
+				ElemType.Elem11,
+				ElemType.Elem14,
+			],
+			rawMap: [
+				[ -2, -2, -2, -2, -2, -2, -2, -2 ],
+				[ -2, -2, -2, -2, -2, -2, -2, -2 ],
+				[ -2, -2, -2, -2, -2, -2, -2, -2 ],
+				[ -3,  0, -2, -2, -2, -2,  0, -3 ],
+				[ -3,  0, -2, -2, -2, -2,  0, -3 ],
+				[ -2, -2, -2, -2, -2, -2, -2, -2 ],
+				[ -2, -2, -2, -2, -2, -2, -2, -2 ],
+				[ -2, -2, -2, -2, -2, -2, -2, -2 ]
+			],
+			starRequirements: [
+				3000,
+				5000,
+				6000
+			],
+			elemGoals: [
+				ElemType.Elem4 => 15,
+				ElemType.Elem9 => 20,
+				ElemType.Elem14 => 10,
+			]
+		},
+
+		// LV 10 ====================================
+		{
+			maxMovement: 15,
+			availableElemTypes: [
+				ElemType.Elem3,
+				ElemType.Elem4,
+				ElemType.Elem9,
+				ElemType.Elem10,
+				ElemType.Elem11
+			],
+			rawMap: [
+				[ -2, -2, -2,  0, -2, -2, -2 ],
+				[ -2, -2, -2, -2, -2, -2, -2 ],
+				[ -2, -2, -2,  0, -2, -2, -2 ],
+				[ -2, -2, -2, -2, -2, -2, -2 ],
+				[ -2, -2, -2,  0, -2, -2, -2 ],
+				[ -2, -2, -2, -2, -2, -2, -2 ],
+				[ -2, -2, -2,  0, -2, -2, -2 ]
+			],
+			starRequirements: [
+				3000,
+				5000,
+				6000
+			],
+			elemGoals: [
+				ElemType.Elem3 => 15,
+				ElemType.Elem4 => 15,
+				ElemType.Elem9 => 15,
+				ElemType.Elem10 => 15,
+			]
+		},
+
+		// LV 11 ====================================
+		{
+			maxMovement: 15,
+			availableElemTypes: [
+				ElemType.Elem5,
+				ElemType.Elem9,
+				ElemType.Elem10,
+				ElemType.Elem12,
+				ElemType.Elem14
+			],
+			rawMap: [
+				[ -2, -2, -2, -2, -2, -2, -2, -2 ],
+				[ -2, -3, -2, -2, -2, -2, -3, -2 ],
+				[ -2, -2, -2, -2, -2, -2, -2, -2 ],
+				[ -2, -2, -2, -3, -3, -2, -2, -2 ],
+				[ -2, -2, -2, -2, -2, -2, -2, -2 ],
+				[ -2, -2, -3, -2, -2, -3, -2, -2 ],
+				[ -2, -2, -2, -2, -2, -2, -2, -2 ],
+				[ -3, -2, -2, -2, -2, -2, -2, -3 ]
+			],
+			starRequirements: [
+				3000,
+				5000,
+				6000
+			],
+			elemGoals: [
+				ElemType.Elem5 => 20,
+				ElemType.Elem9 => 20,
+				ElemType.Elem12 => 20,
+			]
 		}
 	];
 

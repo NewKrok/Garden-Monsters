@@ -202,7 +202,7 @@ class MenuState extends Base2dState
 
 		openWelcomePage();
 
-		onStageResize(0, 0);
+		onStageResize(stage.width, stage.height);
 
 		menuContainer.y = -backgroundContainer.getSize().height * menuContainer.scaleY + stage.height;
 	}

@@ -63,7 +63,7 @@ class StartLevelPage extends Base2dSubState implements ScalebaleSubState
 
 		content = new Flow(dialog);
 		content.isVertical = true;
-		content.verticalSpacing = 10;
+		content.verticalSpacing = 20;
 		content.horizontalAlign = FlowAlign.Middle;
 
 		buildHeader(content);
@@ -78,7 +78,7 @@ class StartLevelPage extends Base2dSubState implements ScalebaleSubState
 		closeButton.setScale(AppConfig.GAME_BITMAP_SCALE);
 
 		startButton = new BaseButton(dialogWrapper, {
-			font: Fonts.DEFAULT_XL,
+			font: Fonts.DEFAULT_XXL,
 			textOffset: { x:0, y: -10 },
 			onClick: function(_){ startRequest(); },
 			baseGraphic: Res.image.menu.ui.button_s.toTile(),
@@ -87,7 +87,7 @@ class StartLevelPage extends Base2dSubState implements ScalebaleSubState
 		Language.registerTextHolder(cast startButton.label, "play");
 		startButton.setScale(AppConfig.GAME_BITMAP_SCALE);
 
-		content.x = dialog.getSize().width / 2 - content.getSize().width / 2 - 5;
+		content.x = dialog.getSize().width / 2 - content.getSize().width / 2;
 		content.y = dialog.getSize().height / 2 - content.getSize().height / 2 - 5;
 
 		Actuate.timer(.2).onComplete(function() { dialog.open(); });
@@ -95,7 +95,7 @@ class StartLevelPage extends Base2dSubState implements ScalebaleSubState
 
 	function buildHeader(parent:Sprite):Void
 	{
-		levelText = new Text(Fonts.DEFAULT_L, parent);
+		levelText = new Text(Fonts.DEFAULT_XL, parent);
 		levelText.smooth = true;
 		levelText.textColor = 0xFFBF00;
 		levelText.textAlign = Align.Left;
@@ -115,13 +115,13 @@ class StartLevelPage extends Base2dSubState implements ScalebaleSubState
 		footer.horizontalSpacing = 20;
 		footer.verticalAlign = FlowAlign.Middle;
 
-		var playersBestScoreLabel = new Text(Fonts.DEFAULT_S, footer);
+		var playersBestScoreLabel = new Text(Fonts.DEFAULT_L, footer);
 		playersBestScoreLabel.smooth = true;
 		playersBestScoreLabel.textColor = 0xFFBF00;
 		playersBestScoreLabel.textAlign = Align.Left;
 		Language.registerTextHolder(cast playersBestScoreLabel, "your_best");
 
-		playersBestScoreText = new Text(Fonts.DEFAULT_M, footer);
+		playersBestScoreText = new Text(Fonts.DEFAULT_XL, footer);
 		playersBestScoreText.smooth = true;
 		playersBestScoreText.textColor = 0xFFFFFF;
 		playersBestScoreText.textAlign = Align.Left;
@@ -141,11 +141,11 @@ class StartLevelPage extends Base2dSubState implements ScalebaleSubState
 		dialogWrapper.x = stage.width / 2;
 		dialogWrapper.y = stage.height / 2 - 100;
 
-		closeButton.x = 130;
-		closeButton.y = -250;
+		closeButton.x = 270;
+		closeButton.y = -425;
 
 		startButton.x = -startButton.getSize().width / 2;
-		startButton.y = 210;
+		startButton.y = 390;
 	}
 
 	override public function onOpen()

@@ -12,8 +12,8 @@ import tink.state.Observable;
  */
 class MapPreview extends Sprite
 {
-	static inline var blockSize:UInt = 26;
-	static inline var blockGap:UInt = 3;
+	static inline var blockSize:UInt = 55;
+	static inline var blockGap:UInt = 5;
 
 	var selectedRawMap:Observable<Array<Array<Int>>>;
 	var back:Bitmap;
