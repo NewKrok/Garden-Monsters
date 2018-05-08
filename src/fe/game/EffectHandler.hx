@@ -20,7 +20,6 @@ import motion.easing.Quad;
 class EffectHandler
 {
 	static public inline var EXPLODING_EFFECT_DURATION:Float = 1;
-	static public inline var EXPLODING_SPARK_EFFECT_DURATION:Float = .5;
 	static public inline var ICE_BREAK_EFFECT_DURATION:Float = 1;
 	static public inline var SPLASH_EFFECT_DURATION:Float = .6;
 	static public inline var BOMB_EFFECT_DURATION:Float = .2;
@@ -58,8 +57,8 @@ class EffectHandler
 			}).ease(Linear.easeNone).onUpdate(function(){
 				image.setScale(image.scaleX);
 			}).onComplete(function(){
+				addExplosionLight(x, y, Res.image.game.effect.light.toTile());
 				addExplosionLight(x, y, Res.image.game.effect.explosion.toTile());
-				addExplosionSparkEffect(x, y, Res.image.game.effect.explosion_spark.toTexture());
 				Actuate.tween(image, BOMB_EFFECT_DURATION, {
 					scaleX: AppConfig.GAME_BITMAP_SCALE * 1.3, scaleY: AppConfig.GAME_BITMAP_SCALE * 1.3, alpha: 0
 				}).ease(Linear.easeNone).onUpdate(function(){
@@ -199,35 +198,6 @@ class EffectHandler
 		particles.addGroup(g);
 
 		Actuate.timer(EXPLODING_EFFECT_DURATION).onComplete(function() {
-			removeEffect(g);
-		});
-	}
-
-	function addExplosionSparkEffect(x:Float, y:Float, texture:Texture):Void
-	{
-		var g = new ParticleGroup(particles);
-
-		g.sizeRand = .2;
-		g.life = EXPLODING_SPARK_EFFECT_DURATION / 2 + .1;
-		g.speed = 100;
-		g.emitDelay = 0;
-		g.nparts = 20;
-		g.emitMode = PartEmitMode.Point;
-		g.emitDist = 200;
-		g.emitLoop = false;
-		g.speedRand = .5;
-		g.fadeIn = 0;
-		g.fadeOut = .5;
-		g.rotSpeed = Math.PI / 5;
-		g.rotSpeedRand = Math.PI / 5;
-		g.sizeIncr = 2;
-		g.texture = texture;
-		g.dx = cast x;
-		g.dy = cast y;
-
-		particles.addGroup(g);
-
-		Actuate.timer(EXPLODING_SPARK_EFFECT_DURATION).onComplete(function() {
 			removeEffect(g);
 		});
 	}

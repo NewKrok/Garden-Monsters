@@ -120,7 +120,7 @@ class Board
 
 	function addElemsToBoard()
 	{
-		for (row in map) for (e in row) container.addChild(e.graphic);
+		for (row in map) for (e in row) if (e != null) container.addChild(e.graphic);
 	}
 
 	function createInteractive()
@@ -329,7 +329,7 @@ class Board
 		{
 			skillHandler.update(map, foundMatch);
 
-			for (row in map) for (e in row) e.animationPath = [];
+			for (row in map) for (e in row) if (e != null) e.animationPath = [];
 			isAnimationInProgress = true;
 
 			var longestSkillTime:Float = 0;
@@ -406,146 +406,189 @@ class Board
 			{
 				if (map[i][j] == null)
 				{
-					var firstElemIndex:UInt = 0;
-					while (
-						firstElemIndex < map.length
-						&& map[firstElemIndex][j] != null
-						&& map[firstElemIndex][j].type == ElemType.None
-					) {
-						firstElemIndex++;
-					}
+					fillElem(j, i);
+					return;
+				}
+			}
+		}
+	}
 
-					if (firstElemIndex < i)
+	function fillElem(x:UInt, y:UInt)
+	{
+		var firstElemIndex:UInt = 0;
+		while (
+			firstElemIndex < map.length
+			&& map[firstElemIndex][x] != null
+			&& map[firstElemIndex][x].type == ElemType.None
+		) {
+			firstElemIndex++;
+		}
+
+		if (firstElemIndex < y)
+		{
+			var upperIndex:UInt = y - 1;
+			while (
+				upperIndex != 0
+				&& (
+					map[upperIndex][x] == null
+					|| map[upperIndex][x].type == ElemType.Empty
+					|| map[upperIndex][x].type == ElemType.None
+				)
+			) upperIndex--;
+
+			var upperElem = map[upperIndex][x];
+
+			var downIndex:UInt = map.length - 1;
+			var noneIndex:Int = -1;
+
+			for (l in y + 1...map.length)
+			{
+				if (map[l][x] != null && map[l][x].type != ElemType.Empty)
+				{
+					if (noneIndex == -1 && map[l][x].type == ElemType.None)
 					{
-						var upperIndex:UInt = i - 1;
-						while (
-							upperIndex != 0
-							&& (
-								map[upperIndex][j] == null
-								|| map[upperIndex][j].type == ElemType.Empty
-								|| map[upperIndex][j].type == ElemType.None
-							)
-						) upperIndex--;
-
-						var upperElem = map[upperIndex][j];
-
-						var downIndex:UInt = map.length - 1;
-						var noneIndex:Int = -1;
-
-						for (l in i + 1...map.length)
-						{
-							if (map[l][j] != null && map[l][j].type != ElemType.Empty)
-							{
-								if (noneIndex == -1 && map[l][j].type == ElemType.None)
-								{
-									noneIndex = l;
-									if (l == map.length - 1) downIndex = l - 1;
-								}
-								else
-								{
-									if (noneIndex == -1) downIndex = l - 1;
-									else downIndex = noneIndex - 1;
-									break;
-								}
-							}
-						}
-
-						if (upperElem.type == ElemType.Blocker)
-						{
-							if (downIndex - i > 1 || i - upperIndex > 0)
-							{
-								var prevPossibleElem = map[downIndex - 1][j - 1];
-								var nextPossibleElem = map[downIndex - 1][j + 1];
-
-								if (
-									(crossFillFromLeft
-										|| nextPossibleElem == null
-										|| nextPossibleElem.type == ElemType.Empty
-										|| nextPossibleElem.type == ElemType.Blocker)
-									&& prevPossibleElem != null
-									&& BoardHelper.isMovableElem(prevPossibleElem)
-								){
-									crossFillFromLeft = !crossFillFromLeft;
-
-									prevPossibleElem.indexX++;
-									prevPossibleElem.indexY++;
-
-									prevPossibleElem.animationPath.push(
-										{ x: prevPossibleElem.indexX * Elem.SIZE, y: prevPossibleElem.indexY * Elem.SIZE }
-									);
-
-									map[downIndex - 1][j - 1] = null;
-									map[prevPossibleElem.indexY][prevPossibleElem.indexX] = prevPossibleElem;
-
-									fillMap();
-									return;
-								}
-								else if (
-									nextPossibleElem != null
-									&& BoardHelper.isMovableElem(nextPossibleElem)
-								){
-									crossFillFromLeft = !crossFillFromLeft;
-
-									nextPossibleElem.indexX--;
-									nextPossibleElem.indexY++;
-
-									nextPossibleElem.animationPath.push(
-										{ x: nextPossibleElem.indexX * Elem.SIZE, y: nextPossibleElem.indexY * Elem.SIZE }
-									);
-
-									map[downIndex - 1][j + 1] = null;
-									map[nextPossibleElem.indexY][nextPossibleElem.indexX] = nextPossibleElem;
-
-									fillMap();
-									return;
-								}
-								else
-								{
-									map[i][j] = new Elem(i, j, ElemType.Empty);
-									container.addChild(map[i][j].graphic);
-								}
-							}
-							else
-							{
-								map[i][j] = new Elem(i, j, ElemType.Empty);
-								container.addChild(map[i][j].graphic);
-							}
-						}
-						else if (upperElem.type != ElemType.Empty)
-						{
-							upperElem.animationPath.push({ x: upperElem.indexX * Elem.SIZE, y: downIndex * Elem.SIZE});
-							upperElem.indexY = downIndex;
-
-							map[upperIndex][j] = null;
-							map[downIndex][j] = upperElem;
-
-							fillMap();
-							return;
-						}
+						noneIndex = l;
+						if (l == map.length - 1) downIndex = l - 1;
 					}
 					else
 					{
-						var addingPosition:Float = -Elem.SIZE;
+						if (noneIndex == -1) downIndex = l - 1;
+						else downIndex = noneIndex - 1;
+						break;
+					}
+				}
+			}
 
-						for (k in 1...map.length)
-						{
-							if (map[k][j] != null && map[k][j].type != ElemType.Empty)
+			if (upperElem.type == ElemType.Blocker)
+			{
+				if (downIndex - y > 1 || y - upperIndex > 0)
+				{
+					var prevElemYIndex:UInt = y - 1;
+					var prevPossibleElem = map[prevElemYIndex][x - 1];
+					if ((map[y][x - 1] != null && map[y][x - 1].type == ElemType.Blocker
+							&& map[y - 1] != null && map[y - 1][x] != null && map[y - 1][x].type == ElemType.Blocker)
+						||
+						(prevPossibleElem != null && prevPossibleElem.type == ElemType.None)
+					)
+						prevPossibleElem = null
+					else if (prevPossibleElem == null)
+						for (k in 2...y)
+							if (map[y - k][x - 1] != null)
 							{
-								addingPosition = map[k][j].graphic.y > 0 ? -Elem.SIZE : map[k][j].graphic.y - Elem.SIZE;
+								prevElemYIndex = y - k;
+								prevPossibleElem = map[prevElemYIndex][x - 1];
 								break;
 							}
-						}
 
-						var newElem = map[i][j] = BoardHelper.createRandomElem(i, j, availableElemTypes);
-						newElem.animationPath.push({ x: newElem.graphic.x, y: newElem.graphic.y});
-						newElem.animationY = newElem.graphic.y = addingPosition;
-						container.addChild(newElem.graphic);
+					var nextElemYIndex:UInt = y - 1;
+					var nextPossibleElem = map[nextElemYIndex][x + 1];
+					if ((map[y][x + 1] != null && map[y][x + 1].type == ElemType.Blocker
+							&& map[y - 1] != null && map[y - 1][x] != null && map[y - 1][x].type == ElemType.Blocker)
+						||
+						(nextPossibleElem != null && nextPossibleElem.type == ElemType.None)
+					)
+						nextPossibleElem = null
+					else if (nextPossibleElem == null)
+						for (k in 2...y)
+							if (map[y - k][x + 1] != null)
+							{
+								nextElemYIndex = y - k;
+								nextPossibleElem = map[nextElemYIndex][x + 1];
+								break;
+							}
+
+					if (
+						(crossFillFromLeft
+							|| nextPossibleElem == null
+							|| nextPossibleElem.type == ElemType.Empty
+							|| nextPossibleElem.type == ElemType.Blocker)
+						&& prevPossibleElem != null
+						&& BoardHelper.isMovableElem(prevPossibleElem)
+					){
+						crossFillFromLeft = !crossFillFromLeft;
+
+						prevPossibleElem.indexX++;
+						prevPossibleElem.indexY++;
+
+						prevPossibleElem.animationPath.push(
+							{ x: prevPossibleElem.indexX * Elem.SIZE, y: prevPossibleElem.indexY * Elem.SIZE }
+						);
+
+						map[prevElemYIndex][x - 1] = null;
+						map[prevPossibleElem.indexY][prevPossibleElem.indexX] = prevPossibleElem;
+
+						fillMap();
+						return;
+					}
+					else if (
+						nextPossibleElem != null
+						&& BoardHelper.isMovableElem(nextPossibleElem)
+					){
+						crossFillFromLeft = !crossFillFromLeft;
+
+						nextPossibleElem.indexX--;
+						nextPossibleElem.indexY++;
+
+						nextPossibleElem.animationPath.push(
+							{ x: nextPossibleElem.indexX * Elem.SIZE, y: nextPossibleElem.indexY * Elem.SIZE }
+						);
+
+						map[nextElemYIndex][x + 1] = null;
+						map[nextPossibleElem.indexY][nextPossibleElem.indexX] = nextPossibleElem;
+
+						fillMap();
+						return;
+					}
+					else
+					{
+						map[y][x] = new Elem(y, x, ElemType.Empty);
+						container.addChild(map[y][x].graphic);
 
 						fillMap();
 						return;
 					}
 				}
+				else
+				{
+					map[y][x] = new Elem(y, x, ElemType.Empty);
+					container.addChild(map[y][x].graphic);
+
+					fillMap();
+					return;
+				}
 			}
+			else if (upperElem.type != ElemType.Empty)
+			{
+				upperElem.animationPath.push({ x: upperElem.indexX * Elem.SIZE, y: downIndex * Elem.SIZE});
+				upperElem.indexY = downIndex;
+
+				map[upperIndex][x] = null;
+				map[downIndex][x] = upperElem;
+
+				fillMap();
+				return;
+			}
+		}
+		else
+		{
+			var addingPosition:Float = -Elem.SIZE;
+
+			for (k in 1...map.length)
+			{
+				if (map[k][x] != null && map[k][x].type != ElemType.Empty)
+				{
+					addingPosition = map[k][x].graphic.y > 0 ? -Elem.SIZE : map[k][x].graphic.y - Elem.SIZE;
+					break;
+				}
+			}
+
+			var newElem = map[y][x] = BoardHelper.createRandomElem(y, x, availableElemTypes);
+			newElem.animationPath.push({ x: newElem.graphic.x, y: newElem.graphic.y});
+			newElem.animationY = newElem.graphic.y = addingPosition;
+			container.addChild(newElem.graphic);
+
+			fillMap();
+			return;
 		}
 	}
 

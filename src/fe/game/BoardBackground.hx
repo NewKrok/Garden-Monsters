@@ -33,7 +33,7 @@ class BoardBackground
 		for (i in 0...map[0].length)
 			for (j in 0...map.length)
 			{
-				if (map[j][i].type != ElemType.Blocker && map[j][i].type != ElemType.None && map[j][i].type != ElemType.Empty)
+				if (map[j][i] != null && map[j][i].type != ElemType.Blocker && map[j][i].type != ElemType.None && map[j][i].type != ElemType.Empty)
 				{
 					if ((i + j) % 2 == 1) backgroundA.drawTile(i * tileA.width, j * tileA.height, tileA);
 					else backgroundB.drawTile(i * tileB.width, j * tileB.height, tileB);
