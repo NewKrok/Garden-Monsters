@@ -365,7 +365,7 @@ class BoardHelper
 		{
 			for (j in 0...map[0].length)
 			{
-				if (map[i][j] != null)
+				if (isMovableElem(map[i][j]) && !map[i][j].isFrozen)
 				{
 					var type:ElemType = map[i][j].type;
 					if (checkElemPossibilities(map, i, j, type)) possibilities.push(map[i][j]);
@@ -386,7 +386,6 @@ class BoardHelper
 			for (o in t.expected)
 				if (map[cast x + o.x] == null
 					|| map[cast x + o.x][cast y + o.y] == null
-					|| map[cast x + o.x][cast y + o.y].isFrozen
 					|| map[cast x + o.x][cast y + o.y].type != cast type
 				) match = false;
 

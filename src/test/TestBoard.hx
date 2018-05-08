@@ -49,6 +49,8 @@ class TestBoard
 		testPossibility3Possibility();
 		testPossibility5Possibility();
 		testPossibility9Possibility();
+		testPossibilityWithFrozenElemRow();
+		testPossibilityWithFrozenElemCol();
 
 		testPossibilityRealMap();
 		testPossibilityRealMap2();
@@ -536,6 +538,34 @@ class TestBoard
 		]);
 
 		if (!checkPossibilities(map, 9))
+			throw "Failed test!";
+	}
+
+	static private function testPossibilityWithFrozenElemRow()
+	{
+		var map = BoardHelper.createMap([
+			[ 1, 6, 3, 6 ],
+			[ 6, 2, 6, 2 ],
+			[ 5, 3, 2, 3 ]
+		]);
+
+		map[0][1].frozenTurnCount = 1;
+
+		if (!checkPossibilities(map, 2))
+			throw "Failed test!";
+	}
+
+	static private function testPossibilityWithFrozenElemCol()
+	{
+		var map = BoardHelper.createMap([
+			[ 1, 6, 3, 6 ],
+			[ 6, 2, 4, 2 ],
+			[ 5, 6, 1, 3 ]
+		]);
+
+		map[1][0].frozenTurnCount = 1;
+
+		if (!checkPossibilities(map, 0))
 			throw "Failed test!";
 	}
 
