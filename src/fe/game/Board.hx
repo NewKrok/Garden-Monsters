@@ -390,11 +390,7 @@ class Board
 					if (e.frozenTurnCount == 0) effectHandler.addIceBreakEffect(e.graphic.x, e.graphic.y);
 				}
 
-		if (foundPossibilities.length == 0)
-		{
-			shuffleElems(onTurnEndCallback);
-			onNoMoreMovesCallback();
-		}
+		if (foundPossibilities.length == 0) onNoMoreMovesCallback();
 		else onTurnEndCallback();
 	}
 
@@ -702,14 +698,21 @@ class Board
 			showHelpTimer = null;
 		}
 
-		if (foundPossibilities.length > 0)
-		{
-			showHelpTimer = Actuate.timer(5).onComplete(function() {
-				for (m in foundPossibilities) if (m != null) m.graphic.mark();
-			});
-		}
+		if (foundPossibilities.length > 0) showPossibilitiesWithDelay();
 
 		debugMapTrace();
+	}
+
+	function showPossibilitiesWithDelay(delay:Float = 5)
+	{
+		showHelpTimer = Actuate.timer(delay).onComplete(function() {
+			for (m in foundPossibilities) if (m != null) m.graphic.mark();
+		});
+	}
+
+	public function shuffleElemsRequest()
+	{
+		shuffleElems(onTurnEndCallback);
 	}
 
 	function shuffleElems(onFinished:Void->Void):Void
@@ -755,6 +758,7 @@ class Board
 							isFirstElem = false;
 						}
 				isShuffleInProgress = false;
+				checkMap();
 			});
 		}
 	}

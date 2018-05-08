@@ -51,7 +51,7 @@ class GameState extends Base2dState
 
 	var backgroundLoopMusic:Sound;
 
-	public function new(stage:Base2dStage, levelId:UInt)
+	public function new(stage:Base2dStage, levelId:UInt = 0)
 	{
 		gameModel = new GameModel();
 		gameModel.levelId = levelId;
@@ -160,7 +160,11 @@ class GameState extends Base2dState
 				gameModel.score.set(gameModel.score.value + 50);
 			});
 			board.onNoMoreMoves(function(){
-				gameDialog.openNoMoreMovesDialog();
+				if (gameModel.remainingMoves.value > 0)
+				{
+					board.shuffleElemsRequest();
+					gameDialog.openNoMoreMovesDialog();
+				}
 			});
 			board.onTurnEnd(function(){
 				gameDialog.closeNoMoreMovesDialog();
