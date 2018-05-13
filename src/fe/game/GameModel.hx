@@ -1,6 +1,7 @@
 package fe.game;
 
 import fe.game.Elem.ElemType;
+import fe.game.Help.HelpType;
 import tink.state.Observable;
 import tink.state.State;
 
@@ -12,9 +13,11 @@ class GameModel
 {
 	public var remainingMoves:State<UInt> = new State(0);
 	public var elemGoals:Map<ElemType, ElemGoalData> = new Map<ElemType, ElemGoalData>();
+	public var helps:Map<HelpType, State<UInt>> = new Map<HelpType, State<UInt>>();
 	public var score:State<UInt> = new State(0);
 	public var playersBestScore:State<UInt> = new State(0);
 	public var isPossibleToPlay:State<Bool> = new State(false);
+	public var starPercentage:State<Float> = new State<Float>(0);
 
 	public var stars:Observable<UInt>;
 
@@ -31,6 +34,14 @@ class GameModel
 			}
 
 			return starRequirements.length;
+		});
+
+		score.observe().bind(function(v){
+			if (v != 0)
+			{
+				if (stars.value == 0) starPercentage.set(v / starRequirements[stars.value]);
+				else starPercentage.set((v - starRequirements[stars.value - 1]) / (starRequirements[stars.value] - starRequirements[stars.value - 1]));
+			}
 		});
 	}
 }

@@ -29,9 +29,9 @@ class Level
 				[ -2, -2, -2, -2, -2, -2 ]
 			],
 			starRequirements: [
-				5000,
-				7000,
-				8000
+				1000,
+				2000,
+				4000
 			],
 			elemGoals: [
 				ElemType.Elem8 => 10,

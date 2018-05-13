@@ -1,5 +1,6 @@
 package fe.game.ui;
 import fe.game.GameLayout;
+import hpp.heaps.HppG;
 
 import fe.game.GameLayout.LayoutMode;
 import fe.game.GameModel;
@@ -12,11 +13,11 @@ import h2d.Sprite;
  */
 class GameUI extends Layers
 {
-	var movesUI:MovesUI;
-	var goalUI:GoalUI;
-	var scoreUI:ScoreUI;
-	var starsUI:StarsUI;
-	var helpsUI:HelpsUI;
+	var movesUi:MovesUI;
+	var goalUi:GoalUI;
+	var scoreUi:ScoreUI;
+	var starsUi:StarsUI;
+	var helpsUi:HelpsUI;
 
 	var activeLayout:LayoutMode = null;
 
@@ -26,41 +27,61 @@ class GameUI extends Layers
 	){
 		super(parent);
 
-		goalUI = new GoalUI(this, gameModel.elemGoals);
-		movesUI = new MovesUI(this, gameModel.remainingMoves, gameModel.stars);
-		scoreUI = new ScoreUI(this, gameModel.score);
-		starsUI = new StarsUI(this, gameModel.stars);
-		//helpsUI = new HelpsUI(this);
+		goalUi = new GoalUI(this, gameModel.elemGoals);
+		movesUi = new MovesUI(this, gameModel.remainingMoves);
+		scoreUi = new ScoreUI(this, gameModel.score);
+		starsUi = new StarsUI(this, gameModel.stars, gameModel.starPercentage);
+		helpsUi = new HelpsUI(this, cast gameModel.helps);
 	}
 
 	public function setLayoutMode(mode:LayoutMode)
 	{
-		if (activeLayout == mode) return;
-		activeLayout = mode;
-
-		movesUI.x = 30;
-		movesUI.y = 30;
-
-		starsUI.x = movesUI.x + 27;
-		starsUI.y = movesUI.y + 160;
-
-		goalUI.setLayoutMode(mode);
-
-		if (mode == LayoutMode.Landscape)
+		if (activeLayout == mode)
 		{
-			goalUI.x = movesUI.x + 215;
-			goalUI.y = movesUI.y + movesUI.getSize().height / 2 + 15;
 
-			scoreUI.x = 2;
-			scoreUI.y = 0;
 		}
 		else
 		{
-			goalUI.x = movesUI.x + movesUI.getSize().width / 2 + 15;
-			goalUI.y = movesUI.y + 25;
+			activeLayout = mode;
 
-			scoreUI.x = movesUI.x + goalUI.x + 220;
-			scoreUI.y = movesUI.y + goalUI.y + 149;
+			movesUi.x = 30;
+			movesUi.y = 30;
+
+			starsUi.x = movesUi.x + 27;
+			starsUi.y = movesUi.y + 160;
+
+			goalUi.setLayoutMode(mode);
+			helpsUi.setLayoutMode(mode);
+
+			if (mode == LayoutMode.Landscape)
+			{
+				goalUi.x = movesUi.x + 215;
+				goalUi.y = movesUi.y + movesUi.getSize().height / 2 + 15;
+
+				scoreUi.x = 2;
+				scoreUi.y = 0;
+			}
+			else
+			{
+				goalUi.x = movesUi.x + movesUi.getSize().width / 2 + 15;
+				goalUi.y = movesUi.y + 25;
+
+				scoreUi.x = movesUi.x + goalUi.x + 220;
+				scoreUi.y = movesUi.y + goalUi.y + 149;
+
+
+			}
+		}
+
+		if (mode == LayoutMode.Landscape)
+		{
+			helpsUi.x = HppG.stage2d.width / scaleX - helpsUi.getSize().width / 2 + 30;
+			helpsUi.y = HppG.stage2d.height / 2 / scaleX - helpsUi.getSize().height / 2 + 10;
+		}
+		else
+		{
+			helpsUi.x = HppG.stage2d.width / 2 / scaleX - helpsUi.getSize().width / 2 + 10;
+			helpsUi.y = HppG.stage2d.height / scaleX - helpsUi.getSize().height - 25;
 		}
 	}
 }

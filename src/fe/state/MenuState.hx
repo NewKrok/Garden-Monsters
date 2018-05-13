@@ -48,9 +48,11 @@ class MenuState extends Base2dState
 	var dragForce:Float = 0;
 	var prevCheckForceYPoint:Int = 0;
 	var dragForceTime:Float = 0;
+	var isOpenedByGame:Bool;
 
-	public function new(stage:Base2dStage, levelId:UInt)
+	public function new(stage:Base2dStage, isOpenedByGame:Bool = false)
 	{
+		this.isOpenedByGame = isOpenedByGame;
 		menuModel = new MenuModel();
 
 		super(stage);
@@ -200,7 +202,7 @@ class MenuState extends Base2dState
 			interactiveArea
 		);
 
-		openWelcomePage();
+		if (!isOpenedByGame) openWelcomePage();
 
 		onStageResize(stage.width, stage.height);
 

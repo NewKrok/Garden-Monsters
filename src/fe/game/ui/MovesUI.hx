@@ -6,7 +6,6 @@ import h2d.Layers;
 import h2d.Text;
 import hpp.util.Language;
 import hxd.Res;
-import motion.Actuate;
 import tink.state.Observable;
 
 /**
@@ -18,7 +17,7 @@ class MovesUI extends Layers
 	var countText:Text;
 	var isStarRegistered:Bool = false;
 
-	public function new(parent, remainingMoves:Observable<UInt>, stars:Observable<UInt>)
+	public function new(parent, remainingMoves:Observable<UInt>)
 	{
 		super(parent);
 
@@ -32,7 +31,7 @@ class MovesUI extends Layers
 		countText.textColor = 0xFFBF00;
 		countText.textAlign = Align.Center;
 		countText.x = back.getSize().width / 2 + 2;
-		countText.y = 30;
+		countText.y = 15;
 
 		var label = new Text(Fonts.DEFAULT_M, this);
 		label.smooth = true;
@@ -44,20 +43,6 @@ class MovesUI extends Layers
 
 		remainingMoves.bind(function(v) {
 			countText.text = Std.string(v);
-		});
-
-		stars.bind(function(v) {
-			if (!isStarRegistered && v > 0)
-			{
-				isStarRegistered = true;
-
-				Actuate.tween(countText, .5, {
-					y: 15
-				}).onUpdate(function() {
-					countText.y = countText.y;
-					label.y = countText.y + countText.textHeight;
-				});
-			}
 		});
 	}
 }

@@ -8,6 +8,7 @@ import fe.game.EffectHandler;
 import fe.game.Elem;
 import fe.game.Elem.ElemType;
 import fe.game.GameModel;
+import fe.game.Help.HelpType;
 import fe.game.SkillHandler;
 import fe.game.dialog.GameDialog;
 import fe.game.ui.GameUI;
@@ -55,6 +56,11 @@ class GameState extends Base2dState
 	{
 		gameModel = new GameModel();
 		gameModel.levelId = levelId;
+		gameModel.helps.set(HelpType.BOMB, 3);
+		gameModel.helps.set(HelpType.APPLE_JUICE, 3);
+		gameModel.helps.set(HelpType.HOT_PEPPER, 3);
+		gameModel.helps.set(HelpType.DICE, 3);
+		gameModel.helps.set(HelpType.FRUIT_BOX, 3);
 
 		super(stage);
 	}
@@ -173,7 +179,7 @@ class GameState extends Base2dState
 				{
 					Actuate.timer(2).onComplete(function()
 					{
-						HppG.changeState(MenuState);
+						HppG.changeState(MenuState, [true]);
 					});
 				}
 			});

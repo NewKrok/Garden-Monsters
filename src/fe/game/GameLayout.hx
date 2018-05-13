@@ -53,8 +53,6 @@ class GameLayout
 
 		background.onResize(width, height, widthRatio);
 
-		gameUI.setLayoutMode(mode);
-
 		if (mode == LayoutMode.Landscape)
 		{
 			gameUI.setScale(heightRatio);
@@ -71,8 +69,10 @@ class GameLayout
 
 			gameContainer.setScale((widthRatio * gameContainerDefaultWidth) / GameLayout.gameContainerDefaultWidth);
 			gameContainer.x = stage.width / 2 - gameContainerDefaultWidth * widthRatio / 2;
-			gameContainer.y = gameUI.y + gameContainerPortraitTopPadding * widthRatio;
+			gameContainer.y = gameContainerPortraitTopPadding * widthRatio;
 		}
+
+		gameUI.setLayoutMode(mode);
 
 		gameDialog.x = gameContainer.x + gameContainer.getSize().width / 2;
 		gameDialog.y = gameContainer.y + gameContainer.getSize().height / 2;
