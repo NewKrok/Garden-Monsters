@@ -1,5 +1,6 @@
 package fe.game.dialog;
 
+import fe.game.GameModel;
 import h2d.Layers;
 import h2d.Sprite;
 /**

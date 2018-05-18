@@ -81,7 +81,7 @@ class GameUI extends Layers
 		else
 		{
 			helpsUi.x = HppG.stage2d.width / 2 / scaleX - helpsUi.getSize().width / 2 + 10;
-			helpsUi.y = HppG.stage2d.height / scaleX - helpsUi.getSize().height - 25;
+			helpsUi.y = HppG.stage2d.height / scaleX - helpsUi.getBounds().height / scaleX - 25;
 		}
 	}
 }

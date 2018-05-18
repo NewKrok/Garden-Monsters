@@ -16,8 +16,14 @@ class GameLayout
 {
 	static var gameContainerDefaultWidth = Elem.SIZE * 8;
 	static var gameContainerDefaultHeight = Elem.SIZE * 8;
-	static inline var gameContainerLandscapeLeftPadding = 340;
-	static inline var gameContainerPortraitTopPadding = 350;
+	static inline var gameContainerLandscapeXOffset = 8;
+	static inline var gameContainerLandscapeYOffset = 8;
+	static inline var gameContainerLandscapeHorizontalMinPadding = 260;
+	static inline var gameContainerLandscapeVerticalMinPadding = 50;
+	static inline var gameContainerPortraitXOffset = 8;
+	static inline var gameContainerPortraitYOffset = 25;
+	static inline var gameContainerPortraitHorizontalMinPadding = 23;
+	static inline var gameContainerPortraitVerticalMinPadding = 280;
 
 	var mode:LayoutMode = LayoutMode.Landscape;
 	var stage:Base2dStage;
@@ -53,23 +59,40 @@ class GameLayout
 
 		background.onResize(width, height, widthRatio);
 
+		var gameContainerMaxWidth;
+		var gameContainerMaxHeight;
+		if (mode == LayoutMode.Landscape)
+		{
+			gameContainerMaxWidth = stage.width - gameContainerLandscapeHorizontalMinPadding * 2 * heightRatio;
+			gameContainerMaxHeight = stage.height - gameContainerLandscapeVerticalMinPadding * 2 * heightRatio;
+		}
+		else
+		{
+			gameContainerMaxWidth = stage.width - gameContainerPortraitHorizontalMinPadding * 2 * widthRatio;
+			gameContainerMaxHeight = stage.height - gameContainerPortraitVerticalMinPadding * 2 * widthRatio;
+		}
+		if (gameContainerMaxWidth < gameContainerMaxHeight)
+			gameContainer.setScale(gameContainerMaxWidth / gameContainerDefaultWidth);
+		else
+			gameContainer.setScale(gameContainerMaxHeight / gameContainerDefaultHeight);
+		gameContainer.x = stage.width / 2 - gameContainer.getSize().width / 2;
+		gameContainer.y = stage.height / 2 - gameContainer.getSize().height / 2;
+
 		if (mode == LayoutMode.Landscape)
 		{
 			gameUI.setScale(heightRatio);
 			gameDialog.setScale(heightRatio);
 
-			gameContainer.setScale((heightRatio * gameContainerDefaultHeight) / gameContainerDefaultHeight);
-			gameContainer.x = gameUI.x + gameContainerLandscapeLeftPadding;
-			gameContainer.y = stage.height / 2 - gameContainerDefaultHeight * heightRatio / 2;
+			gameContainer.x += gameContainerLandscapeXOffset;
+			gameContainer.y += gameContainerLandscapeYOffset;
 		}
 		else
 		{
 			gameUI.setScale(widthRatio);
 			gameDialog.setScale(widthRatio);
 
-			gameContainer.setScale((widthRatio * gameContainerDefaultWidth) / GameLayout.gameContainerDefaultWidth);
-			gameContainer.x = stage.width / 2 - gameContainerDefaultWidth * widthRatio / 2;
-			gameContainer.y = gameContainerPortraitTopPadding * widthRatio;
+			gameContainer.x += gameContainerPortraitXOffset;
+			gameContainer.y += gameContainerPortraitYOffset;
 		}
 
 		gameUI.setLayoutMode(mode);

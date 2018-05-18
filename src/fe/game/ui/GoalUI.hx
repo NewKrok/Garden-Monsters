@@ -1,11 +1,11 @@
 package fe.game.ui;
-import fe.game.GameLayout;
 
+import fe.game.GameLayout;
+import fe.game.GameModel.ElemGoalData;
 import fe.AppConfig;
 import fe.game.GameLayout.LayoutMode;
 import fe.asset.Fonts;
 import fe.game.Elem.ElemType;
-import fe.game.GameModel.ElemGoalData;
 import h2d.Bitmap;
 import h2d.Flow;
 import h2d.Layers;

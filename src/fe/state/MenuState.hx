@@ -18,6 +18,7 @@ import hxd.res.Sound;
 import hxd.Cursor;
 import fe.menu.substate.StartLevelPage;
 import fe.menu.substate.WelcomePage;
+import hxd.snd.Channel;
 import motion.Actuate;
 import motion.easing.Linear;
 
@@ -252,6 +253,8 @@ class MenuState extends Base2dState
 		openSubState(startLevelPage);
 
 		for (b in levelButtons) b.isEnabled = false;
+
+		AppConfig.CHANNEL_GROUP_MUSIC.volume = AppConfig.MUSIC_VOLUME / 3;
 	}
 
 	function normalizeContainerY(baseY:Float, withOverFlow:Bool = true):Float
@@ -266,6 +269,8 @@ class MenuState extends Base2dState
 	{
 		interactiveArea.onClick = function(_){};
 		interactiveArea.cursor = Cursor.Default;
+
+		AppConfig.CHANNEL_GROUP_MUSIC.volume = AppConfig.MUSIC_VOLUME;
 
 		for (b in levelButtons) b.isEnabled = true;
 	}
@@ -304,8 +309,9 @@ class MenuState extends Base2dState
 
 	override public function dispose()
 	{
-		/*backgroundLoopMusic.stop();
-		backgroundLoopMusic.dispose();*/
+		backgroundLoopMusic.stop();
+
+		AppConfig.CHANNEL_GROUP_MUSIC.volume = AppConfig.MUSIC_VOLUME;
 
 		super.dispose();
 	}
