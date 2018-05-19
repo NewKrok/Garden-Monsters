@@ -82,7 +82,7 @@ class GameState extends Base2dState
 
 		loadLevel(Level.getLevelData(gameModel.levelId));
 
-		gameUI = new GameUI(stage, gameModel);
+		gameUI = new GameUI(stage, gameModel, activateHelp);
 		gameDialog = new GameDialog(stage, gameModel);
 		gameContainer.addChild(effectHandler.view);
 
@@ -190,6 +190,11 @@ class GameState extends Base2dState
 		var mapData = BoardHelper.analyzeMap(map);
 		if (mapData.matches.length > 0 || mapData.movePossibilities.length < 2) createMap(rawMap, availableElemTypes, onComplete);
 		else onComplete(map);
+	}
+
+	function activateHelp(helpType:HelpType)
+	{
+		gameModel.helps.get(helpType).set(gameModel.helps.get(helpType).value - 1);
 	}
 
 	override public function update(delta:Float)

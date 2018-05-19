@@ -1,5 +1,6 @@
 package fe.game.ui;
 import fe.game.GameLayout;
+import fe.game.Help.HelpType;
 import hpp.heaps.HppG;
 
 import fe.game.GameLayout.LayoutMode;
@@ -23,7 +24,8 @@ class GameUI extends Layers
 
 	public function new(
 		parent:Sprite,
-		gameModel:GameModel
+		gameModel:GameModel,
+		activateHelp:HelpType->Void
 	){
 		super(parent);
 
@@ -31,7 +33,7 @@ class GameUI extends Layers
 		movesUi = new MovesUI(this, gameModel.remainingMoves);
 		scoreUi = new ScoreUI(this, gameModel.score);
 		starsUi = new StarsUI(this, gameModel.stars, gameModel.starPercentage);
-		helpsUi = new HelpsUI(this, cast gameModel.helps);
+		helpsUi = new HelpsUI(this, activateHelp, cast gameModel.helps);
 	}
 
 	public function setLayoutMode(mode:LayoutMode)

@@ -57,6 +57,12 @@ class MenuState extends Base2dState
 		menuModel = new MenuModel();
 
 		super(stage);
+
+		if (isOpenedByGame)
+		{
+			backgroundLoopMusic = if (Sound.supportedFormat(Mp3)) Res.sound.game_loop else null;
+			if (backgroundLoopMusic != null) backgroundLoopMusic.play(true, AppConfig.MUSIC_VOLUME, AppConfig.CHANNEL_GROUP_MUSIC);
+		}
 	}
 
 	override function build()
@@ -309,7 +315,7 @@ class MenuState extends Base2dState
 
 	override public function dispose()
 	{
-		backgroundLoopMusic.stop();
+		if (backgroundLoopMusic != null) backgroundLoopMusic.stop();
 
 		AppConfig.CHANNEL_GROUP_MUSIC.volume = AppConfig.MUSIC_VOLUME;
 
