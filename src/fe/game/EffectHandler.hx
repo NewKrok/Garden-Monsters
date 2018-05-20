@@ -10,6 +10,7 @@ import hpp.util.GeomUtil.SimplePoint;
 import hxd.Res;
 import motion.Actuate;
 import motion.MotionPath;
+import motion.easing.Bounce;
 import motion.easing.Linear;
 import motion.easing.Quad;
 
@@ -40,31 +41,37 @@ class EffectHandler
 	{
 		var image:Bitmap = new Bitmap(Res.image.game.effect.bomb.toTile(), view);
 		image.x = x;
-		image.y = y - 10;
+		image.y = y - 140;
 		image.setScale(AppConfig.GAME_BITMAP_SCALE);
 
 		var tile:Tile = image.tile;
 		tile.dx = cast -tile.width / 2;
 		tile.dy = cast -tile.height / 2;
 
-		Actuate.tween(image, BOMB_EFFECT_DURATION, {
-			scaleX: AppConfig.GAME_BITMAP_SCALE * 1.1, scaleY: AppConfig.GAME_BITMAP_SCALE * 1.1
-		}).ease(Linear.easeNone).onUpdate(function(){
-			image.setScale(image.scaleX);
+		Actuate.tween(image, BOMB_EFFECT_DURATION * 3, {
+			y: y - 10
+		}).ease(Bounce.easeOut).onUpdate(function(){
+			image.y = image.y;
 		}).onComplete(function(){
 			Actuate.tween(image, BOMB_EFFECT_DURATION, {
-				scaleX: AppConfig.GAME_BITMAP_SCALE * .8, scaleY: AppConfig.GAME_BITMAP_SCALE * .8
+				scaleX: AppConfig.GAME_BITMAP_SCALE * 1.1, scaleY: AppConfig.GAME_BITMAP_SCALE * 1.1
 			}).ease(Linear.easeNone).onUpdate(function(){
 				image.setScale(image.scaleX);
 			}).onComplete(function(){
-				addExplosionLight(x, y, Res.image.game.effect.light.toTile());
-				addExplosionLight(x, y, Res.image.game.effect.explosion.toTile());
 				Actuate.tween(image, BOMB_EFFECT_DURATION, {
-					scaleX: AppConfig.GAME_BITMAP_SCALE * 1.3, scaleY: AppConfig.GAME_BITMAP_SCALE * 1.3, alpha: 0
+					scaleX: AppConfig.GAME_BITMAP_SCALE * .8, scaleY: AppConfig.GAME_BITMAP_SCALE * .8
 				}).ease(Linear.easeNone).onUpdate(function(){
 					image.setScale(image.scaleX);
 				}).onComplete(function(){
-					removeBitmap(image);
+					addExplosionLight(x, y, Res.image.game.effect.light.toTile());
+					addExplosionLight(x, y, Res.image.game.effect.explosion.toTile());
+					Actuate.tween(image, BOMB_EFFECT_DURATION, {
+						scaleX: AppConfig.GAME_BITMAP_SCALE * 1.3, scaleY: AppConfig.GAME_BITMAP_SCALE * 1.3, alpha: 0
+					}).ease(Linear.easeNone).onUpdate(function(){
+						image.setScale(image.scaleX);
+					}).onComplete(function(){
+						removeBitmap(image);
+					});
 				});
 			});
 		});

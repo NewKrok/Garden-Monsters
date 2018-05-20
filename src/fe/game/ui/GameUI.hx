@@ -33,7 +33,7 @@ class GameUI extends Layers
 		movesUi = new MovesUI(this, gameModel.remainingMoves);
 		scoreUi = new ScoreUI(this, gameModel.score);
 		starsUi = new StarsUI(this, gameModel.stars, gameModel.starPercentage);
-		helpsUi = new HelpsUI(this, activateHelp, cast gameModel.helps);
+		helpsUi = new HelpsUI(this, activateHelp, gameModel.isPossibleToPlay, cast gameModel.helps);
 	}
 
 	public function setLayoutMode(mode:LayoutMode)

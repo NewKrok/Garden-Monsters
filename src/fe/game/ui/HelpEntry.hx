@@ -25,11 +25,13 @@ class HelpEntry extends Layers
 	var isChangedToDone:Bool;
 	var elem:Bitmap;
 	var interactive:Interactive;
+	var isPossibleToPlay:Observable<Bool>;
 	var availableCount:Observable<UInt>;
 
-	public function new(parent:Sprite, tile:Tile, availableCount:Observable<UInt>, activateHelp:Void->Void)
+	public function new(parent:Sprite, isPossibleToPlay:Observable<Bool>, tile:Tile, availableCount:Observable<UInt>, activateHelp:Void->Void)
 	{
 		super(parent);
+		this.isPossibleToPlay = isPossibleToPlay;
 		this.availableCount = availableCount;
 
 		elem = makeGraphic(tile.clone());
@@ -59,17 +61,23 @@ class HelpEntry extends Layers
 		interactive = new Interactive(tile.width * AppConfig.GAME_BITMAP_SCALE, tile.height * AppConfig.GAME_BITMAP_SCALE, this);
 		interactive.cursor = Cursor.Button;
 		interactive.onClick = function(_) {
-			if (availableCount.value > 0) activateHelp();
+			if (availableCount.value > 0 && isPossibleToPlay.value) activateHelp();
 		};
 		interactive.onOver = onOverHandler;
 		interactive.onOut = onOutHandler;
 		interactive.x = -80;
 		interactive.y = -80;
+
+		isPossibleToPlay.bind(function(v:Bool)
+		{
+			if (v) interactive.cursor = Cursor.Button;
+			else interactive.cursor = Cursor.Default;
+		});
 	}
 
 	function onOverHandler(_)
 	{
-		if (availableCount.value == 0) return;
+		if (availableCount.value == 0 || !isPossibleToPlay.value) return;
 
 		Actuate.stop(elem);
 

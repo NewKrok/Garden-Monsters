@@ -25,7 +25,7 @@ class HelpsUI extends Layers
 	var label:Text;
 	var helps:Flow;
 
-	public function new(parent, activateHelp:HelpType->Void, helpCounts:Map<HelpType, Observable<UInt>>)
+	public function new(parent, activateHelp:HelpType->Void, isPossibleToPlay:Observable<Bool>, helpCounts:Map<HelpType, Observable<UInt>>)
 	{
 		super(parent);
 
@@ -48,7 +48,7 @@ class HelpsUI extends Layers
 
 		for (key in helpCounts.keys())
 		{
-			var entry = new HelpEntry(helps, HelpTile.tiles.get(key), helpCounts.get(key), activateHelp.bind(key));
+			var entry = new HelpEntry(helps, isPossibleToPlay, HelpTile.tiles.get(key), helpCounts.get(key), activateHelp.bind(key));
 			helpEntries.push(entry);
 		}
 	}

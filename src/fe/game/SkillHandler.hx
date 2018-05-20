@@ -1,5 +1,6 @@
 package fe.game;
 
+import fe.game.Board.Map;
 import fe.game.Elem.ElemType;
 import fe.game.util.BoardHelper;
 import fe.game.util.TweenHelper;
@@ -19,7 +20,7 @@ using hpp.util.ArrayUtil;
  */
 class SkillHandler
 {
-	var map:Array<Array<Elem>>;
+	var map:Map;
 	var foundMatch:Array<Array<Elem>>;
 
 	var container:Layers;
@@ -34,17 +35,21 @@ class SkillHandler
 		container:Layers,
 		availableElemTypes:Array<ElemType>,
 		effectHandler:EffectHandler,
+		map:Map,
 		moveElemToPosition:Elem->Void,
 		onElemCollectCallback:ElemType-> Void
 	){
 		this.container = container;
 		this.availableElemTypes = availableElemTypes;
 		this.effectHandler = effectHandler;
+		this.map = map;
 		this.moveElemToPosition = moveElemToPosition;
 		this.onElemCollectCallback = onElemCollectCallback;
+
+		foundMatch = [];
 	}
 
-	public function update(map:Array<Array<Elem>>, foundMatch:Array<Array<Elem>>)
+	public function update(map:Map, foundMatch:Array<Array<Elem>>)
 	{
 		this.map = map;
 		this.foundMatch = foundMatch;
@@ -65,11 +70,12 @@ class SkillHandler
 			if (match.length < 4) longestSkillTime = .2;
 			else if (match.length == 4)
 			{
-				longestSkillTime = .5;
+				longestSkillTime = 1.2;
 				removeNearbyElemsByElem(
 					selectedElem,
 					effectHandler.addBombEffect,
-					effectHandler.addMonsterMatchEffect
+					effectHandler.addMonsterMatchEffect,
+					longestSkillTime
 				);
 			}
 			else if (match.length > 4)
@@ -148,6 +154,25 @@ class SkillHandler
 		return longestSkillTime;
 	}
 
+	public function addBomb(onComplete:Void->Void):Void
+	{
+		var target = BoardHelper.getRandomPlayableElem(map);
+
+		removeNearbyElemsByElem(
+			target,
+			effectHandler.addBombEffect,
+			effectHandler.addMonsterMatchEffect,
+			1.2
+		);
+
+		effectHandler.addMonsterMatchEffect(target.graphic.x, target.graphic.y);
+		map[target.indexY][target.indexX] = null;
+		target.graphic.remove();
+		target = null;
+
+		Actuate.timer(1.2).onComplete(onComplete);
+	}
+
 	function getRandomNearbyNotMatchedPlayableElem(m:Array<Elem>):Elem
 	{
 		var searchDirections:Array<SimplePoint> = [
@@ -210,7 +235,7 @@ class SkillHandler
 		return true;
 	}
 
-	function removeNearbyElemsByElem(triggerElem:Elem, startEffect:Float->Float->Void, activateEffect:Float->Float->Void)
+	function removeNearbyElemsByElem(triggerElem:Elem, startEffect:Float->Float->Void, activateEffect:Float->Float->Void, delay:Float)
 	{
 		var nearbyElems:Array<SimplePoint> = [
 			{ x: -1, y: -1 }, { x: -1, y: 0 }, { x: -1, y: 1 },
@@ -220,7 +245,7 @@ class SkillHandler
 
 		if (startEffect != null) startEffect(triggerElem.graphic.x, triggerElem.graphic.y);
 
-		Actuate.timer(.5).onComplete(function(){
+		Actuate.timer(delay).onComplete(function(){
 			for (d in nearbyElems)
 			{
 				if (map[cast triggerElem.indexY + d.y] == null) continue;

@@ -151,6 +151,12 @@ class GameState extends Base2dState
 				map
 			);
 
+			board.onSwapRequest(function(){
+				gameModel.isPossibleToPlay.set(false);
+			});
+			board.onFailedSwap(function(){
+				gameModel.isPossibleToPlay.set(true);
+			});
 			board.onSuccessfulSwap(function(){
 				gameModel.remainingMoves.set(gameModel.remainingMoves.value - 1);
 				if (gameModel.remainingMoves.value == 0) gameModel.isPossibleToPlay.set(false);
@@ -179,6 +185,7 @@ class GameState extends Base2dState
 						HppG.changeState(MenuState, [true]);
 					});
 				}
+				else gameModel.isPossibleToPlay.set(true);
 			});
 		});
 	}
@@ -194,7 +201,15 @@ class GameState extends Base2dState
 
 	function activateHelp(helpType:HelpType)
 	{
+		gameModel.isPossibleToPlay.set(false);
 		gameModel.helps.get(helpType).set(gameModel.helps.get(helpType).value - 1);
+
+		switch (helpType)
+		{
+			case HelpType.BOMB: skillHandler.addBomb(board.analyzeMap);
+
+			case _:
+		}
 	}
 
 	override public function update(delta:Float)

@@ -1,7 +1,10 @@
 package fe.game.util;
 
+import fe.game.Board.Map;
 import hpp.util.GeomUtil.SimplePoint;
 import fe.game.Elem;
+
+using hpp.util.ArrayUtil;
 
 /**
  * ...
@@ -156,9 +159,9 @@ class BoardHelper
 		}
 	];
 
-	public static function createMap(rawMap:Array<Array<Int>>, availableElemTypes:Array<ElemType> = null):Array<Array<Elem>>
+	public static function createMap(rawMap:Array<Array<Int>>, availableElemTypes:Array<ElemType> = null):Map
 	{
-		var map:Array<Array<Elem>> = [];
+		var map:Map = [];
 		availableElemTypes = availableElemTypes == null ? [] : availableElemTypes;
 
 		for (i in 0...rawMap.length)
@@ -186,7 +189,7 @@ class BoardHelper
 		minimumStartPossiblities:UInt = 2,
 		blockCount:UInt = 0,
 		availableElemTypes:Array<ElemType>
-	):Array<Array<Elem>>
+	):Map
 	{
 		var maxTry:UInt = 300;
 
@@ -208,9 +211,9 @@ class BoardHelper
 		return map;
 	}
 
-	public static function createRandomMap(col:UInt, row:UInt, blockCount:UInt = 0, availableElemTypes:Array<ElemType>):Array<Array<Elem>>
+	public static function createRandomMap(col:UInt, row:UInt, blockCount:UInt = 0, availableElemTypes:Array<ElemType>):Map
 	{
-		var map:Array<Array<Elem>> = [];
+		var map:Map = [];
 
 		for (i in 0...row)
 		{
@@ -234,7 +237,7 @@ class BoardHelper
 		return availableElemTypes[Math.floor(Math.random() * availableElemTypes.length)];
 	}
 
-	public static function analyzeMap(map:Array<Array<Elem>>):MapData
+	public static function analyzeMap(map:Map):MapData
 	{
 		return {
 			movePossibilities: calculateMovePossibilities(map),
@@ -242,7 +245,7 @@ class BoardHelper
 		}
 	}
 
-	public static function detectMatch(map:Array<Array<Elem>>):Array<Array<Elem>>
+	public static function detectMatch(map:Map):Array<Array<Elem>>
 	{
 		var foundMatch:Array<Array<Elem>> = [];
 
@@ -357,7 +360,7 @@ class BoardHelper
 		return foundMatch;
 	}
 
-	static function calculateMovePossibilities(map:Array<Array<Elem>>):Array<Elem>
+	static function calculateMovePossibilities(map:Map):Array<Elem>
 	{
 		var possibilities:Array<Elem> = [];
 
@@ -376,7 +379,7 @@ class BoardHelper
 		return possibilities;
 	}
 
-	static function checkElemPossibilities(map:Array<Array<Elem>>, x:UInt, y:UInt, type:ElemType):Bool
+	static function checkElemPossibilities(map:Map, x:UInt, y:UInt, type:ElemType):Bool
 	{
 		if (!isMovableType(type)) return false;
 
@@ -416,6 +419,22 @@ class BoardHelper
 	static public function isFruitElem(elem:Elem):Bool
 	{
 		return elem != null && elem.type.toInt() > 7;
+	}
+
+	static public function getRandomPlayableElem(map:Map):Elem
+	{
+		var possibleElems:Array<Elem> = [];
+
+		for (row in map)
+			for (e in row)
+				if (
+					e != null
+					&& e.type != ElemType.Blocker
+					&& e.type != ElemType.Empty
+					&& e.type != ElemType.None
+				) possibleElems.push(e);
+
+		return possibleElems.random();
 	}
 }
 

@@ -35,7 +35,7 @@ class Board
 	public var alreadyAnimatedElems:Array<Elem>;
 	public var underAnimationElems:Array<Elem>;
 
-	var map:Array<Array<Elem>>;
+	var map:Map;
 	var availableElemTypes:Array<ElemType>;
 	var parent:Layers;
 	var interactiveArea:Interactive;
@@ -57,6 +57,8 @@ class Board
 
 	var showHelpTimer:Dynamic;
 
+	var onSwapRequestCallback:Void->Void = function(){};
+	var onFailedSwapCallback:Void->Void = function(){};
 	var onSuccessfulSwapCallback:Void->Void = function(){};
 	var onTurnEndCallback:Void->Void = function(){};
 	var onElemCollectCallback:ElemType->Void = function(_){};
@@ -69,7 +71,7 @@ class Board
 		skillHandler:SkillHandler,
 		availableElemTypes:Array<ElemType>,
 		isPossibleToPlay:Observable<Bool>,
-		map:Array<Array<Elem>>
+		map:Map
 	){
 		this.parent = parent;
 		this.interactiveArea = interactiveArea;
@@ -89,6 +91,7 @@ class Board
 			container,
 			availableElemTypes,
 			effectHandler,
+			map,
 			function(e) { moveElemToPosition(e); },
 			function(t) { onElemCollectCallback(t); }
 		);
@@ -111,9 +114,36 @@ class Board
 		mask.height = Std.int(container.getSize().height + maskOffset * 2);
 
 		createInteractive();
+
+		isPossibleToPlay.bind(function(v){
+			if (v)
+			{
+				if (showHelpTimer != null)
+				{
+					Actuate.stop(showHelpTimer, null, false, false);
+					showHelpTimer = null;
+				}
+
+				if (foundPossibilities.length > 0)
+					showHelpTimer = Actuate.timer(10).onComplete(function()
+					{
+						for (m in foundPossibilities) if (m != null) m.graphic.mark();
+					});
+			}
+			else
+			{
+				Actuate.stop(showHelpTimer, null, false, false);
+				showHelpTimer = null;
+
+				if (foundPossibilities != null)
+					for (m in foundPossibilities) if (m != null) m.graphic.unmark();
+			}
+		});
 	}
 
 	public function onTurnEnd(callback:Void->Void):Void onTurnEndCallback = callback;
+	public function onSwapRequest(callback:Void->Void):Void onSwapRequestCallback = callback;
+	public function onFailedSwap(callback:Void->Void):Void onFailedSwapCallback = callback;
 	public function onSuccessfulSwap(callback:Void->Void):Void onSuccessfulSwapCallback = callback;
 	public function onElemCollect(callback:ElemType->Void):Void onElemCollectCallback = callback;
 	public function onNoMoreMoves(callback:Void->Void):Void onNoMoreMovesCallback = callback;
@@ -261,6 +291,8 @@ class Board
 			|| tempB.type == ElemType.None
 		) return;
 
+		onSwapRequestCallback();
+
 		tempA.isUnderSwapping = true;
 		tempB.isUnderSwapping = true;
 		isAnimationInProgress = true;
@@ -299,6 +331,7 @@ class Board
 				tempA.isUnderSwapping = false;
 				tempB.isUnderSwapping = false;
 				isAnimationInProgress = false;
+				onFailedSwapCallback();
 			}
 			else checkSwapResult(indexX, indexY, targetIndexX, targetIndexY);
 		});
@@ -357,13 +390,16 @@ class Board
 				}
 			}
 
-			Actuate.timer(longestSkillTime).onComplete(function() {
-				checkMap();
-				fillMap();
-
-				for (row in map) for (e in row) if (e != null && e.animationPath.length > 0) moveElemToPosition(e, checkAnimationProgress);
-			});
+			Actuate.timer(longestSkillTime).onComplete(analyzeMap);
 		}
+	}
+
+	public function analyzeMap():Void
+	{
+		checkMap();
+		fillMap();
+
+		for (row in map) for (e in row) if (e != null && e.animationPath.length > 0) moveElemToPosition(e, checkAnimationProgress);
 	}
 
 	function checkAnimationProgress()
@@ -692,22 +728,7 @@ class Board
 
 		for (m in foundMatch) for (e in m) if (e != null) effectHandler.addMonsterMatchEffect(e.graphic.x, e.graphic.y);
 
-		if (showHelpTimer != null)
-		{
-			Actuate.stop(showHelpTimer, null, false, false);
-			showHelpTimer = null;
-		}
-
-		if (foundPossibilities.length > 0) showPossibilitiesWithDelay();
-
 		debugMapTrace();
-	}
-
-	function showPossibilitiesWithDelay(delay:Float = 5)
-	{
-		showHelpTimer = Actuate.timer(delay).onComplete(function() {
-			for (m in foundPossibilities) if (m != null) m.graphic.mark();
-		});
 	}
 
 	public function shuffleElemsRequest()
@@ -786,3 +807,5 @@ enum DragDirection {
 	Right;
 	None;
 }
+
+typedef Map = Array<Array<Elem>>;
