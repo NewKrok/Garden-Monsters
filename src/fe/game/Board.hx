@@ -733,7 +733,7 @@ class Board
 
 	public function shuffleElemsRequest()
 	{
-		shuffleElems(onTurnEndCallback);
+		shuffleElems(function(){ Actuate.timer(.5).onComplete(onTurnEndCallback); });
 	}
 
 	function shuffleElems(onFinished:Void->Void):Void
@@ -767,20 +767,17 @@ class Board
 		if (mapData.matches.length > 0 || mapData.movePossibilities.length < 2) shuffleElems(onFinished);
 		else
 		{
-			Actuate.timer(1).onComplete(function()
-			{
-				var isFirstElem:Bool = true;
-				for (row in map)
-					for (elem in row)
-						if (BoardHelper.isMovableElem(elem))
-						{
-							moveElemToPosition(elem, isFirstElem ? onFinished : null);
+			var isFirstElem:Bool = true;
+			for (row in map)
+				for (elem in row)
+					if (BoardHelper.isMovableElem(elem))
+					{
+						moveElemToPosition(elem, isFirstElem ? onFinished : null);
 
-							isFirstElem = false;
-						}
-				isShuffleInProgress = false;
-				checkMap();
-			});
+						isFirstElem = false;
+					}
+			isShuffleInProgress = false;
+			checkMap();
 		}
 	}
 

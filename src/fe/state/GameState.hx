@@ -171,7 +171,7 @@ class GameState extends Base2dState
 			board.onNoMoreMoves(function(){
 				if (gameModel.remainingMoves.value > 0)
 				{
-					board.shuffleElemsRequest();
+					Actuate.timer(1).onComplete(board.shuffleElemsRequest);
 					gameDialog.openNoMoreMovesDialog();
 				}
 			});
@@ -212,6 +212,8 @@ class GameState extends Base2dState
 				gameUI.onMovesIncreased();
 				Actuate.timer(.5).onComplete(function(){ gameModel.remainingMoves.set(gameModel.remainingMoves.value + 3); });
 				Actuate.timer(1.6).onComplete(function(){ gameModel.isPossibleToPlay.set(true); });
+
+			case HelpType.DICE: board.shuffleElemsRequest();
 
 			case _:
 		}
