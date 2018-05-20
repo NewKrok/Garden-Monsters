@@ -117,7 +117,7 @@ class Elem
 
 /* TEMPORARY INFO
 -3	DONE Not playable block but it cant block the other elems
--2	DONE Random block between 1 - 7
+-2	DONE Random block from the available elems
 -1	DONE Temporary empty block - Iterable can happen after match
  0	DONE Not playable block and it block the other elems
  1	DONE After match it removes 1 nearby element too

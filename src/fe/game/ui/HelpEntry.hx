@@ -8,6 +8,8 @@ import h2d.Layers;
 import h2d.Sprite;
 import h2d.Text;
 import h2d.Tile;
+import h2d.filter.ColorMatrix;
+import h3d.Matrix;
 import hpp.heaps.ui.BaseButton;
 import hpp.util.Language;
 import hxd.Cursor;
@@ -23,6 +25,7 @@ class HelpEntry extends Layers
 {
 	var counter:Text;
 	var isChangedToDone:Bool;
+	var infoBack:Bitmap;
 	var elem:Bitmap;
 	var interactive:Interactive;
 	var isPossibleToPlay:Observable<Bool>;
@@ -38,7 +41,7 @@ class HelpEntry extends Layers
 		elem.setScale(AppConfig.GAME_BITMAP_SCALE);
 		elem.y = 30;
 
-		var infoBack = new Bitmap(Res.image.common.ui.help_counter.toTile(), this);
+		infoBack = new Bitmap(Res.image.common.ui.help_counter.toTile(), this);
 		infoBack.smooth = true;
 		infoBack.setScale(AppConfig.GAME_BITMAP_SCALE);
 
@@ -56,12 +59,31 @@ class HelpEntry extends Layers
 		availableCount.bind(function(c:UInt)
 		{
 			counter.text = '$c';
+
+			if (c == 0)
+			{
+				infoBack.alpha = 0;
+				counter.alpha = 0;
+
+				interactive.cursor = Cursor.Default;
+
+				var m = new Matrix();
+				m.identity();
+				m.colorSaturation(-1);
+				filter = new ColorMatrix(m);
+
+				alpha = .5;
+			}
 		});
 
 		interactive = new Interactive(tile.width * AppConfig.GAME_BITMAP_SCALE, tile.height * AppConfig.GAME_BITMAP_SCALE, this);
 		interactive.cursor = Cursor.Button;
 		interactive.onClick = function(_) {
-			if (availableCount.value > 0 && isPossibleToPlay.value) activateHelp();
+			if (availableCount.value > 0 && isPossibleToPlay.value)
+			{
+				onOutHandler(null);
+				activateHelp();
+			}
 		};
 		interactive.onOver = onOverHandler;
 		interactive.onOut = onOutHandler;

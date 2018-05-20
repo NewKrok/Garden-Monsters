@@ -436,6 +436,23 @@ class BoardHelper
 
 		return possibleElems.random();
 	}
+
+	static public function getRandomMonsters(map:Map):Array<Elem>
+	{
+		var possibleElems:Array<Elem> = [];
+
+		for (row in map)
+			for (e in row)
+				if (
+					e != null
+					&& e.type.toInt() > 0
+					&& e.type.toInt() < 8
+				) possibleElems.push(e);
+
+		possibleElems.shuffle();
+
+		return possibleElems;
+	}
 }
 
 typedef MapData = {

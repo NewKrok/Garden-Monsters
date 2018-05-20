@@ -5,12 +5,14 @@
 		"play": "Indítás",
 		"moves": "LÉPÉS",
 		"goals": "Célok",
-		"helps": "Segítségek",
+		"helps": "Segítség",
 		"done": "KÉSZ",
 		"score": "Pont",
 		"no_more_moves": "nincs több lépés",
 		"shuffle": "KEVERÉS",
 		"level_num": "Szint ${level}",
-		"your_best": "Legjobb Eredményed"
+		"your_best": "Legjobb Eredményed",
+		"cant_use_help": "Nem tudod használni",
+		"no_monsters_on_the_board": "Nincs egy szörny se a táblán!"
 	}
 }

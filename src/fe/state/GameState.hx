@@ -19,6 +19,7 @@ import haxe.Timer;
 import hpp.heaps.Base2dStage;
 import hpp.heaps.Base2dState;
 import hpp.heaps.HppG;
+import hpp.util.Language;
 import hxd.Cursor;
 import hxd.Res;
 import hxd.res.Sound;
@@ -212,6 +213,22 @@ class GameState extends Base2dState
 				gameUI.onMovesIncreased();
 				Actuate.timer(.5).onComplete(function(){ gameModel.remainingMoves.set(gameModel.remainingMoves.value + 3); });
 				Actuate.timer(1.6).onComplete(function(){ gameModel.isPossibleToPlay.set(true); });
+
+			case HelpType.HOT_PEPPER:
+				if (board.getCountOfMonsters() > 0)
+				{
+					skillHandler.addHotPeppers(board.analyzeMap);
+				}
+				else
+				{
+					gameModel.helps.get(helpType).set(gameModel.helps.get(helpType).value + 1);
+					gameDialog.openSmallWarningDialog(Language.get("cant_use_help"), Language.get("no_monsters_on_the_board"));
+					Actuate.timer(2).onComplete(function()
+					{
+						gameDialog.closeSmallWarningDialog();
+						gameModel.isPossibleToPlay.set(true);
+					});
+				}
 
 			case HelpType.DICE: board.shuffleElemsRequest();
 

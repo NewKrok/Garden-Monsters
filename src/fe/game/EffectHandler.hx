@@ -23,6 +23,7 @@ class EffectHandler
 	static public inline var EXPLODING_EFFECT_DURATION:Float = 1;
 	static public inline var ICE_BREAK_EFFECT_DURATION:Float = 1;
 	static public inline var SPLASH_EFFECT_DURATION:Float = .6;
+	static public inline var HOT_PEPPER_EFFECT_DURATION:Float = .2;
 	static public inline var BOMB_EFFECT_DURATION:Float = .2;
 	static public inline var VORTEX_EFFECT_START_DURATION:Float = .3;
 	static public inline var VORTEX_EFFECT_FINISH_DURATION:Float = .7;
@@ -66,6 +67,45 @@ class EffectHandler
 					addExplosionLight(x, y, Res.image.game.effect.light.toTile());
 					addExplosionLight(x, y, Res.image.game.effect.explosion.toTile());
 					Actuate.tween(image, BOMB_EFFECT_DURATION, {
+						scaleX: AppConfig.GAME_BITMAP_SCALE * 1.3, scaleY: AppConfig.GAME_BITMAP_SCALE * 1.3, alpha: 0
+					}).ease(Linear.easeNone).onUpdate(function(){
+						image.setScale(image.scaleX);
+					}).onComplete(function(){
+						removeBitmap(image);
+					});
+				});
+			});
+		});
+	}
+
+	public function addHotPepperEffect(x:Float, y:Float):Void
+	{
+		var image:Bitmap = new Bitmap(Res.image.common.help.hot_pepper.toTile(), view);
+		image.x = x;
+		image.y = y - 140;
+		image.setScale(AppConfig.GAME_BITMAP_SCALE);
+
+		var tile:Tile = image.tile;
+		tile.dx = cast -tile.width / 2;
+		tile.dy = cast -tile.height / 2;
+
+		Actuate.tween(image, HOT_PEPPER_EFFECT_DURATION * 3, {
+			y: y - 10
+		}).ease(Bounce.easeOut).onUpdate(function(){
+			image.y = image.y;
+		}).onComplete(function(){
+			Actuate.tween(image, HOT_PEPPER_EFFECT_DURATION, {
+				scaleX: AppConfig.GAME_BITMAP_SCALE * 1.1, scaleY: AppConfig.GAME_BITMAP_SCALE * 1.1
+			}).ease(Linear.easeNone).onUpdate(function(){
+				image.setScale(image.scaleX);
+			}).onComplete(function(){
+				Actuate.tween(image, HOT_PEPPER_EFFECT_DURATION, {
+					scaleX: AppConfig.GAME_BITMAP_SCALE * .8, scaleY: AppConfig.GAME_BITMAP_SCALE * .8
+				}).ease(Linear.easeNone).onUpdate(function(){
+					image.setScale(image.scaleX);
+				}).onComplete(function(){
+					addExplosionLight(x, y, Res.image.game.effect.chili_light.toTile());
+					Actuate.tween(image, HOT_PEPPER_EFFECT_DURATION, {
 						scaleX: AppConfig.GAME_BITMAP_SCALE * 1.3, scaleY: AppConfig.GAME_BITMAP_SCALE * 1.3, alpha: 0
 					}).ease(Linear.easeNone).onUpdate(function(){
 						image.setScale(image.scaleX);

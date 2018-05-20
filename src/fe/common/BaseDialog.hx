@@ -15,6 +15,7 @@ import tink.CoreApi.Noise;
 class BaseDialog extends Layers
 {
 	var defaultY:Int = 0;
+	var baseWidth:Float;
 
 	public function new(parent, background:Tile, offset:SimplePoint = null)
 	{
@@ -28,6 +29,8 @@ class BaseDialog extends Layers
 
 		x = offset.x + -back.tile.width / 2 * AppConfig.GAME_BITMAP_SCALE;
 		y = defaultY = cast(offset.y + -back.tile.height / 2 * AppConfig.GAME_BITMAP_SCALE);
+
+		baseWidth = back.getSize().width;
 	}
 
 	public function open():Void

@@ -795,6 +795,21 @@ class Board
 			trace(rowText.substr(0, rowText.length - 2) + " ]");
 		}
 	}
+
+	public function getCountOfMonsters():UInt
+	{
+		var count = 0;
+
+		for (row in map)
+			for (e in row)
+				if (
+					e != null
+					&& e.type.toInt() > 0
+					&& e.type.toInt() < 8
+				) count++;
+
+		return count;
+	}
 }
 
 enum DragDirection {

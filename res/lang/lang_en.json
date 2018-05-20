@@ -11,6 +11,8 @@
 		"no_more_moves": "no more moves",
 		"shuffle": "SHUFFLE",
 		"level_num": "Level ${level}",
-		"your_best": "Your Best Score"
+		"your_best": "Your Best Score",
+		"cant_use_help": "You can't use this help",
+		"no_monsters_on_the_board": "There are no any monsters on the board!"
 	}
 }

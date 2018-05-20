@@ -5,6 +5,8 @@ import fe.game.Elem.ElemType;
 import fe.game.util.BoardHelper;
 import fe.game.util.TweenHelper;
 import h2d.Layers;
+import h2d.filter.ColorMatrix;
+import h3d.Matrix;
 import hpp.util.GeomUtil;
 import hpp.util.GeomUtil.SimplePoint;
 import motion.Actuate;
@@ -165,12 +167,43 @@ class SkillHandler
 			1.2
 		);
 
+		onElemCollectCallback(target.type);
 		effectHandler.addMonsterMatchEffect(target.graphic.x, target.graphic.y);
 		map[target.indexY][target.indexX] = null;
 		target.graphic.remove();
 		target = null;
 
 		Actuate.timer(1.2).onComplete(onComplete);
+	}
+
+	public function addHotPeppers(onComplete:Void->Void):Void
+	{
+		var monsters = BoardHelper.getRandomMonsters(map).splice(0, 3);
+
+		var m = new Matrix();
+		m.identity();
+		m.colorGain(0xFF0000, .8);
+		var colorFilter = new ColorMatrix(m);
+
+		for (m in monsters)
+		{
+			onElemCollectCallback(m.type);
+			effectHandler.addHotPepperEffect(m.graphic.x, m.graphic.y);
+			map[m.indexY][m.indexX] = null;
+
+			Actuate.timer(.7).onComplete(function(){
+				m.graphic.filter = colorFilter;
+			});
+
+			Actuate.tween(m.graphic, .5, {
+
+			}).delay(1).onComplete(function(){
+				m.graphic.remove();
+				m = null;
+			});
+		}
+
+		Actuate.timer(1.5).onComplete(onComplete);
 	}
 
 	function getRandomNearbyNotMatchedPlayableElem(m:Array<Elem>):Elem
