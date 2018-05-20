@@ -11,6 +11,7 @@ import fe.game.GameModel;
 import fe.game.Help.HelpType;
 import fe.game.SkillHandler;
 import fe.game.dialog.GameDialog;
+import fe.game.substate.MenuPage;
 import fe.game.ui.GameUI;
 import fe.game.util.BoardHelper;
 import h2d.Interactive;
@@ -33,6 +34,8 @@ import tink.state.State;
 class GameState extends Base2dState
 {
 	var gameModel:GameModel;
+
+	var menuPage:MenuPage;
 
 	var gameContainer:Layers;
 	var interactiveArea:Interactive;
@@ -79,11 +82,13 @@ class GameState extends Base2dState
 		effectHandler = new EffectHandler();
 		skillHandler = new SkillHandler();
 
+		menuPage = new MenuPage(closeMenu);
+
 		reset();
 
 		loadLevel(Level.getLevelData(gameModel.levelId));
 
-		gameUI = new GameUI(stage, gameModel, activateHelp);
+		gameUI = new GameUI(stage, openMenu, gameModel, activateHelp);
 		gameDialog = new GameDialog(stage, gameModel);
 		gameContainer.addChild(effectHandler.view);
 
@@ -93,7 +98,8 @@ class GameState extends Base2dState
 			gameContainer,
 			interactiveArea,
 			gameUI,
-			gameDialog
+			gameDialog,
+			menuPage
 		);
 
 		gameModel.isPossibleToPlay.set(false);
@@ -105,6 +111,18 @@ class GameState extends Base2dState
 		});
 
 		onStageResize(stage.width, stage.height);
+	}
+
+	function openMenu()
+	{
+		gameModel.isPossibleToPlay.set(false);
+		openSubState(menuPage);
+	}
+
+	function closeMenu()
+	{
+		gameModel.isPossibleToPlay.set(true);
+		closeSubState();
 	}
 
 	function createRandomBoard(onComplete:Void->Void)

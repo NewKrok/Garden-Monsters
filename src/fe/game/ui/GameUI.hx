@@ -1,8 +1,11 @@
 package fe.game.ui;
+
 import fe.game.GameLayout;
 import fe.game.Help.HelpType;
+import h2d.Flow;
 import hpp.heaps.HppG;
-
+import hpp.heaps.ui.BaseButton;
+import hxd.Res;
 import fe.game.GameLayout.LayoutMode;
 import fe.game.GameModel;
 import h2d.Layers;
@@ -14,26 +17,48 @@ import h2d.Sprite;
  */
 class GameUI extends Layers
 {
+	var secondaryContainer:Flow;
+
 	var movesUi:MovesUI;
 	var goalUi:GoalUI;
 	var scoreUi:ScoreUI;
 	var starsUi:StarsUI;
 	var helpsUi:HelpsUI;
+	var menuButton:BaseButton;
 
 	var activeLayout:LayoutMode = null;
 
 	public function new(
 		parent:Sprite,
+		openMenu:Void->Void,
 		gameModel:GameModel,
 		activateHelp:HelpType->Void
 	){
 		super(parent);
 
+		secondaryContainer = new Flow(this);
+		secondaryContainer.isVertical = false;
+		secondaryContainer.verticalAlign = FlowAlign.Middle;
+		secondaryContainer.horizontalAlign = FlowAlign.Middle;
+
+		menuButton = new BaseButton(secondaryContainer, {
+			onClick: function(_){ openMenu(); },
+			baseGraphic: Res.image.game.ui.menu_button.toTile(),
+			overGraphic: Res.image.game.ui.menu_button_over.toTile()
+		});
+		menuButton.setScale(AppConfig.GAME_BITMAP_SCALE);
+
+		gameModel.isPossibleToPlay.observe().bind(function(v){
+			menuButton.isEnabled = v;
+		});
+
 		goalUi = new GoalUI(this, gameModel.elemGoals);
 		movesUi = new MovesUI(this, gameModel.remainingMoves);
 		scoreUi = new ScoreUI(this, gameModel.score);
 		starsUi = new StarsUI(this, gameModel.stars, gameModel.starPercentage);
-		helpsUi = new HelpsUI(this, activateHelp, gameModel.isPossibleToPlay, cast gameModel.helps);
+		helpsUi = new HelpsUI(secondaryContainer, activateHelp, gameModel.isPossibleToPlay, cast gameModel.helps);
+
+		secondaryContainer.reflow();
 	}
 
 	public function onMovesIncreased():Void movesUi.onMovesIncreased();
@@ -72,20 +97,28 @@ class GameUI extends Layers
 
 				scoreUi.x = movesUi.x + goalUi.x + 220;
 				scoreUi.y = movesUi.y + goalUi.y + 149;
-
-
 			}
 		}
 
+		var secondaryContainerSize = secondaryContainer.getSize();
+
 		if (mode == LayoutMode.Landscape)
 		{
-			helpsUi.x = HppG.stage2d.width / scaleX - helpsUi.getSize().width / 2 + 30;
-			helpsUi.y = HppG.stage2d.height / 2 / scaleX - helpsUi.getSize().height / 2 + 10;
+			secondaryContainer.isVertical = true;
+			secondaryContainer.reflow();
+			var secondaryContainerSize = secondaryContainer.getSize();
+
+			secondaryContainer.x = HppG.stage2d.width / scaleX - secondaryContainerSize.width - 85;
+			secondaryContainer.y = 10;
 		}
 		else
 		{
-			helpsUi.x = HppG.stage2d.width / 2 / scaleX - helpsUi.getSize().width / 2 + 10;
-			helpsUi.y = HppG.stage2d.height / scaleX - helpsUi.getBounds().height / scaleX - 25;
+			secondaryContainer.isVertical = false;
+			secondaryContainer.reflow();
+			var secondaryContainerSize = secondaryContainer.getSize();
+
+			secondaryContainer.x = HppG.stage2d.width / scaleX / 2 - secondaryContainerSize.width / 2;
+			secondaryContainer.y = HppG.stage2d.height / scaleX - secondaryContainerSize.height - 25;
 		}
 	}
 }

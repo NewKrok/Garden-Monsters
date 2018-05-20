@@ -2,6 +2,9 @@
 	"h": {
 		"welcome": "Welcome",
 		"click_to_continue": "Click to continue!",
+		"select_lang": "Select language",
+		"sound": "Sound",
+		"music": "Music",
 		"play": "Play",
 		"moves": "MOVES",
 		"goals": "Goals",

@@ -9,6 +9,7 @@ import h2d.Bitmap;
 import h2d.Flow;
 import h2d.Layers;
 import h2d.Text;
+import h2d.col.Bounds;
 import hpp.util.Language;
 import hxd.Res;
 import tink.state.Observable;
@@ -24,6 +25,8 @@ class HelpsUI extends Layers
 	var infoTextBack:Bitmap;
 	var label:Text;
 	var helps:Flow;
+
+	var mode:LayoutMode = LayoutMode.Landscape;
 
 	public function new(parent, activateHelp:HelpType->Void, isPossibleToPlay:Observable<Bool>, helpCounts:Map<HelpType, Observable<UInt>>)
 	{
@@ -55,6 +58,8 @@ class HelpsUI extends Layers
 
 	public function setLayoutMode(mode:LayoutMode)
 	{
+		this.mode = mode;
+
 		if (mode == LayoutMode.Landscape)
 		{
 			back.rotation = Math.PI / 2;
@@ -87,5 +92,23 @@ class HelpsUI extends Layers
 			helps.x = back.getSize().width / 2 - helps.getSize().width / 2 + 30;
 			helps.y = back.getSize().height / 2 - helps.getSize().height / 2 + 43;
 		}
+
+		helps.reflow();
+	}
+
+	override public function getSize(?out:h2d.col.Bounds):Bounds
+	{
+		var b = new Bounds();
+		b.x = 0;
+		b.y = 0;
+		b.height = back.tile.height * AppConfig.GAME_BITMAP_SCALE;
+		b.width = back.tile.width * AppConfig.GAME_BITMAP_SCALE;
+
+		if (mode == LayoutMode.Landscape)
+		{
+			b.width = -back.tile.height * AppConfig.GAME_BITMAP_SCALE;
+		}
+
+		return b;
 	}
 }

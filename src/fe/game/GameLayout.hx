@@ -3,6 +3,7 @@ package fe.game;
 import fe.game.Background;
 import fe.game.Elem;
 import fe.game.dialog.GameDialog;
+import fe.game.substate.MenuPage;
 import fe.game.ui.GameUI;
 import h2d.Interactive;
 import h2d.Layers;
@@ -33,6 +34,7 @@ class GameLayout
 	var interactiveArea:Interactive;
 	var gameUI:GameUI;
 	var gameDialog:GameDialog;
+	var menuPage:MenuPage;
 
 	public function new(
 		stage:Base2dStage,
@@ -40,7 +42,8 @@ class GameLayout
 		gameContainer:Layers,
 		interactiveArea:Interactive,
 		gameUI:GameUI,
-		gameDialog:GameDialog
+		gameDialog:GameDialog,
+		menuPage:MenuPage
 	){
 		this.stage = stage;
 		this.background = background;
@@ -48,6 +51,7 @@ class GameLayout
 		this.interactiveArea = interactiveArea;
 		this.gameUI = gameUI;
 		this.gameDialog = gameDialog;
+		this.menuPage = menuPage;
 	}
 
 	public function update(width:UInt, height:UInt):Void
@@ -80,6 +84,8 @@ class GameLayout
 
 		if (mode == LayoutMode.Landscape)
 		{
+			menuPage.setScale(heightRatio);
+
 			gameUI.setScale(heightRatio);
 			gameDialog.setScale(heightRatio);
 
@@ -88,6 +94,8 @@ class GameLayout
 		}
 		else
 		{
+			menuPage.setScale(widthRatio);
+
 			gameUI.setScale(widthRatio);
 			gameDialog.setScale(widthRatio);
 
