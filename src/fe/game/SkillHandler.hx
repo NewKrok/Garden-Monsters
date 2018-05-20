@@ -4,13 +4,17 @@ import fe.game.Board.Map;
 import fe.game.Elem.ElemType;
 import fe.game.util.BoardHelper;
 import fe.game.util.TweenHelper;
+import format.abc.Data.IName;
+import h2d.Bitmap;
 import h2d.Layers;
 import h2d.filter.ColorMatrix;
 import h3d.Matrix;
 import hpp.util.GeomUtil;
 import hpp.util.GeomUtil.SimplePoint;
+import hxd.Res;
 import motion.Actuate;
 import motion.MotionPath;
+import motion.easing.Back;
 import motion.easing.Linear;
 import motion.easing.Quad;
 
@@ -178,7 +182,7 @@ class SkillHandler
 
 	public function addHotPeppers(onComplete:Void->Void):Void
 	{
-		var monsters = BoardHelper.getRandomMonsters(map).splice(0, 3);
+		var monsters = BoardHelper.getMonsters(map).shuffle().splice(0, 3);
 
 		var m = new Matrix();
 		m.identity();
@@ -187,7 +191,6 @@ class SkillHandler
 
 		for (m in monsters)
 		{
-			onElemCollectCallback(m.type);
 			effectHandler.addHotPepperEffect(m.graphic.x, m.graphic.y);
 			map[m.indexY][m.indexX] = null;
 
@@ -195,12 +198,67 @@ class SkillHandler
 				m.graphic.filter = colorFilter;
 			});
 
-			Actuate.tween(m.graphic, .5, {
-
-			}).delay(1).onComplete(function(){
+			Actuate.timer(1.2).onComplete(function(){
+				effectHandler.addMonsterMatchEffect(m.graphic.x, m.graphic.y);
+				onElemCollectCallback(m.type);
 				m.graphic.remove();
 				m = null;
 			});
+		}
+
+		Actuate.timer(1.5).onComplete(onComplete);
+	}
+
+	public function collectRandomFruits(onComplete:Void->Void):Void
+	{
+		var fruits = BoardHelper.getFruits(map).shuffle().splice(0, 3);
+		var index:Int = 0;
+
+		for (f in fruits)
+		{
+			var box = new Bitmap(Res.image.game.block_base.toTile());
+			box.setScale(AppConfig.GAME_BITMAP_SCALE);
+			box.x = f.graphic.x - box.getSize().width / 2;
+			box.y = f.graphic.y - box.getSize().height / 2;
+			box.alpha = 0;
+			container.addChild(box);
+
+			var clone = f.clone();
+			container.addChild(clone.graphic);
+
+			onElemCollectCallback(f.type);
+			map[f.indexY][f.indexX] = null;
+			f.graphic.remove();
+			f = null;
+
+			Actuate.tween(box, .6, {
+				alpha: 1
+			}).delay(index * .2);
+
+			Actuate.tween(clone.graphic, .6, {
+				scaleX: clone.graphic.scaleX - .2,
+				scaleY: clone.graphic.scaleY - .2,
+			}).delay(index * .2).onUpdate(function(){
+				clone.graphic.scaleX = clone.graphic.scaleX;
+			}).onComplete(function(){
+				Actuate.timer(.2).onComplete(function(){
+					effectHandler.addMonsterMatchEffect(clone.graphic.x, clone.graphic.y);
+				});
+				Actuate.tween(clone.graphic, .6, {
+					scaleX: clone.graphic.scaleX + .4,
+					scaleY: clone.graphic.scaleY + .4,
+					alpha: 0
+				}).delay(.1).onUpdate(function(){
+					clone.graphic.scaleX = clone.graphic.scaleX;
+				}).onComplete(function(){
+					clone.graphic.remove();
+					clone = null;
+					box.remove();
+					box = null;
+				});
+			});
+
+			index++;
 		}
 
 		Actuate.timer(1.5).onComplete(onComplete);

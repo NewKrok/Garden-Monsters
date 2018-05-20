@@ -437,7 +437,7 @@ class BoardHelper
 		return possibleElems.random();
 	}
 
-	static public function getRandomMonsters(map:Map):Array<Elem>
+	static public function getMonsters(map:Map):Array<Elem>
 	{
 		var possibleElems:Array<Elem> = [];
 
@@ -449,7 +449,19 @@ class BoardHelper
 					&& e.type.toInt() < 8
 				) possibleElems.push(e);
 
-		possibleElems.shuffle();
+		return possibleElems;
+	}
+
+	static public function getFruits(map:Map):Array<Elem>
+	{
+		var possibleElems:Array<Elem> = [];
+
+		for (row in map)
+			for (e in row)
+				if (
+					e != null
+					&& e.type.toInt() > 7
+				) possibleElems.push(e);
 
 		return possibleElems;
 	}

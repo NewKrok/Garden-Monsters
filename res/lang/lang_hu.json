@@ -13,6 +13,7 @@
 		"level_num": "Szint ${level}",
 		"your_best": "Legjobb Eredményed",
 		"cant_use_help": "Nem tudod használni",
-		"no_monsters_on_the_board": "Nincs egy szörny se a táblán!"
+		"no_monsters_on_the_board": "Nincs egy szörny se a táblán!",
+		"no_fruits_on_the_board": "Nincs egy gyümölcs se a táblán!"
 	}
 }

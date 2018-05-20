@@ -810,6 +810,20 @@ class Board
 
 		return count;
 	}
+
+	public function getCountOfFruits():UInt
+	{
+		var count = 0;
+
+		for (row in map)
+			for (e in row)
+				if (
+					e != null
+					&& e.type.toInt() > 7
+				) count++;
+
+		return count;
+	}
 }
 
 enum DragDirection {

@@ -13,6 +13,7 @@
 		"level_num": "Level ${level}",
 		"your_best": "Your Best Score",
 		"cant_use_help": "You can't use this help",
-		"no_monsters_on_the_board": "There are no any monsters on the board!"
+		"no_monsters_on_the_board": "There are no any monsters on the board!",
+		"no_fruits_on_the_board": "There are no any fruits on the board!"
 	}
 }

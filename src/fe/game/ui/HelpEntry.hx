@@ -92,7 +92,7 @@ class HelpEntry extends Layers
 
 		isPossibleToPlay.bind(function(v:Bool)
 		{
-			if (v) interactive.cursor = Cursor.Button;
+			if (v && availableCount.value > 0) interactive.cursor = Cursor.Button;
 			else interactive.cursor = Cursor.Default;
 		});
 	}

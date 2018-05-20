@@ -215,10 +215,7 @@ class GameState extends Base2dState
 				Actuate.timer(1.6).onComplete(function(){ gameModel.isPossibleToPlay.set(true); });
 
 			case HelpType.HOT_PEPPER:
-				if (board.getCountOfMonsters() > 0)
-				{
-					skillHandler.addHotPeppers(board.analyzeMap);
-				}
+				if (board.getCountOfMonsters() > 0) skillHandler.addHotPeppers(board.analyzeMap);
 				else
 				{
 					gameModel.helps.get(helpType).set(gameModel.helps.get(helpType).value + 1);
@@ -232,7 +229,18 @@ class GameState extends Base2dState
 
 			case HelpType.DICE: board.shuffleElemsRequest();
 
-			case _:
+			case HelpType.FRUIT_BOX:
+				if (board.getCountOfFruits() > 0) skillHandler.collectRandomFruits(board.analyzeMap);
+				else
+				{
+					gameModel.helps.get(helpType).set(gameModel.helps.get(helpType).value + 1);
+					gameDialog.openSmallWarningDialog(Language.get("cant_use_help"), Language.get("no_fruits_on_the_board"));
+					Actuate.timer(2).onComplete(function()
+					{
+						gameDialog.closeSmallWarningDialog();
+						gameModel.isPossibleToPlay.set(true);
+					});
+				}
 		}
 	}
 
