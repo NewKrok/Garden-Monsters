@@ -208,6 +208,11 @@ class GameState extends Base2dState
 		{
 			case HelpType.BOMB: skillHandler.addBomb(board.analyzeMap);
 
+			case HelpType.APPLE_JUICE:
+				gameUI.onMovesIncreased();
+				Actuate.timer(.5).onComplete(function(){ gameModel.remainingMoves.set(gameModel.remainingMoves.value + 3); });
+				Actuate.timer(1.6).onComplete(function(){ gameModel.isPossibleToPlay.set(true); });
+
 			case _:
 		}
 	}

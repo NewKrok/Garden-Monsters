@@ -6,6 +6,9 @@ import h2d.Layers;
 import h2d.Text;
 import hpp.util.Language;
 import hxd.Res;
+import motion.Actuate;
+import motion.easing.Back;
+import motion.easing.Elastic;
 import tink.state.Observable;
 
 /**
@@ -43,6 +46,37 @@ class MovesUI extends Layers
 
 		remainingMoves.bind(function(v) {
 			countText.text = Std.string(v);
+		});
+	}
+
+	public function onMovesIncreased():Void
+	{
+		var img = new Bitmap(Res.image.common.help.apple_juice.toTile(), this);
+		img.smooth = true;
+		img.setScale(.1 * AppConfig.GAME_BITMAP_SCALE);
+		img.tile.dx = cast -img.tile.width / 2;
+		img.tile.dy = cast -img.tile.height / 2;
+		img.alpha = 0;
+		img.x = 130;
+		img.y = 100;
+
+		Actuate.tween(img, .5, {
+			scaleX: 1.5 * AppConfig.GAME_BITMAP_SCALE,
+			scaleY: 1.5 * AppConfig.GAME_BITMAP_SCALE,
+			alpha: 1
+		}).delay(.2).ease(Elastic.easeOut).onUpdate(function(){
+			img.scaleX = img.scaleX;
+		}).onComplete(function(){
+			Actuate.tween(img, .5, {
+				scaleX: .1 * AppConfig.GAME_BITMAP_SCALE,
+				scaleY: .1 * AppConfig.GAME_BITMAP_SCALE,
+				alpha: 0
+			}).delay(.4).ease(Back.easeIn).onUpdate(function(){
+				img.scaleX = img.scaleX;
+			}).onComplete(function(){
+				img.remove();
+				img = null;
+			});
 		});
 	}
 }

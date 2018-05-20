@@ -36,7 +36,9 @@ class GameUI extends Layers
 		helpsUi = new HelpsUI(this, activateHelp, gameModel.isPossibleToPlay, cast gameModel.helps);
 	}
 
-	public function setLayoutMode(mode:LayoutMode)
+	public function onMovesIncreased():Void movesUi.onMovesIncreased();
+
+	public function setLayoutMode(mode:LayoutMode):Void
 	{
 		if (activeLayout == mode)
 		{
