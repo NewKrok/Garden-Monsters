@@ -41,9 +41,10 @@ class HelpsUI extends Layers
 		infoTextBack.setScale(AppConfig.GAME_BITMAP_SCALE);
 
 		label = new Text(Fonts.DEFAULT_M, this);
+		label.maxWidth = infoTextBack.getSize().width;
 		label.smooth = true;
 		label.textColor = 0xFFBF00;
-		label.textAlign = Align.Left;
+		label.textAlign = Align.Center;
 
 		Language.registerTextHolder(cast label, "helps");
 
@@ -67,7 +68,7 @@ class HelpsUI extends Layers
 			infoTextBack.x = -152;
 			infoTextBack.y = back.getSize().height - infoTextBack.getSize().height / 2 - 44;
 
-			label.x = infoTextBack.x + infoTextBack.getSize().width / 2 - label.textWidth / 2;
+			label.x = infoTextBack.x;
 			label.y = infoTextBack.y + 3;
 
 			helps.isVertical = true;
@@ -83,7 +84,7 @@ class HelpsUI extends Layers
 			infoTextBack.x = back.getSize().width - infoTextBack.getSize().width - 50;
 			infoTextBack.y = -19;
 
-			label.x = infoTextBack.x + infoTextBack.getSize().width / 2 - label.textWidth / 2;
+			label.x = infoTextBack.x;
 			label.y = infoTextBack.y + 5;
 
 			helps.isVertical = false;

@@ -26,7 +26,8 @@ class SaveUtil
 			applicationInfo:
 			{
 				soundVolume: 1,
-				musicVolume: 1
+				musicVolume: 1,
+				lang: "en"
 			}
 		};
 	}
@@ -41,4 +42,5 @@ typedef ApplicationInfo =
 {
 	var soundVolume:Float;
 	var musicVolume:Float;
+	var lang:String;
 }

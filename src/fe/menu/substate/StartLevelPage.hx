@@ -72,8 +72,8 @@ class StartLevelPage extends Base2dSubState implements ScalebaleSubState
 
 		closeButton = new BaseButton(dialogWrapper, {
 			onClick: closeRequest,
-			baseGraphic: Res.image.menu.ui.close_button.toTile(),
-			overGraphic: Res.image.menu.ui.close_button_over.toTile()
+			baseGraphic: Res.image.common.ui.close_button.toTile(),
+			overGraphic: Res.image.common.ui.close_button_over.toTile()
 		});
 		closeButton.setScale(AppConfig.GAME_BITMAP_SCALE);
 
@@ -81,8 +81,8 @@ class StartLevelPage extends Base2dSubState implements ScalebaleSubState
 			font: Fonts.DEFAULT_XXL,
 			textOffset: { x:0, y: -10 },
 			onClick: function(_){ startRequest(); },
-			baseGraphic: Res.image.menu.ui.button_s.toTile(),
-			overGraphic: Res.image.menu.ui.button_over_s.toTile()
+			baseGraphic: Res.image.common.ui.button_s.toTile(),
+			overGraphic: Res.image.common.ui.button_over_s.toTile()
 		});
 		Language.registerTextHolder(cast startButton.label, "play");
 		startButton.setScale(AppConfig.GAME_BITMAP_SCALE);

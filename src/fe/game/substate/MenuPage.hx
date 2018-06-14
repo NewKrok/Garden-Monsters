@@ -37,14 +37,20 @@ class MenuPage extends Base2dSubState implements ScalebaleSubState
 	var closeButton:BaseButton;
 	var soundButton:BaseButton;
 	var musicButton:BaseButton;
+	var backToGameButton:BaseButton;
+	var quitButton:BaseButton;
+	var buttonContainer:Flow;
 	var content:Flow;
 
 	var closeRequestCallBack:Void->Void;
+	var quitRequestCallBack:Void->Void;
 
 	public function new(
-		closeRequestCallBack:Void->Void
+		closeRequestCallBack:Void->Void,
+		quitRequestCallBack:Void->Void
 	){
 		this.closeRequestCallBack = closeRequestCallBack;
+		this.quitRequestCallBack = quitRequestCallBack;
 
 		super();
 	}
@@ -97,10 +103,13 @@ class MenuPage extends Base2dSubState implements ScalebaleSubState
 		flagFlow.horizontalSpacing = 15;
 		flagFlow.isVertical = false;
 
-		var engButton = createFlagButton(flagFlow, Res.image.common.ui.flag_en.toTile(), Res.lang.lang_en.entry.getText());
-		var hunButton = createFlagButton(flagFlow, Res.image.common.ui.flag_hu.toTile(), Res.lang.lang_hu.entry.getText());
+		var engButton = createFlagButton(flagFlow, Res.image.common.ui.flag_en.toTile(), Res.lang.lang_en.entry.getText(), "en");
+		var hunButton = createFlagButton(flagFlow, Res.image.common.ui.flag_hu.toTile(), Res.lang.lang_hu.entry.getText(), "hu");
 		engButton.linkToButton(hunButton);
-		engButton.isSelected = true;
+		if (SaveUtil.data.applicationInfo.lang == "en")
+			engButton.isSelected = true;
+		else
+			hunButton.isSelected = true;
 
 		soundButton = new BaseButton(actionFlow, {
 			onClick: function(_) {
@@ -134,10 +143,34 @@ class MenuPage extends Base2dSubState implements ScalebaleSubState
 
 		closeButton = new BaseButton(dialogWrapper, {
 			onClick: closeRequest,
-			baseGraphic: Res.image.menu.ui.close_button.toTile(),
-			overGraphic: Res.image.menu.ui.close_button_over.toTile()
+			baseGraphic: Res.image.common.ui.close_button.toTile(),
+			overGraphic: Res.image.common.ui.close_button_over.toTile()
 		});
 		closeButton.setScale(AppConfig.GAME_BITMAP_SCALE);
+
+		buttonContainer = new Flow(dialogWrapper);
+		buttonContainer.isVertical = false;
+		buttonContainer.horizontalSpacing = 20;
+
+		backToGameButton = new BaseButton(buttonContainer, {
+			onClick: closeRequest,
+			baseGraphic: Res.image.common.ui.button_s.toTile(),
+			overGraphic: Res.image.common.ui.button_over_s.toTile(),
+			font: Fonts.DEFAULT_XXL
+		});
+		backToGameButton.setScale(AppConfig.GAME_BITMAP_SCALE);
+		Language.registerTextHolder(cast backToGameButton.label, "back_to_game");
+
+		quitButton = new BaseButton(buttonContainer, {
+			onClick: function(_) {
+				quitRequestCallBack();
+			},
+			baseGraphic: Res.image.common.ui.button_s.toTile(),
+			overGraphic: Res.image.common.ui.button_over_s.toTile(),
+			font: Fonts.DEFAULT_XXL
+		});
+		quitButton.setScale(AppConfig.GAME_BITMAP_SCALE);
+		Language.registerTextHolder(cast quitButton.label, "quit_game");
 
 		content.x = dialog.getSize().width / 2 - content.getSize().width / 2 - 10;
 		content.y = dialog.getSize().height / 2 - content.getSize().height / 2 - 5;
@@ -146,10 +179,14 @@ class MenuPage extends Base2dSubState implements ScalebaleSubState
 	function getSoundButtonLabel():String return AppConfig.SOUND_VOLUME == 1 ? "off" : "on";
 	function getMusicButtonLabel():String return AppConfig.MUSIC_VOLUME == 1 ? "off" : "on";
 
-	function createFlagButton(parent:Sprite, flagTile:Tile, langString:String):LinkedButton
+	function createFlagButton(parent:Sprite, flagTile:Tile, langString:String, shortcut:String):LinkedButton
 	{
 		var button = new LinkedButton(parent, {
-			onClick: function(_) { Language.setLang(Json.parse(langString)); },
+			onClick: function(_) {
+				Language.setLang(Json.parse(langString));
+				SaveUtil.data.applicationInfo.lang = shortcut;
+				SaveUtil.save();
+			},
 			baseGraphic: Res.image.common.ui.lang_back.toTile(),
 			overGraphic: Res.image.common.ui.lang_back_selected.toTile(),
 			selectedGraphic: Res.image.common.ui.lang_back_selected.toTile(),
@@ -171,6 +208,7 @@ class MenuPage extends Base2dSubState implements ScalebaleSubState
 	{
 		Actuate.tween(background, .5, { alpha: 0 }).ease(Linear.easeNone);
 		closeButton.visible = false;
+		buttonContainer.visible = false;
 
 		dialog.close().handle(function(){ closeRequestCallBack(); });
 	}
@@ -183,6 +221,7 @@ class MenuPage extends Base2dSubState implements ScalebaleSubState
 		background.alpha = 0;
 		Actuate.tween(background, .5, { alpha: 1 }).ease(Linear.easeNone);
 		closeButton.visible = true;
+		buttonContainer.visible = true;
 	}
 
 	override public function onStageResize(width:Float, height:Float)
@@ -193,10 +232,13 @@ class MenuPage extends Base2dSubState implements ScalebaleSubState
 		background.endFill();
 
 		dialogWrapper.x = stage.width / 2;
-		dialogWrapper.y = stage.height / 2;
+		dialogWrapper.y = stage.height / 2 - 100;
 
 		closeButton.x = 315;
 		closeButton.y = -195;
+
+		buttonContainer.x = -buttonContainer.getSize().width / 2;
+		buttonContainer.y = 160;
 	}
 
 	public function setScale(v:Float):Void
@@ -206,7 +248,7 @@ class MenuPage extends Base2dSubState implements ScalebaleSubState
 		if (stage != null)
 		{
 			dialogWrapper.x = stage.width / 2;
-			dialogWrapper.y = stage.height / 2;
+			dialogWrapper.y = stage.height / 2 - 100;
 		}
 	}
 }

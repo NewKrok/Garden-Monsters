@@ -82,7 +82,10 @@ class GameState extends Base2dState
 		effectHandler = new EffectHandler();
 		skillHandler = new SkillHandler();
 
-		menuPage = new MenuPage(closeMenu);
+		menuPage = new MenuPage(
+			closeMenu,
+			function(){ HppG.changeState(MenuState); }
+		);
 
 		reset();
 

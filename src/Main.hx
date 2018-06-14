@@ -28,15 +28,19 @@ class Main extends Base2dApp
 		AppConfig.SOUND_VOLUME = SaveUtil.data.applicationInfo.soundVolume;
 		AppConfig.MUSIC_VOLUME = SaveUtil.data.applicationInfo.musicVolume;
 
+		switch (SaveUtil.data.applicationInfo.lang)
+		{
+			case "en": Language.setLang(Json.parse(Res.lang.lang_en.entry.getText()));
+			case "hu": Language.setLang(Json.parse(Res.lang.lang_hu.entry.getText()));
+			case _: Language.setLang(Json.parse(Res.lang.lang_en.entry.getText()));
+		}
+
 		setDefaultAppSize(AppConfig.APP_WIDTH, AppConfig.APP_HEIGHT);
 		stage.stageScaleMode = StageScaleMode.NO_SCALE;
 
 		Fonts.init();
 		ElemTile.init();
 		HelpTile.init();
-
-		//Language.setLang(Json.parse(Res.lang.lang_hu.entry.getText()));
-		Language.setLang(Json.parse(Res.lang.lang_en.entry.getText()));
 
 		//TestBoard.test();
 
