@@ -4,6 +4,7 @@ import fe.AppConfig;
 import fe.asset.ElemTile;
 import fe.asset.Fonts;
 import fe.asset.HelpTile;
+import fe.common.SaveUtil;
 import fe.state.GameState;
 import fe.state.MenuState;
 import haxe.Json;
@@ -23,6 +24,10 @@ class Main extends Base2dApp
 	{
 		super.init();
 
+		SaveUtil.load();
+		AppConfig.SOUND_VOLUME = SaveUtil.data.applicationInfo.soundVolume;
+		AppConfig.MUSIC_VOLUME = SaveUtil.data.applicationInfo.musicVolume;
+
 		setDefaultAppSize(AppConfig.APP_WIDTH, AppConfig.APP_HEIGHT);
 		stage.stageScaleMode = StageScaleMode.NO_SCALE;
 
@@ -35,8 +40,8 @@ class Main extends Base2dApp
 
 		//TestBoard.test();
 
-		//changeState(GameState);
-		changeState(MenuState);
+		changeState(GameState);
+		//changeState(MenuState);
 	}
 
 	static function main()

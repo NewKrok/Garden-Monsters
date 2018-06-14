@@ -2,6 +2,7 @@ package fe.game.substate;
 
 import fe.asset.Fonts;
 import fe.common.BaseDialog;
+import fe.common.SaveUtil;
 import fe.common.ScalebaleSubState;
 import h2d.Bitmap;
 import h2d.Flow;
@@ -34,6 +35,8 @@ class MenuPage extends Base2dSubState implements ScalebaleSubState
 	var dialogWrapper:Sprite;
 	var dialog:BaseDialog;
 	var closeButton:BaseButton;
+	var soundButton:BaseButton;
+	var musicButton:BaseButton;
 	var content:Flow;
 
 	var closeRequestCallBack:Void->Void;
@@ -61,7 +64,7 @@ class MenuPage extends Base2dSubState implements ScalebaleSubState
 		content.horizontalAlign = FlowAlign.Middle;
 
 		var titleFlow = new Flow(content);
-		titleFlow.verticalSpacing = 20;
+		titleFlow.verticalSpacing = 26;
 		titleFlow.isVertical = true;
 		titleFlow.horizontalAlign = FlowAlign.Right;
 
@@ -99,6 +102,36 @@ class MenuPage extends Base2dSubState implements ScalebaleSubState
 		engButton.linkToButton(hunButton);
 		engButton.isSelected = true;
 
+		soundButton = new BaseButton(actionFlow, {
+			onClick: function(_) {
+				AppConfig.SOUND_VOLUME = AppConfig.SOUND_VOLUME == 1 ? 0 : 1;
+				AppConfig.CHANNEL_GROUP_SOUND.volume = AppConfig.SOUND_VOLUME;
+				SaveUtil.data.applicationInfo.soundVolume = AppConfig.SOUND_VOLUME;
+				SaveUtil.save();
+				Language.updateTextHolderText(cast soundButton.label, getSoundButtonLabel());
+			},
+			baseGraphic: Res.image.common.ui.button_xs.toTile(),
+			overGraphic: Res.image.common.ui.button_over_xs.toTile(),
+			font: Fonts.DEFAULT_XL
+		});
+		soundButton.setScale(AppConfig.GAME_BITMAP_SCALE);
+		Language.registerTextHolder(cast soundButton.label, getSoundButtonLabel());
+
+		musicButton = new BaseButton(actionFlow, {
+			onClick: function(_) {
+				AppConfig.MUSIC_VOLUME = AppConfig.MUSIC_VOLUME == 1 ? 0 : 1;
+				AppConfig.CHANNEL_GROUP_MUSIC.volume = AppConfig.MUSIC_VOLUME;
+				SaveUtil.data.applicationInfo.musicVolume = AppConfig.MUSIC_VOLUME;
+				SaveUtil.save();
+				Language.updateTextHolderText(cast musicButton.label, getMusicButtonLabel());
+			},
+			baseGraphic: Res.image.common.ui.button_xs.toTile(),
+			overGraphic: Res.image.common.ui.button_over_xs.toTile(),
+			font: Fonts.DEFAULT_XL
+		});
+		musicButton.setScale(AppConfig.GAME_BITMAP_SCALE);
+		Language.registerTextHolder(cast musicButton.label, getMusicButtonLabel());
+
 		closeButton = new BaseButton(dialogWrapper, {
 			onClick: closeRequest,
 			baseGraphic: Res.image.menu.ui.close_button.toTile(),
@@ -109,6 +142,9 @@ class MenuPage extends Base2dSubState implements ScalebaleSubState
 		content.x = dialog.getSize().width / 2 - content.getSize().width / 2 - 10;
 		content.y = dialog.getSize().height / 2 - content.getSize().height / 2 - 5;
 	}
+
+	function getSoundButtonLabel():String return AppConfig.SOUND_VOLUME == 1 ? "off" : "on";
+	function getMusicButtonLabel():String return AppConfig.MUSIC_VOLUME == 1 ? "off" : "on";
 
 	function createFlagButton(parent:Sprite, flagTile:Tile, langString:String):LinkedButton
 	{
