@@ -1,4 +1,5 @@
 package fe.common;
+
 import hxd.Save;
 
 /**
@@ -28,7 +29,14 @@ class SaveUtil
 				soundVolume: 1,
 				musicVolume: 1,
 				lang: "en"
-			}
+			},
+			levelInfos:
+			[{
+				id: 0,
+				isEnabled: true,
+				isCompleted: false,
+				score: 0
+			}]
 		};
 	}
 }
@@ -36,6 +44,7 @@ class SaveUtil
 typedef SavedData =
 {
 	var applicationInfo:ApplicationInfo;
+	var levelInfos:Array<LevelInfo>;
 }
 
 typedef ApplicationInfo =
@@ -43,4 +52,12 @@ typedef ApplicationInfo =
 	var soundVolume:Float;
 	var musicVolume:Float;
 	var lang:String;
+}
+
+typedef LevelInfo =
+{
+	var id:UInt;
+	var isEnabled:Bool;
+	var isCompleted:Bool;
+	var score:UInt;
 }

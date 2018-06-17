@@ -6,11 +6,15 @@ import fe.common.ScalebaleSubState;
 import h2d.Flow;
 import h2d.Flow.FlowAlign;
 import h2d.Graphics;
+import h2d.Interactive;
 import h2d.Sprite;
 import h2d.Text;
 import h2d.Text.Align;
 import hpp.heaps.Base2dSubState;
+import hpp.heaps.HppG;
 import hpp.util.Language;
+import hxd.Cursor;
+import hxd.Event;
 import hxd.Res;
 import motion.Actuate;
 import motion.easing.Linear;
@@ -27,6 +31,14 @@ class WelcomePage extends Base2dSubState implements ScalebaleSubState
 	var dialogWrapper:Sprite;
 	var dialog:BaseDialog;
 	var content:Flow;
+	var interactiveArea:Interactive;
+	var onCloseRequest:Void->Void;
+
+	public function new(onCloseRequest:Void->Void)
+	{
+		super();
+		this.onCloseRequest = onCloseRequest;
+	}
 
 	override function build()
 	{
@@ -60,16 +72,15 @@ class WelcomePage extends Base2dSubState implements ScalebaleSubState
 
 		Actuate.timer(.2).onComplete(function() { dialog.open(); });
 		Actuate.tween(background, .5, { alpha: 1 });
-	}
 
-	public function closeRequest():Future<Noise>
-	{
-		var t = Future.trigger();
+		interactiveArea = new Interactive(HppG.stage2d.width, HppG.stage2d.height, container);
+		interactiveArea.cursor = Cursor.Button;
 
-		Actuate.tween(background, .5, { alpha: 0 }).ease(Linear.easeNone);
-		dialog.close().handle(function(){ t.trigger(Noise); });
-
-		return t.asFuture();
+		interactiveArea.onClick = function(e:Event)
+		{
+			Actuate.tween(background, .5, { alpha: 0 }).ease(Linear.easeNone);
+			dialog.close().handle(onCloseRequest);
+		}
 	}
 
 	override public function onStageResize(width:Float, height:Float)
@@ -81,6 +92,9 @@ class WelcomePage extends Base2dSubState implements ScalebaleSubState
 
 		dialogWrapper.x = stage.width / 2;
 		dialogWrapper.y = stage.height / 2;
+
+		interactiveArea.width = HppG.stage2d.width;
+		interactiveArea.height = HppG.stage2d.height;
 	}
 
 	public function setScale(v:Float):Void

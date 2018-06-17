@@ -44,8 +44,8 @@ class Main extends Base2dApp
 
 		//TestBoard.test();
 
-		changeState(GameState);
-		//changeState(MenuState);
+		//changeState(GameState);
+		changeState(MenuState);
 	}
 
 	static function main()
@@ -56,5 +56,3 @@ class Main extends Base2dApp
 }
 
 // handle mosue scroll in menu
-// fix position of game container
-// fiXml sound issue
