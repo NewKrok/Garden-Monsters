@@ -1,6 +1,7 @@
 package fe.state;
 
 import fe.asset.Level;
+import fe.common.SaveUtil;
 import fe.menu.MenuLayout;
 import fe.menu.MenuModel;
 import fe.menu.substate.StartLevelPage;
@@ -57,7 +58,8 @@ class MenuState extends Base2dState
 			function(){ HppG.changeState(GameState, [menuModel.selectedLevelId.value]); },
 			closeSubState,
 			menuModel.selectedLevelId,
-			menuModel.selectedRawMap
+			menuModel.selectedRawMap,
+			menuModel.selectedLevelsHighScore
 		);
 
 		layout = new MenuLayout(
@@ -84,7 +86,8 @@ class MenuState extends Base2dState
 		if (levelId != menuModel.selectedLevelId.value)
 		{
 			menuModel.selectedLevelId.set(levelId);
-			menuModel.selectedRawMap.set(Level.getLevelData(levelId).rawMap);
+			menuModel.selectedRawMap.set(Level.getLevelConfig(levelId).rawMap);
+			menuModel.selectedLevelsHighScore.set(SaveUtil.getLevelInfo(levelId).score);
 		}
 
 		menuMap.disable();

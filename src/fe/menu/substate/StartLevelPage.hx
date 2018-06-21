@@ -13,6 +13,7 @@ import hpp.heaps.Base2dSubState;
 import hpp.heaps.HppG;
 import hpp.heaps.ui.BaseButton;
 import hpp.util.Language;
+import hpp.util.NumberUtil;
 import hxd.Res;
 import motion.Actuate;
 import motion.easing.Linear;
@@ -38,17 +39,20 @@ class StartLevelPage extends Base2dSubState implements ScalebaleSubState
 	var closeRequestCallBack:Void->Void;
 	var selectedLevelId:Observable<UInt>;
 	var selectedRawMap:Observable<Array<Array<Int>>>;
+	var highScore:Observable<UInt>;
 
 	public function new(
 		startRequest:Void->Void,
 		closeRequestCallBack:Void->Void,
 		selectedLevelId:Observable<UInt>,
-		selectedRawMap:Observable<Array<Array<Int>>>
+		selectedRawMap:Observable<Array<Array<Int>>>,
+		highScore:Observable<UInt>
 	){
 		this.startRequest = startRequest;
 		this.closeRequestCallBack = closeRequestCallBack;
 		this.selectedLevelId = selectedLevelId;
 		this.selectedRawMap = selectedRawMap;
+		this.highScore = highScore;
 
 		super();
 	}
@@ -127,8 +131,9 @@ class StartLevelPage extends Base2dSubState implements ScalebaleSubState
 		playersBestScoreText.textAlign = Align.Left;
 		playersBestScoreText.text = "N/A";
 
-		//TODO update
-		//playersBestScoreText.text = playersBestScore.value == 0 ? "N/A" : NumberUtil.formatNumber(v);
+		highScore.bind(function(s){
+			playersBestScoreText.text = s == 0 ? "N/A" : NumberUtil.formatNumber(s);
+		});
 	}
 
 	override public function onStageResize(width:Float, height:Float)

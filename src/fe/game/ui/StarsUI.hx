@@ -29,27 +29,27 @@ class StarsUI extends Layers
 	{
 		super(parent);
 
-		leftStarInactive = new Bitmap(Res.image.game.ui.ingame_stars_left_inactive.toTile(), this);
+		leftStarInactive = new Bitmap(Res.image.common.ui.stars_left_inactive.toTile(), this);
 		leftStarInactive.smooth = true;
 		leftStarInactive.setScale(AppConfig.GAME_BITMAP_SCALE);
 		leftStarMask = new Mask(cast leftStarInactive.getSize().width, cast leftStarInactive.getSize().height, this);
-		leftStar = new Bitmap(Res.image.game.ui.ingame_stars_left.toTile(), leftStarMask);
+		leftStar = new Bitmap(Res.image.common.ui.stars_left.toTile(), leftStarMask);
 		leftStar.smooth = true;
 		leftStar.setScale(AppConfig.GAME_BITMAP_SCALE);
 
-		rightStarInactive = new Bitmap(Res.image.game.ui.ingame_stars_right_inactive.toTile(), this);
+		rightStarInactive = new Bitmap(Res.image.common.ui.stars_right_inactive.toTile(), this);
 		rightStarInactive.smooth = true;
 		rightStarInactive.setScale(AppConfig.GAME_BITMAP_SCALE);
 		rightStarMask = new Mask(cast rightStarInactive.getSize().width, cast rightStarInactive.getSize().height, this);
-		rightStar = new Bitmap(Res.image.game.ui.ingame_stars_right.toTile(), rightStarMask);
+		rightStar = new Bitmap(Res.image.common.ui.stars_right.toTile(), rightStarMask);
 		rightStar.smooth = true;
 		rightStar.setScale(AppConfig.GAME_BITMAP_SCALE);
 
-		middleStarInactive = new Bitmap(Res.image.game.ui.ingame_stars_middle_inactive.toTile(), this);
+		middleStarInactive = new Bitmap(Res.image.common.ui.stars_middle_inactive.toTile(), this);
 		middleStarInactive.smooth = true;
 		middleStarInactive.setScale(AppConfig.GAME_BITMAP_SCALE);
 		middleStarMask = new Mask(cast leftStarInactive.getSize().width, cast leftStarInactive.getSize().height, this);
-		middleStar = new Bitmap(Res.image.game.ui.ingame_stars_middle.toTile(), middleStarMask);
+		middleStar = new Bitmap(Res.image.common.ui.stars_middle.toTile(), middleStarMask);
 		middleStar.smooth = true;
 		middleStar.setScale(AppConfig.GAME_BITMAP_SCALE);
 

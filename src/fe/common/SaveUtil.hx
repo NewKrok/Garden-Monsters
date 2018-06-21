@@ -20,6 +20,28 @@ class SaveUtil
 		Save.save(data, AppConfig.APP_NAME);
 	}
 
+	public static function getLevelInfo(levelId:UInt):LevelInfo
+	{
+		return data.levelInfos.filter(function (info) {
+			return info.id == levelId;
+		})[0];
+	}
+
+	public static function enableLevel(levelId:UInt)
+	{
+		if (data.levelInfos.filter(function (info) {
+			return info.id == levelId;
+		}).length == 0)
+		{
+			data.levelInfos.push({
+				id: levelId,
+				isEnabled: true,
+				isCompleted: false,
+				score: 0
+			});
+		}
+	}
+
 	static function getEmptyData():SavedData
 	{
 		return

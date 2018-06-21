@@ -18,7 +18,6 @@ import tink.state.Observable;
 class MovesUI extends Layers
 {
 	var countText:Text;
-	var isStarRegistered:Bool = false;
 
 	public function new(parent, remainingMoves:Observable<UInt>)
 	{

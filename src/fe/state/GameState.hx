@@ -1,5 +1,6 @@
 package fe.state;
 
+import fe.common.SaveUtil;
 import fe.game.GameLayout;
 import fe.asset.Level;
 import fe.game.Background;
@@ -89,7 +90,7 @@ class GameState extends Base2dState
 
 		reset();
 
-		loadLevel(Level.getLevelData(gameModel.levelId));
+		loadLevel(Level.getLevelConfig(gameModel.levelId));
 
 		gameUI = new GameUI(stage, openMenu, gameModel, activateHelp);
 		gameDialog = new GameDialog(stage, gameModel);
@@ -145,7 +146,7 @@ class GameState extends Base2dState
 		}
 	}
 
-	function loadLevel(data:LevelData)
+	function loadLevel(data:LevelConfig)
 	{
 		gameModel.remainingMoves.set(data.maxMovement);
 		gameModel.starRequirements = data.starRequirements.concat([]);
@@ -202,6 +203,27 @@ class GameState extends Base2dState
 
 				if (gameModel.remainingMoves.value == 0)
 				{
+					var isWon:Bool = true;
+					for (key in gameModel.elemGoals.keys())
+					{
+						if (gameModel.elemGoals.get(key).collected < gameModel.elemGoals.get(key).expected)
+						{
+							isWon = false;
+							break;
+						}
+					}
+
+					if (isWon)
+					{
+						var savedData = SaveUtil.getLevelInfo(gameModel.levelId);
+						savedData.score = gameModel.score.value;
+						savedData.isCompleted = true;
+
+						if (gameModel.levelId + 1 < 20) SaveUtil.enableLevel(gameModel.levelId + 1);
+
+						SaveUtil.save();
+					}
+
 					Actuate.timer(2).onComplete(function()
 					{
 						HppG.changeState(MenuState, [true]);

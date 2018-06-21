@@ -1,5 +1,9 @@
 package fe.menu.ui;
 
+import fe.asset.Level;
+import fe.asset.Level.LevelConfig;
+import fe.common.SaveUtil;
+import fe.common.SaveUtil.LevelInfo;
 import h2d.Bitmap;
 import h2d.Interactive;
 import h2d.Layers;
@@ -100,12 +104,22 @@ class MenuMap extends Layers
 		levelButtons = [];
 		for (i in 0...levelButtonPoints.length)
 		{
-			var levelButton = new LevelButton(menuContainer, i, function(levelId)
-			{
-				startLevelRequest(levelId);
-			});
+			var savedLevelInfo:LevelInfo = SaveUtil.getLevelInfo(i);
+			var levelConfig:LevelConfig = Level.getLevelConfig(i);
+			var levelButton = new LevelButton(
+				menuContainer,
+				i,
+				savedLevelInfo != null ? !savedLevelInfo.isEnabled : true,
+				savedLevelInfo != null ? savedLevelInfo.isCompleted : false,
+				savedLevelInfo != null ? scoreToStar(savedLevelInfo.score, levelConfig.starRequirements) : 0,
+				function(levelId)
+				{
+					startLevelRequest(levelId);
+				}
+			);
 			levelButton.x = (levelButtonPoints[i].x + levelButton.getSize().width / 2 + buttonPadding) * AppConfig.GAME_BITMAP_SCALE;
 			levelButton.y = (levelButtonPoints[i].y + levelButton.getSize().height / 2 + buttonPadding) * AppConfig.GAME_BITMAP_SCALE;
+
 			levelButtons.push(levelButton);
 		}
 
@@ -179,6 +193,17 @@ class MenuMap extends Layers
 		};
 
 		menuContainer.y = -backgroundContainer.getSize().height * menuContainer.scaleY + HppG.stage2d.height;
+	}
+
+	function scoreToStar(score:UInt, starRequirements:Array<UInt>):UInt
+	{
+		for (i in 0...starRequirements.length)
+		{
+			if (score == starRequirements[i]) return cast Math.min(i + 1, starRequirements.length);
+			if (score < starRequirements[i]) return i;
+		}
+
+		return 0;
 	}
 
 	function recalculateLeafPositions()

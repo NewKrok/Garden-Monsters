@@ -8,7 +8,7 @@ import fe.game.Elem.ElemType;
  */
 class Level
 {
-	static var data:Array<LevelData> =
+	static var config:Array<LevelConfig> =
 	[
 		// LV 1 =====================================
 		{
@@ -365,9 +365,9 @@ class Level
 		}
 	];
 
-	public static function getLevelData(id:UInt):LevelData
+	public static function getLevelConfig(id:UInt):LevelConfig
 	{
-		if (id < data.length) return data[id];
+		if (id < config.length) return config[id];
 		else return {
 			maxMovement: 0,
 			rawMap: [],
@@ -377,7 +377,7 @@ class Level
 	}
 }
 
-typedef LevelData =
+typedef LevelConfig =
 {
 	var maxMovement:UInt;
 	var rawMap:Array<Array<Int>>;
