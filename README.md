@@ -1,8 +1,8 @@
 # Garden-Monsters
 Match3 game made in Haxe with Heaps
 
-## Try it now
-- coming soon
+## Try it now (Pre alpha version)
+- https://flashplusplus.net/haxe/gm/index.html
 
 ## Dependencies
 - **Heaps forked*** High Performance Game Framework. http://heaps.io/
