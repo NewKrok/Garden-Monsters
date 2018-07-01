@@ -7,10 +7,12 @@ import fe.menu.MenuModel;
 import fe.menu.substate.StartLevelPage;
 import fe.menu.substate.WelcomePage;
 import fe.menu.ui.MenuMap;
+import fe.menu.ui.MenuUI;
 import h2d.Layers;
 import hpp.heaps.Base2dStage;
 import hpp.heaps.Base2dState;
 import hpp.heaps.HppG;
+import hpp.util.HPPServices;
 import hxd.Res;
 import hxd.res.Sound;
 import motion.Actuate;
@@ -24,6 +26,7 @@ class MenuState extends Base2dState
 
 	var welcomePage:WelcomePage;
 	var startLevelPage:StartLevelPage;
+	var menuUI:MenuUI;
 
 	var backgroundLoopMusic:Sound;
 
@@ -46,6 +49,7 @@ class MenuState extends Base2dState
 	override function build()
 	{
 		menuMap = new MenuMap(new Layers(stage), startLevelRequest);
+		menuUI = new MenuUI(stage, HPPServices.open);
 
 		welcomePage = new WelcomePage(function()
 		{
@@ -64,6 +68,7 @@ class MenuState extends Base2dState
 
 		layout = new MenuLayout(
 			stage,
+			menuUI,
 			menuMap,
 			welcomePage,
 			startLevelPage

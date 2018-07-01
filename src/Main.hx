@@ -10,6 +10,7 @@ import fe.state.MenuState;
 import haxe.Json;
 import hpp.heaps.Base2dApp;
 import hpp.heaps.Base2dStage.StageScaleMode;
+import hpp.util.HPPServices;
 import hpp.util.Language;
 import hxd.Res;
 import test.TestBoard;
@@ -23,6 +24,8 @@ class Main extends Base2dApp
 	override function init()
 	{
 		super.init();
+
+		HPPServices.init("hppservices", AppConfig.APP_ID);
 
 		SaveUtil.load();
 		AppConfig.SOUND_VOLUME = SaveUtil.data.applicationInfo.soundVolume;

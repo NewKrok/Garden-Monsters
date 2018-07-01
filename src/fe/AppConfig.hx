@@ -8,7 +8,8 @@ import hxd.snd.ChannelGroup;
  */
 class AppConfig
 {
-	public static inline var APP_NAME:String = "FPP-GardenMonster";
+	public static inline var APP_NAME:String = "FPP-GardenMonsters";
+	public static inline var APP_ID:String = "garden-monsters";
 
 	public static inline var APP_WIDTH:Int = 1136;
 	public static inline var APP_HEIGHT:Int = 1136;

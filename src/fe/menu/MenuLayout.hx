@@ -2,8 +2,7 @@ package fe.menu;
 
 import fe.common.ScalebaleSubState;
 import fe.menu.ui.MenuMap;
-import h2d.Layers;
-import h2d.Sprite;
+import fe.menu.ui.MenuUI;
 import hpp.heaps.Base2dStage;
 
 /**
@@ -17,17 +16,20 @@ class MenuLayout
 	var mode:LayoutMode = LayoutMode.Landscape;
 	var stage:Base2dStage;
 
+	var menuUI:MenuUI;
 	var menuMap:MenuMap;
 	var welcomePage:ScalebaleSubState;
 	var startLevelPage:ScalebaleSubState;
 
 	public function new(
 		stage:Base2dStage,
+		menuUI:MenuUI,
 		menuMap:MenuMap,
 		welcomePage:ScalebaleSubState,
 		startLevelPage:ScalebaleSubState
 	){
 		this.stage = stage;
+		this.menuUI = menuUI;
 		this.menuMap = menuMap;
 		this.welcomePage = welcomePage;
 		this.startLevelPage = startLevelPage;
@@ -40,6 +42,7 @@ class MenuLayout
 		var widthRatio = stage.width / stage.defaultWidth;
 		var heightRatio = stage.height / stage.defaultHeight;
 
+		menuUI.updateScale(stage.width / menuContainerDefaultWidth);
 		menuMap.updateScale(stage.width / menuContainerDefaultWidth);
 
 		if (mode == LayoutMode.Landscape)
