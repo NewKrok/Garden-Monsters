@@ -105,9 +105,6 @@ class GameLayout
 
 		gameUI.setLayoutMode(mode);
 
-		gameDialog.x = gameContainer.x + gameContainer.getSize().width / 2;
-		gameDialog.y = gameContainer.y + gameContainer.getSize().height / 2;
-
 		interactiveArea.width = stage.width;
 		interactiveArea.height = stage.height;
 	}

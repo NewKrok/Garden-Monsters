@@ -86,6 +86,8 @@ class LevelButton extends Layers
 		interactive.onOut = onOutHandler;
 		interactive.x = -tile.width / 2;
 		interactive.y = -tile.height / 2;
+
+		isEnabled = false;
 	}
 
 	function buildStarView()

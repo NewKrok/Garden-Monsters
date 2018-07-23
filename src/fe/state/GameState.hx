@@ -304,6 +304,7 @@ class GameState extends Base2dState
 		super.onStageResize(width, height);
 
 		layout.update(width, height);
+		gameDialog.onStageResize(width, height);
 	}
 
 	function resumeRequest()

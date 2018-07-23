@@ -191,8 +191,6 @@ class MenuMap extends Layers
 				}
 			}
 		};
-
-		menuContainer.y = -backgroundContainer.getSize().height * menuContainer.scaleY + HppG.stage2d.height;
 	}
 
 	function scoreToStar(score:UInt, starRequirements:Array<UInt>):UInt
@@ -203,7 +201,7 @@ class MenuMap extends Layers
 			if (score < starRequirements[i]) return i;
 		}
 
-		return 0;
+		return starRequirements.length;
 	}
 
 	function recalculateLeafPositions()
@@ -233,7 +231,7 @@ class MenuMap extends Layers
 	public function onStageResize()
 	{
 		Actuate.stop(menuContainer);
-		menuContainer.y = normalizeContainerY(menuContainer.y);
+		menuContainer.y = normalizeContainerY(-backgroundContainer.getSize().height * menuContainer.scaleY + HppG.stage2d.height);
 		recalculateLeafPositions();
 
 		interactiveArea.width = HppG.stage2d.width;
